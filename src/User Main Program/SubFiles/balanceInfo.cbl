@@ -5,13 +5,19 @@
       * Tectonics: cobc
       ******************************************************************
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. YOUR-PROGRAM-NAME.
+       PROGRAM-ID. balanceInfo.
+       ENVIRONMENT DIVISION.
+
+       INPUT-OUTPUT SECTION.
+
        DATA DIVISION.
        FILE SECTION.
        WORKING-STORAGE SECTION.
-       PROCEDURE DIVISION.
-       MAIN-PROCEDURE.
-            DISPLAY "Hello world"
-            STOP RUN.
-       END PROGRAM YOUR-PROGRAM-NAME.
+       LINKAGE SECTION.
+       01  UID pic 9(5).
+       PROCEDURE DIVISION using REFERENCE UID.
+           DISPLAY UID
+           exit PROGRAM.
+      *Procedures will be declare here*****
 
+       END PROGRAM balanceInfo.

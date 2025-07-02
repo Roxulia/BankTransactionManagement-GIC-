@@ -5,13 +5,19 @@
       * Tectonics: cobc
       ******************************************************************
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. YOUR-PROGRAM-NAME.
+       PROGRAM-ID. encryption.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT section.
        DATA DIVISION.
        FILE SECTION.
        WORKING-STORAGE SECTION.
-       PROCEDURE DIVISION.
+       LINKAGE SECTION.
+       01  password pic x(20).
+       01  encPassword pic x(255).
+       PROCEDURE DIVISION using REFERENCE password,encPassword.
+           move password to encPassword
+           exit PROGRAM.
        MAIN-PROCEDURE.
             DISPLAY "Hello world"
             STOP RUN.
-       END PROGRAM YOUR-PROGRAM-NAME.
-
+       END PROGRAM encryption.
