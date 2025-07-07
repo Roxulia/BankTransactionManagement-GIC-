@@ -182,7 +182,7 @@
                    when  EQUAL 4
                        perform deposit-page
                    when EQUAL 5
-      *                call 'adminCreate'
+                      call 'adminCreate' using statusCode
                        display "Create Admin Page"
                        perform home-page
                    when equal 6

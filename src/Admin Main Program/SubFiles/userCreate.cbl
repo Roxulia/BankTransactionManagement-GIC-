@@ -9,7 +9,7 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT UserFile ASSIGN TO 'BankingPrj/UserAccounts.DAT'
+           SELECT UserFile ASSIGN TO 'XXXXXX/UserAccounts.DAT'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
