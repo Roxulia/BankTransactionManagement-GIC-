@@ -20,9 +20,9 @@
 
        PROCEDURE DIVISION.
        MAIN-PARA.
-           PERFORM GET-LOGIN-INFO
+      *     PERFORM GET-LOGIN-INFO
            PERFORM VALIDATE-INPUT
-           PERFORM DISPLAY-RESULT
+      *     PERFORM DISPLAY-RESULT
            STOP RUN.
 
        GET-LOGIN-INFO.
@@ -32,9 +32,54 @@
            ACCEPT WS-PASSWORD.
 
        VALIDATE-INPUT.
+           move "" to WS-USERNAME
+           move "" to WS-PASSWORD
            CALL 'userNamePassVal' USING WS-USERNAME
                                       WS-PASSWORD
-                                      WS-RETURN-CODE.
+                                      WS-RETURN-CODE
+           PERFORM DISPLAY-RESULT
+           move "abcd" to WS-USERNAME
+           move " " to WS-PASSWORD
+           CALL 'userNamePassVal' using WS-USERNAME,WS-PASSWORD,
+           WS-RETURN-CODE
+           PERFORM DISPLAY-RESULT
+           move " abd" to WS-USERNAME
+           move "abc " to WS-PASSWORD
+           call 'userNamePassVal' using WS-USERNAME,WS-PASSWORD,
+           WS-RETURN-CODE
+           PERFORM DISPLAY-RESULT
+           move "abd" to WS-USERNAME
+           move "abc" to WS-PASSWORD
+           call 'userNamePassVal' using WS-USERNAME,WS-PASSWORD,
+           WS-RETURN-CODE
+           PERFORM DISPLAY-RESULT
+           move "abd" to WS-USERNAME
+           move "abcdefghi" to WS-PASSWORD
+           call 'userNamePassVal' using WS-USERNAME,WS-PASSWORD,
+           WS-RETURN-CODE
+           PERFORM DISPLAY-RESULT
+           move "abd" to WS-USERNAME
+           move "ABCDEFGHI" to WS-PASSWORD
+           call 'userNamePassVal' using WS-USERNAME,WS-PASSWORD,
+           WS-RETURN-CODE
+           PERFORM DISPLAY-RESULT
+           move "abd" to WS-USERNAME
+           move "AbcDefghi" to WS-PASSWORD
+           call 'userNamePassVal' using WS-USERNAME,WS-PASSWORD,
+           WS-RETURN-CODE
+           PERFORM DISPLAY-RESULT
+           move "abd" to WS-USERNAME
+           move "AbcDefghi1" to WS-PASSWORD
+           call 'userNamePassVal' using WS-USERNAME,WS-PASSWORD,
+           WS-RETURN-CODE
+           PERFORM DISPLAY-RESULT
+           move "abd" to WS-USERNAME
+           move "AbcDefghi1@" to WS-PASSWORD
+           call 'userNamePassVal' using WS-USERNAME,WS-PASSWORD,
+           WS-RETURN-CODE
+           PERFORM DISPLAY-RESULT
+           .
+                       
        DISPLAY-RESULT.
            EVALUATE WS-RETURN-CODE
                WHEN 0
