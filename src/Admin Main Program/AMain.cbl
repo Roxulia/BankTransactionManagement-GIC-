@@ -170,7 +170,7 @@
            perform UNTIL homepageOpt = 99
                EVALUATE homepageOpt
                    when EQUAL 1
-      *                call 'userCreate'
+                       call 'userCreate' using statusCode
                        display "Create User Page"
                        perform home-page
                    when  EQUAL 2
@@ -182,7 +182,7 @@
                    when  EQUAL 4
                        perform deposit-page
                    when EQUAL 5
-      *                call 'adminCreate'
+                      call 'adminCreate' using statusCode
                        display "Create Admin Page"
                        perform home-page
                    when equal 6
