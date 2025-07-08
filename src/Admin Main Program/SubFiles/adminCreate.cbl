@@ -11,7 +11,8 @@
        FILE-CONTROL.
 
           *>fix this file directory plsss <3
-           SELECT AdminFile ASSIGN TO 'XXXXXX/AdminAccounts.DAT'
+           SELECT AdminFile 
+           ASSIGN TO '../../../data/AdminAccounts.dat'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS AID
@@ -133,7 +134,8 @@
           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
            *> Call encryption submodule
 
-           CALL 'encryption' USING BY CONTENT PlainPassword
+           CALL '../../UtilityFunctions/bin/encryption' 
+           USING BY CONTENT PlainPassword
                                               EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."
@@ -159,6 +161,7 @@
                        WITH NO ADVANCING
                    DISPLAY "successfully."
                    MOVE 0 TO WS-ReturnCode
+                   display esc RESET-CODE
            END-WRITE
 
            CLOSE AdminFile.
@@ -166,6 +169,6 @@
           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
           *>Sub routine to end the program if something happened
            End-Program.
-           STOP RUN.
+           exit program.
 
        END PROGRAM adminCreate.
