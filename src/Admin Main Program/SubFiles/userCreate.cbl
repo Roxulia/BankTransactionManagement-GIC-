@@ -9,7 +9,7 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT UserFile ASSIGN TO 'XXXXXX/UserAccounts.DAT'
+           SELECT UserFile ASSIGN TO '../../../data/UserAccounts.dat'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
@@ -66,7 +66,7 @@
 
            OPEN INPUT UserFile
            IF WS-FS  = '35'
-               DISPLAY "No file with name AdminAccounts.DAT , creating"
+               DISPLAY "No file with name UserAccounts.DAT , creating"
                OPEN OUTPUT UserFile
                CLOSE UserFile
            END-IF
@@ -187,8 +187,8 @@
           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
           *> Call encryption submodule( to uncomment after encryption sub)
 
-           CALL 'encryption' USING BY CONTENT PlainPassword
-                                              EncryptedPassword
+           CALL '../../UtilityFunctions/bin/encryption' 
+           USING BY CONTENT PlainPassword,EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."
                MOVE 4 TO WS-ReturnCode
@@ -215,7 +215,7 @@
                    DISPLAY ESC GREEN-CODE "User account created"
                        WITH NO ADVANCING
                    DISPLAY "successfully."
-
+                   DISPLAY ESC RESET-CODE
                    MOVE 0 TO WS-ReturnCode
            END-WRITE
 
@@ -225,7 +225,7 @@
           *>Sub routine to end the program if something happened
 
            End-Program.
-           STOP RUN.
+           exit PROGRAM.
 
           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
        END PROGRAM userCreate.
