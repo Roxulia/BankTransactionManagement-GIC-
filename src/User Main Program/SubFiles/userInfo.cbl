@@ -1,7 +1,7 @@
       ******************************************************************
-      * Author:
-      * Date:
-      * Purpose:
+      * Author: Nyan Ye Thu
+      * Date:4.7.2025
+      * Purpose:Bank Transaction Management
       * Tectonics: cobc
       ******************************************************************
        IDENTIFICATION DIVISION.
