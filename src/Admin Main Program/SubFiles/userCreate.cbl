@@ -49,10 +49,7 @@
        77  VALID-PHONE         PIC X VALUE 'N'.
 
        *>For display colors
-       77  RED-CODE            PIC X(6) VALUE "[1;31m".*> set red
-       77  ESC                 PIC X    VALUE X"1B".   *> ASCII ESC
-       77  RESET-CODE          PIC X(4) VALUE "[0m".   *> reset
-       77  GREEN-CODE          PIC X(6) VALUE "[1;32m".*>set green
+       COPY "../../Utility Functions/colorCodes.cpy"
 
        LINKAGE SECTION.
        01  WS-ReturnCode       PIC 9(4) VALUE 0.
@@ -143,9 +140,9 @@
                    END-PERFORM
                    MOVE 'Y' TO VALID-PHONE
                ELSE
-                  DISPLAY ESC RED-CODE">> ERROR: You must enter "
+                  DISPLAY ESC REDX">> ERROR: You must enter "
                        WITH NO ADVANCING
-                  DISPLAY "exactly 9 digits." ESC RESET-CODE
+                  DISPLAY "exactly 9 digits." ESC RESETX
                END-IF
            END-PERFORM
 
@@ -174,20 +171,20 @@
                UID               DELIMITED BY SIZE
            INTO ULoginName
 
-           DISPLAY ESC RED-CODE"======================================="
+           DISPLAY ESC REDX"======================================="
            DISPLAY "!! REMEMBER YOUR LOGIN INFOS !! "
-           DISPLAY "~  LoginName : "ESC GREEN-CODE WITH NO ADVANCING
-           DISPLAY ULoginName ESC RED-CODE
-           DISPLAY "~  Password  : "ESC GREEN-CODE WITH NO ADVANCING
+           DISPLAY "~  LoginName : "ESC GREENX WITH NO ADVANCING
+           DISPLAY ULoginName ESC REDX
+           DISPLAY "~  Password  : "ESC GREENX WITH NO ADVANCING
            DISPLAY PlainPassword
-           DISPLAY ESC RED-CODE "!! DON'T FORGET TO" WITH NO ADVANCING
+           DISPLAY ESC REDX "!! DON'T FORGET TO" WITH NO ADVANCING
            DISPLAY " CHANGE YOUR PASSWORD !!"
            DISPLAY "=========================================="
 
           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
           *> Call encryption submodule( to uncomment after encryption sub)
 
-           CALL '../../UtilityFunctions/bin/encryption' 
+           CALL '../../UtilityFunctions/bin/encryption'
            USING BY CONTENT PlainPassword,EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."
@@ -212,10 +209,10 @@
                    DISPLAY "Error writing to file (Status=" WS-FS ")"
                    MOVE 2 TO WS-ReturnCode
                NOT INVALID KEY
-                   DISPLAY ESC GREEN-CODE "User account created"
+                   DISPLAY ESC GREENX "User account created"
                        WITH NO ADVANCING
                    DISPLAY "successfully."
-                   DISPLAY ESC RESET-CODE
+                   DISPLAY ESC RESETX
                    MOVE 0 TO WS-ReturnCode
            END-WRITE
 

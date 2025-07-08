@@ -11,7 +11,7 @@
        FILE-CONTROL.
 
           *>fix this file directory plsss <3
-           SELECT AdminFile 
+           SELECT AdminFile
            ASSIGN TO '../../../data/AdminAccounts.dat'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
@@ -26,6 +26,7 @@
            05  AName      PIC X(20).
            05  ALoginName PIC X(20).
            05  AEncPsw    PIC X(255).
+           05  ARole      Pic X.
 
        WORKING-STORAGE SECTION.
        01  WS-FS            PIC XX.
@@ -39,10 +40,7 @@
        01  I                   PIC 9(4)  COMP-5.
 
        *>For display colors
-       77  RED-CODE            PIC X(6) VALUE "[1;31m".*> set red
-       77  ESC                 PIC X    VALUE X"1B".   *> ASCII ESC
-       77  RESET-CODE          PIC X(4) VALUE "[0m".   *> reset
-       77  GREEN-CODE          PIC X(6) VALUE "[1;32m".*>set green
+       COPY "../../Utility Functions/colorCodes.cpy"
 
        LINKAGE SECTION.
        01  WS-ReturnCode       PIC 9(4) VALUE 0.
@@ -102,6 +100,8 @@
            COMPUTE RPSW = FUNCTION RANDOM() * 1000000.
            MOVE RPSW TO PlainPassword.
 
+           MOVE 2 TO ARole.
+
           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
           *>Generating Login name ( full name + ID )
 
@@ -121,20 +121,20 @@
                AID               DELIMITED BY SIZE
            INTO ALoginName
 
-           DISPLAY ESC RED-CODE"======================================"
+           DISPLAY ESC REDX"======================================"
            DISPLAY "!! REMEMBER YOUR LOGIN INFOS !! "
-           DISPLAY "~  LoginName : "ESC GREEN-CODE WITH NO ADVANCING
-           DISPLAY ALoginName ESC RED-CODE
-           DISPLAY "~  Password  : "ESC GREEN-CODE WITH NO ADVANCING
+           DISPLAY "~  LoginName : "ESC GREENX WITH NO ADVANCING
+           DISPLAY ALoginName ESC REDX
+           DISPLAY "~  Password  : "ESC GREENX WITH NO ADVANCING
            DISPLAY PlainPassword
-           DISPLAY ESC RED-CODE "!! DON'T FORGET TO" WITH NO ADVANCING
+           DISPLAY ESC REDX "!! DON'T FORGET TO" WITH NO ADVANCING
            DISPLAY " CHANGE YOUR PASSWORD !!"
            DISPLAY "======================================="
 
           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
            *> Call encryption submodule
 
-           CALL '../../UtilityFunctions/bin/encryption' 
+           CALL '../../UtilityFunctions/bin/encryption'
            USING BY CONTENT PlainPassword
                                               EncryptedPassword
            IF RETURN-CODE NOT = 0
@@ -157,11 +157,11 @@
                    DISPLAY "Error writing to file (Status=" WS-FS ")"
                    MOVE 2 TO WS-ReturnCode
                NOT INVALID KEY
-                   DISPLAY ESC GREEN-CODE "Admin account created"
+                   DISPLAY ESC GREENX "Admin account created"
                        WITH NO ADVANCING
                    DISPLAY "successfully."
                    MOVE 0 TO WS-ReturnCode
-                   display esc RESET-CODE
+                   display esc RESETX
            END-WRITE
 
            CLOSE AdminFile.
