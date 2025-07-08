@@ -9,8 +9,12 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT testfile ASSIGN TO 'userfile.txt'
-           ORGANIZATION IS LINE SEQUENTIAL.
+           SELECT testfile
+           ASSIGN TO "../../../data/UserAccounts.dat"
+           ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS UID
+               FILE STATUS IS WS-FS.
        DATA DIVISION.
        FILE SECTION.
        FD testfile.
@@ -28,10 +32,11 @@
        01 InputUID PIC 9(5).
        01 Found    PIC X(1) VALUE 'N'.
        01 EOF-Flag PIC X(1) VALUE 'N'.
+       01  ws-fs pic x(2).
        linkage SECTION.
        01 InputUID1 PIC 9(5).
-       
-       PROCEDURE DIVISION.
+
+       PROCEDURE DIVISION using InputUID1.
        MAIN-PROCEDURE.
             DISPLAY "Enter User ID(UID):"
             ACCEPT InputUID.

@@ -4,8 +4,12 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT UserFile ASSIGN TO "UserAccounts.txt"
-               ORGANIZATION IS LINE SEQUENTIAL.
+           SELECT UserFile
+           ASSIGN TO "../../../data/UserAccounts.dat"
+           ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS UID
+               FILE STATUS IS WS-FS.
 
        DATA DIVISION.
        FILE SECTION.
@@ -25,11 +29,15 @@
        01 WS-UID            PIC 9(5).
        01 WS-FOUND          PIC X VALUE "N".
        01 END-FILE          PIC X VALUE "N".
+       01  ws-fs pic x(2).
 
-       PROCEDURE DIVISION.
+       linkage section.
+       01  LS-UID pic 9(5).
+
+       PROCEDURE DIVISION using LS-UID.
        MAIN-LOGIC.
            DISPLAY "Enter your User ID: ".
-           ACCEPT WS-UID.
+           ACCEPT WS-UID. *>to change to LS-UID
 
            OPEN INPUT UserFile.
 
