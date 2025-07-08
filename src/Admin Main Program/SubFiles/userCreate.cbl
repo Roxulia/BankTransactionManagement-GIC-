@@ -187,7 +187,7 @@
           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
           *> Call encryption submodule( to uncomment after encryption sub)
 
-           CALL '../../UtilityFunctions/bin/encryption' 
+           CALL '../../Utility Functions/bin/encryption'
            USING BY CONTENT PlainPassword,EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."

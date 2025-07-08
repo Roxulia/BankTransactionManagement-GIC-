@@ -11,7 +11,7 @@
        FILE-CONTROL.
 
           *>fix this file directory plsss <3
-           SELECT AdminFile 
+           SELECT AdminFile
            ASSIGN TO '../../../data/AdminAccounts.dat'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
@@ -134,7 +134,7 @@
           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
            *> Call encryption submodule
 
-           CALL '../../UtilityFunctions/bin/encryption' 
+           CALL '../../Utility Functions/bin/encryption'
            USING BY CONTENT PlainPassword
                                               EncryptedPassword
            IF RETURN-CODE NOT = 0

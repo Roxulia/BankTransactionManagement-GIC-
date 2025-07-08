@@ -10,10 +10,18 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT USERACCOUNTS ASSIGN TO "UserAccounts.dat"
-               ORGANIZATION IS SEQUENTIAL.
-           SELECT TRANSACTIONS ASSIGN TO "Transactions.dat"
-               ORGANIZATION IS SEQUENTIAL.
+           SELECT USERACCOUNTS
+           ASSIGN TO "../../../data/UserAccounts.dat"
+           ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS UID
+               FILE STATUS IS WS-FS2.
+           SELECT TRANSACTIONS
+           ASSIGN TO "../../../data/Transactions.dat"
+           ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS TRXID
+               FILE STATUS IS WS-FS1.
 
        DATA DIVISION.
        FILE SECTION.
@@ -31,16 +39,13 @@
        FD TRANSACTIONS.
        01 TRXRECORD.
            05 TRXID        PIC 9(10).
-           05 UID          PIC 9(5).
+           05 SENDERID          PIC 9(5).
            05 RECEIVERID   PIC 9(5).
            05 DESCRIPTION  PIC X(30).
            05 AMOUNT       PIC 9(10)V99.
            05 T-TYPE       PIC X(20).
            05 TIMESTAMP    PIC 9(16).
 
-          FD  USERACCOUNTS
-           LABEL RECORDS ARE STANDARD
-           RECORD CONTAINS 360 CHARACTERS.
        01 USER-RECORD.
            05 U-UID       PIC 9(5).
            05 U-NAME     PIC X(20).
@@ -60,7 +65,8 @@
        01 CURRENT-TIME       PIC 9(6) VALUE ZERO.
        01 USER-FOUND         PIC X VALUE 'N'.
        01 TEMP-BALANCE       PIC 9(10)V99 VALUE ZERO.
-
+       01  ws-fs1 pic x(2).
+       01  ws-fs2 pic x(2).
 
        LINKAGE SECTION.
        01 LS-UID PIC 9(5).
@@ -115,7 +121,7 @@
            MOVE FUNCTION CURRENT-DATE (1:8) TO CURRENT-DATE
            MOVE FUNCTION CURRENT-DATE (9:6) TO CURRENT-TIME
 
-           MOVE WS-UID TO UID OF TRXRECORD
+           MOVE WS-UID TO senderID OF TRXRECORD
            MOVE 0 TO RECEIVERID OF TRXRECORD
            MOVE "WITHDRAW" TO DESCRIPTION OF TRXRECORD
            MOVE WS-AMOUNT TO AMOUNT OF TRXRECORD
