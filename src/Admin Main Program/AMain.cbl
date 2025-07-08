@@ -170,8 +170,9 @@
            perform UNTIL homepageOpt = 99
                EVALUATE homepageOpt
                    when EQUAL 1
-                       call 'userCreate' using statusCode
-                       display "Create User Page"
+                       call '../SubFiles/bin/userCreate' 
+                       using statusCode
+                       DISPLAY SPACE
                        perform home-page
                    when  EQUAL 2
       *                call 'userList'
@@ -184,7 +185,7 @@
                    when EQUAL 5
                        call '../SubFiles/bin/adminCreate' 
                        using statusCode
-                       display "Create Admin Page"
+                       display SPACE
                        perform home-page
                    when equal 6
       *                call 'adminList'
