@@ -26,15 +26,18 @@
            05  ARole      pic X.
 
        WORKING-STORAGE SECTION.
+
+       *>For display colors
+       COPY "../../Utility Functions/colorCodes.cpy"
+
        77  WS-FileStatus     PIC XX.
        77  OptCode           PIC 9(1).
        77  NewName           PIC X(20).
        77  NewPsw            PIC X(255).
+       77  EncryptedPassword PIC X(32).
        77  NewRole           PIC 9(1).
        77  RoleStr           PIC X(10).
 
-       *>For display colors
-       COPY "../../Utility Functions/colorCodes.cpy"
 
        LINKAGE SECTION.
        01  LNK-AID           PIC 9(5).
@@ -44,8 +47,8 @@
 
        Main-Section.
 
-           DISPLAY "Enter Admin Id to update"
-           ACCEPT LNK-AID
+           *>DISPLAY "Enter Admin Id to update"
+           *>ACCEPT LNK-AID
 
            MOVE LNK-AID TO AID
            OPEN I-O AdminFile
@@ -78,8 +81,9 @@
            DISPLAY "2. Password"
            DISPLAY "3. Role"
            DISPLAY "========================================"
-           DISPLAY "Enter option code: " WITH NO ADVANCING
+           DISPLAY "Enter option code: "
            ACCEPT OptCode
+           DISPLAY "========================================"
 
            EVALUATE OptCode
                WHEN 1
@@ -93,17 +97,17 @@
 
            *> Call encryption submodule
 
-                   CALL '../../UtilityFunctions/bin/encryption'
-                       USING BY CONTENT NewPsw EncryptedPassword
-                   IF RETURN-CODE NOT = 0
-                       DISPLAY "Error encrypting password. Aborting."
-                       MOVE 4 TO WS-ReturnCode
-                   END-IF
+           *>      CALL '../../UtilityFunctions/bin/encryption'
+           *>            USING BY CONTENT NewPsw EncryptedPassword
+           *>       IF RETURN-CODE NOT = 0
+           *>            DISPLAY "Error encrypting password. Aborting."
+           *>            MOVE '04' TO LNK-Status
+           *>        END-IF
 
            *>remove the line following if encryption.cbl is ready
-           *>MOVE PlainPassword TO AEncPsw
+                   MOVE NewPsw TO AEncPsw
 
-                   MOVE EncryptedPassword TO AEncPsw
+          *>       MOVE EncryptedPassword TO AEncPsw
 
                WHEN 3
                    DISPLAY "Enter new Role(1 for Manager, 2 for staff):"

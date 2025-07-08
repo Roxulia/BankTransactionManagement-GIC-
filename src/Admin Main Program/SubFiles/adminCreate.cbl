@@ -29,6 +29,10 @@
            05  ARole      Pic X.
 
        WORKING-STORAGE SECTION.
+
+       *>For display colors
+       COPY "../../Utility Functions/colorCodes.cpy".
+
        01  WS-FS            PIC XX.
        01  Dup-Flag         PIC X VALUE 'N'.
        01  RPSW               PIC 9(6).
@@ -38,9 +42,6 @@
        01  EOF-Flag           PIC X value 'N'.
        01  PTR                 PIC 9(4)  COMP-5.
        01  I                   PIC 9(4)  COMP-5.
-
-       *>For display colors
-       COPY "../../Utility Functions/colorCodes.cpy"
 
        LINKAGE SECTION.
        01  WS-ReturnCode       PIC 9(4) VALUE 0.
