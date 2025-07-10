@@ -17,7 +17,7 @@
        01 userdata.
            05 UID           PIC 9(5).
            05 UName         PIC X(20).
-           05 ULoginName    PIC X(20).
+           05 ULoginName    PIC X(25).
            05 UEncPsw       PIC X(32).
            05 UAddress      PIC X(20).
            05 Phone         PIC 9(9).
@@ -36,17 +36,20 @@
 
        PROCEDURE DIVISION using LS-UID.
        MAIN-LOGIC.
-           DISPLAY "Enter your User ID: ".
-           ACCEPT WS-UID. *>to change to LS-UID
 
            OPEN INPUT UserFile.
+
+           if ws-fs not EQUAL "00" THEN
+               display "File openning error"
+               exit PROGRAM
+           end-if.
 
            PERFORM UNTIL END-FILE = "Y"
                READ UserFile
                    AT END
                        MOVE "Y" TO END-FILE
                    NOT AT END
-                       IF UID = WS-UID
+                       IF UID = LS-UID
                            MOVE "Y" TO WS-FOUND
                            DISPLAY "-----------------------------------"
                            DISPLAY "User Name : " UName
@@ -64,4 +67,4 @@
 
            CLOSE UserFile.
 
-           STOP RUN.
+           exit program.
