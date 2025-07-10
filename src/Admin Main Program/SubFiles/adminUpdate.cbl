@@ -28,7 +28,7 @@
        WORKING-STORAGE SECTION.
 
        *>For display colors
-       COPY "../../Utility Functions/colorCodes.cpy"
+       COPY "../../Utility Functions/colorCodes.cpy".
 
        77  WS-FileStatus     PIC XX.
        77  OptCode           PIC 9(1).
@@ -49,6 +49,9 @@
 
            *>DISPLAY "Enter Admin Id to update"
            *>ACCEPT LNK-AID
+
+          *>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+          *> opening AdminAccounts data file and retrieving the RECORD
 
            MOVE LNK-AID TO AID
            OPEN I-O AdminFile
@@ -71,7 +74,9 @@
                WHEN OTHER MOVE "Unknown" TO RoleStr
            END-EVALUATE
 
-           *> Display current values
+          *>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+          *> Display current values prompting edit options
+
            DISPLAY "========================================"
            DISPLAY "Current Name : " ESC GREENX AName ESC RESETX
            DISPLAY "Current Role : " ESC GREENX RoleStr ESC RESETX
@@ -80,39 +85,48 @@
            DISPLAY "1. Name"
            DISPLAY "2. Password"
            DISPLAY "3. Role"
+           DISPLAY "4. Exit"
            DISPLAY "========================================"
            DISPLAY "Enter option code: "
            ACCEPT OptCode
            DISPLAY "========================================"
 
+          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<
+          *>evaluating the option code, 1,2,3,4
+
            EVALUATE OptCode
                WHEN 1
-                 DISPLAY "Enter new Name (20 chars): "
-                 ACCEPT NewName
-                 MOVE NewName TO AName
+                   DISPLAY "Enter new Name (20 chars): "
+                   ACCEPT NewName
+                   MOVE NewName TO AName
 
                WHEN 2
                    DISPLAY "Enter new Password: "
                    ACCEPT NewPsw
 
-           *> Call encryption submodule
+                   *>Call encryption submodule
 
-           *>      CALL '../../UtilityFunctions/bin/encryption'
-           *>            USING BY CONTENT NewPsw EncryptedPassword
-           *>       IF RETURN-CODE NOT = 0
-           *>            DISPLAY "Error encrypting password. Aborting."
-           *>            MOVE '04' TO LNK-Status
-           *>        END-IF
+                   CALL '../../UtilityFunctions/bin/encryption'
+                       USING BY CONTENT NewPsw EncryptedPassword
+                   IF RETURN-CODE NOT = 0
+                       DISPLAY "Error encrypting password. Aborting."
+                       MOVE '04' TO LNK-Status
+                   END-IF
 
-           *>remove the line following if encryption.cbl is ready
-                   MOVE NewPsw TO AEncPsw
+                   *>remove the line following if encryption.cbl is ready
+                   *>MOVE NewPsw TO AEncPsw
 
-          *>       MOVE EncryptedPassword TO AEncPsw
+                   MOVE EncryptedPassword TO AEncPsw
 
                WHEN 3
                    DISPLAY "Enter new Role(1 for Manager, 2 for staff):"
                    ACCEPT NewRole
                    MOVE NewRole TO ARole
+
+               WHEN 4
+                   CLOSE AdminFile
+                   GOBACK
+
                WHEN OTHER
                    DISPLAY "Invalid option"
                    MOVE '99' TO LNK-Status
@@ -120,15 +134,21 @@
                    GOBACK
            END-EVALUATE
 
+          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<
            *> Rewrite the updated record
+
            REWRITE AdminRecord
                INVALID KEY
                    DISPLAY "Error updating record " WS-FileStatus
                    MOVE "99" TO LNK-Status
                NOT INVALID KEY
+                   DISPLAY "========================================"
                    DISPLAY "Record updated successfully"
+                   DISPLAY "========================================"
                    MOVE "00" TO LNK-Status
            END-REWRITE
+
+           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
            CLOSE AdminFile
 
