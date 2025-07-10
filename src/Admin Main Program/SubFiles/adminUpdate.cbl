@@ -47,11 +47,21 @@
 
        Main-Section.
 
-           *>DISPLAY "Enter Admin Id to update"
-           *>ACCEPT LNK-AID
+           PERFORM Record-pointer
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-          *> opening AdminAccounts data file and retrieving the RECORD
+           PERFORM UNTIL OptCode = 4
+               PERFORM Update-Menu
+               PERFORM Process-option
+               PERFORM Update-record
+           END-PERFORM
+
+           CLOSE AdminFile
+
+           GOBACK.
+
+       *>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+       *> opening AdminAccounts data file and retrieving the RECORD
+       Record-pointer.
 
            MOVE LNK-AID TO AID
            OPEN I-O AdminFile
@@ -72,27 +82,29 @@
                WHEN 1 MOVE "Manager" TO RoleStr
                WHEN 2 MOVE "Staff"   TO RoleStr
                WHEN OTHER MOVE "Unknown" TO RoleStr
-           END-EVALUATE
+           END-EVALUATE.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-          *> Display current values prompting edit options
+       *>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+       *> Display current values prompting edit options
+       Update-Menu.
 
            DISPLAY "========================================"
-           DISPLAY "Current Name : " ESC GREENX AName ESC RESETX
-           DISPLAY "Current Role : " ESC GREENX RoleStr ESC RESETX
+           DISPLAY "=  Current Name : " ESC GREENX AName ESC RESETX
+           DISPLAY "=  Current Role : " ESC GREENX RoleStr ESC RESETX
            DISPLAY "========================================"
-           DISPLAY "Which field to update?"
-           DISPLAY "1. Name"
-           DISPLAY "2. Password"
-           DISPLAY "3. Role"
-           DISPLAY "4. Exit"
+           DISPLAY "=  Which field to update?"
+           DISPLAY "=  1. Name"
+           DISPLAY "=  2. Password"
+           DISPLAY "=  3. Role"
+           DISPLAY "=  4. Exit"
            DISPLAY "========================================"
-           DISPLAY "Enter option code: "
+           DISPLAY "=  Enter option code: "
            ACCEPT OptCode
-           DISPLAY "========================================"
+           DISPLAY "========================================".
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<
-          *>evaluating the option code, 1,2,3,4
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<
+       *>evaluating the option code, 1,2,3,4
+       Process-option.
 
            EVALUATE OptCode
                WHEN 1
@@ -125,31 +137,27 @@
 
                WHEN 4
                    CLOSE AdminFile
-                   GOBACK
+                   CONTINUE
 
                WHEN OTHER
                    DISPLAY "Invalid option"
                    MOVE '99' TO LNK-Status
                    CLOSE AdminFile
-                   GOBACK
-           END-EVALUATE
+                   CONTINUE
+           END-EVALUATE.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-           *> Rewrite the updated record
-
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+       *> Rewrite the updated record
+       Update-record.
            REWRITE AdminRecord
                INVALID KEY
                    DISPLAY "Error updating record " WS-FileStatus
                    MOVE "99" TO LNK-Status
                NOT INVALID KEY
                    DISPLAY "========================================"
-                   DISPLAY "Record updated successfully"
+                   DISPLAY "=      Record updated successfully     ="
                    DISPLAY "========================================"
                    MOVE "00" TO LNK-Status
-           END-REWRITE
+           END-REWRITE.
 
-           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-           CLOSE AdminFile
-
-           GOBACK.
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

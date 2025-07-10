@@ -57,9 +57,19 @@
        PROCEDURE DIVISION USING WS-ReturnCode.
 
        Main-Section.
+           PERFORM File-Check
+           PERFORM Generate-UID
+           PERFORM Prompt-Box
+           PERFORM ValidCheck-IniPsw
+           PERFORM Generate-Login
+           PERFORM Encryption-Call
+           PERFORM Write-Record
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Creating a new file to store data if not already exist
+           GOBACK.
+
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>Creating a new file to store data if not already exist
+       File-Check.
 
            OPEN INPUT UserFile
            IF WS-FS  = '35'
@@ -67,10 +77,11 @@
                OPEN OUTPUT UserFile
                CLOSE UserFile
            END-IF
-           CLOSE UserFile
+           CLOSE UserFile.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Opening the file for generating UID
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>Opening the file for generating UID
+       Generate-UID.
 
            OPEN INPUT UserFile
            IF WS-FS NOT = '00'
@@ -92,10 +103,11 @@
                        ADD 1 TO PrevUID
                END-READ
            END-PERFORM
-           CLOSE UserFile
+           CLOSE UserFile.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Prompt display for user input
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>Prompt display for user input
+       Prompt-Box.
 
            DISPLAY "----- Create New User Account -----"
            DISPLAY "Generated UID: " UID.
@@ -104,10 +116,11 @@
            ACCEPT UName
 
            DISPLAY "Enter Address (max 20 chars): "
-           ACCEPT UAddress
+           ACCEPT UAddress.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Prompt display for PH NO and valid check
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>Prompt display for PH NO and valid check
+       ValidCheck-IniPsw.
 
            PERFORM UNTIL VALID-PHONE = 'Y'
                *> 1) Prompt and read
@@ -147,13 +160,14 @@
            END-PERFORM
 
            *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Generate random initial password
+           *>Generate random initial password
 
            COMPUTE RPSW = FUNCTION RANDOM() * 1000000.
            MOVE RPSW TO PlainPassword.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Generating Login name ( full name + ID )
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>Generating Login name ( full name + ID )
+       Generate-Login.
 
            MOVE FUNCTION LOWER-CASE(UName) to ULoginName
 
@@ -179,10 +193,11 @@
            DISPLAY PlainPassword
            DISPLAY ESC REDX "!! DON'T FORGET TO" WITH NO ADVANCING
            DISPLAY " CHANGE YOUR PASSWORD !!"
-           DISPLAY "=========================================="
+           DISPLAY "========================================"ESC RESETX.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *> Call encryption submodule( to uncomment after encryption sub)
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *> Call encryption submodule( to uncomment after encryption sub)
+       Encryption-Call.
 
            CALL '../../UtilityFunctions/bin/encryption'
            USING BY CONTENT PlainPassword,EncryptedPassword
@@ -193,9 +208,11 @@
            END-IF
 
            MOVE EncryptedPassword TO UEncPsw
-           DISPLAY UEncPsw
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Writing a new record to user file
+           DISPLAY UEncPsw. *>for test ,comment this line out
+
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>Writing a new record to user file
+       Write-Record.
 
            MOVE    0               TO      Balance
            ACCEPT  CurrentDate     FROM    DATE
@@ -218,11 +235,10 @@
 
            CLOSE UserFile.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Sub routine to end the program if something happened
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>Sub routine to end the program if something happened
+       End-Program.
 
-           End-Program.
-           exit PROGRAM.
+           GOBACK.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-       END PROGRAM userCreate.
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
