@@ -24,8 +24,9 @@
        01  AdminRecord.
            05  AID        PIC 9(5).
            05  AName      PIC X(20).
-           05  ALoginName PIC X(20).
-           05  AEncPsw    PIC X(255).
+           05  ALoginName PIC X(25).
+           05  AEncPsw    PIC X(32).
+           05  role       pic 9 value 2.
 
        WORKING-STORAGE SECTION.
        01  WS-FS            PIC XX.
@@ -47,7 +48,7 @@
        LINKAGE SECTION.
        01  WS-ReturnCode       PIC 9(4) VALUE 0.
 
-       PROCEDURE DIVISION USING WS-ReturnCode.
+       PROCEDURE DIVISION.
 
        Main-Section.
 
@@ -99,6 +100,11 @@
            DISPLAY "Enter Full Name (max 20 chars):"
            ACCEPT AName
 
+           DISPLAY "Choose Role : "
+           DISPLAY "   1.Main Admin"
+           DISPLAY "   2.Moderator"
+           DISPLAY "Enter Role Code : " ACCEPT role
+
            COMPUTE RPSW = FUNCTION RANDOM() * 1000000.
            MOVE RPSW TO PlainPassword.
 
@@ -135,11 +141,9 @@
            *> Call encryption submodule
 
            CALL '../../Utility Functions/bin/encryption'
-           USING BY CONTENT PlainPassword
-                                              EncryptedPassword
+           USING  PlainPassword,EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."
-               MOVE 4 TO WS-ReturnCode
                GO TO End-Program
            END-IF
 
@@ -147,7 +151,6 @@
            *>MOVE PlainPassword TO AEncPsw
 
            MOVE EncryptedPassword TO AEncPsw
-
           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
           *>wRITING A NEW RECORD TO THE AdminAccounts.DAT
 
@@ -155,12 +158,12 @@
            WRITE AdminRecord
                INVALID KEY
                    DISPLAY "Error writing to file (Status=" WS-FS ")"
-                   MOVE 2 TO WS-ReturnCode
+
                NOT INVALID KEY
                    DISPLAY ESC GREEN-CODE "Admin account created"
                        WITH NO ADVANCING
                    DISPLAY "successfully."
-                   MOVE 0 TO WS-ReturnCode
+
                    display esc RESET-CODE
            END-WRITE
 
