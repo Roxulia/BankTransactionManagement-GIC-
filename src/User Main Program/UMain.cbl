@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. UMAIN.
+       PROGRAM-ID. UMain.
        AUTHOR. YOUR-NAME.
 
        ENVIRONMENT DIVISION.
@@ -8,7 +8,7 @@
 
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01 UID     PIC 9(5).
+       01 UID     PIC 9(5) value 1.
        01 STATUSCODE PIC X(2) VALUE ZEROS.
        01 OPTION     PIC 9(1) VALUE ZEROS.
        01 loginOpt pic 9(2).
@@ -17,10 +17,10 @@
        MAIN-LOGIC.
 
            DISPLAY "================ USER LOGIN ===================".
-     **      CALL 'USERLOGIN' USING UID STATUSCODE.
-             PERFORM login-page
+      *      CALL 'USERLOGIN' USING UID STATUSCODE.
+             PERFORM MAIN-MENU
            Stop run.
-           
+
        login-page.
            DISPLAY "==============================================="
            DISPLAY "=======Bank Transaction Management(USER)======"
@@ -29,7 +29,7 @@
            DISPLAY "=               99.Exit                       ="
            DISPLAY "==============================================="
            perform choice-opt-login.
-           
+
       *     IF STATUSCODE NOT EQUAL "00"
       *         DISPLAY "Login failed. Exiting..."
       *         GO TO END-PROGRAM
@@ -41,6 +41,7 @@
            DISPLAY SPACE
            DISPLAY "****************  Welcome **********************"
            DISPLAY SPACE
+           call '../SubFiles/bin/balanceInfo' using UID
            DISPLAY "===== USER MENU =====".
            DISPLAY "1. Update Password".
            DISPLAY "2. Check Balance".
@@ -58,12 +59,12 @@
        *> ===================================================
        *> Sub-menu for Transactions
        *> ===================================================
-       
+
        choice-opt-login.
            DISPLAY "Choosen Option Code : "
            accept loginOpt
            display SPACE
-           
+
            PERFORM UNTIL loginOpt = 99
                EVALUATE loginOpt
                    when EQUAL 1
@@ -79,8 +80,8 @@
            END-PERFORM
            DISPLAY "Exitting the Program ...."
            stop run.
-           
-        
+
+
        choice-opt-home.
            DISPLAY SPACE
            Display "Enter your option code:"
@@ -108,7 +109,7 @@
 
            GO TO MAIN-MENU.
            STOP RUN.
-           
+
        TRANSACTION-MENU.
            DISPLAY SPACE
            DISPLAY "===== TRANSACTION MENU =====".
@@ -128,3 +129,4 @@
                    DISPLAY "Invalid Option."
            END-EVALUATE.
        END-PARAGRAPH.
+       end PROGRAM UMain.

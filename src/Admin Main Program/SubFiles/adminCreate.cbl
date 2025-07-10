@@ -48,7 +48,7 @@
        LINKAGE SECTION.
        01  WS-ReturnCode       PIC 9(4) VALUE 0.
 
-       PROCEDURE DIVISION.
+       PROCEDURE DIVISION using WS-ReturnCode.
 
        Main-Section.
 
@@ -141,7 +141,7 @@
            *> Call encryption submodule
 
            CALL '../../Utility Functions/bin/encryption'
-           USING  PlainPassword,EncryptedPassword
+           USING by REFERENCE PlainPassword,EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."
                GO TO End-Program
