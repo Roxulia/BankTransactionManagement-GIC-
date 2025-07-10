@@ -39,8 +39,6 @@
        77  NewName           PIC X(20).
        77  NewPsw            PIC X(255).
        77  EncryptedPassword PIC X(32).
-       77  NewRole           PIC 9(1).
-       77  RoleStr           PIC X(10).
 
        LINKAGE SECTION.
        01  LNK-UID           PIC 9(5).
@@ -89,7 +87,6 @@
 
            DISPLAY "========================================"
            DISPLAY "=  Current Name : " ESC GREENX UName ESC RESETX
-           DISPLAY "=  Current Role : " ESC GREENX RoleStr ESC RESETX
            DISPLAY "========================================"
            DISPLAY "=  Which field to update?"
            DISPLAY "=  1. Name"
