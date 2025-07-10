@@ -21,8 +21,8 @@
        01  UserRecord.
            05  UID        PIC 9(5).
            05  UName      PIC X(20).
-           05  ULoginName PIC X(20).
-           05  UEncPsw    PIC X(255).
+           05  ULoginName PIC X(25).
+           05  UEncPsw    PIC X(32).
            05  UAddress   PIC X(20).
            05  UPh        PIC 9(9).
            05  Balance    PIC 9(10)V99.
@@ -31,6 +31,8 @@
 
        WORKING-STORAGE SECTION.
        01  WS-FS               PIC XX.
+       01  rawDate             pic x(8).
+       01  rawTime             pic x(6).
        01  CurrentDate         PIC 9(8).
        01  CurrentTime         PIC 9(6).
        01  Dup-Flag            PIC X VALUE 'N'.
@@ -57,7 +59,7 @@
        LINKAGE SECTION.
        01  WS-ReturnCode       PIC 9(4) VALUE 0.
 
-       PROCEDURE DIVISION USING WS-ReturnCode.
+       PROCEDURE DIVISION using WS-ReturnCode.
 
        Main-Section.
 
@@ -78,7 +80,7 @@
            OPEN INPUT UserFile
            IF WS-FS NOT = '00'
               DISPLAY "Error opening UserAccounts.dat (Status="WS-FS")"
-              MOVE 1 TO WS-ReturnCode
+
               GO TO End-Program
            END-IF
 
@@ -188,38 +190,37 @@
           *> Call encryption submodule( to uncomment after encryption sub)
 
            CALL '../../Utility Functions/bin/encryption'
-           USING BY CONTENT PlainPassword,EncryptedPassword
+           USING by REFERENCE PlainPassword,EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."
-               MOVE 4 TO WS-ReturnCode
+
                GO TO End-Program
            END-IF
-
            MOVE EncryptedPassword TO UEncPsw
-           DISPLAY UEncPsw
+
           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
           *>Writing a new record to user file
 
            MOVE    0               TO      Balance
-           ACCEPT  CurrentDate     FROM    DATE
-           ACCEPT  CurrentTime     FROM    TIME
-           MOVE    CurrentDate     TO      UDate
-           MOVE    CurrentTime     TO      UTime
+           ACCEPT  rawDate     FROM    DATE
+           ACCEPT  rawTime     FROM    TIME
+           MOVE    rawDate     TO      UDate
+           MOVE    rawTime     TO      UTime
 
            OPEN I-O UserFile
            WRITE UserRecord
                INVALID KEY
                    DISPLAY "Error writing to file (Status=" WS-FS ")"
-                   MOVE 2 TO WS-ReturnCode
+
                NOT INVALID KEY
                    DISPLAY ESC GREEN-CODE "User account created"
                        WITH NO ADVANCING
                    DISPLAY "successfully."
                    DISPLAY ESC RESET-CODE
-                   MOVE 0 TO WS-ReturnCode
-           END-WRITE
 
-           CLOSE UserFile.
+           END-WRITE
+           close UserFile.
+
 
           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
           *>Sub routine to end the program if something happened

@@ -204,6 +204,7 @@
                    when EQUAL 5
                        if adminRole equal 1 then
                            call '../SubFiles/bin/adminCreate'
+                           using statusCode
                            display SPACE
                            perform home-page
                        else
