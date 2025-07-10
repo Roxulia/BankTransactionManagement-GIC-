@@ -1,0 +1,5 @@
+       *> Color codes copybook
+       77  REDX            PIC X(6) VALUE "[1;31m".  *> set red
+       77  ESC             PIC X    VALUE X"1B".    *> ASCII ESC
+       77  RESETX          PIC X(4) VALUE "[0m".    *> reset
+       77  GREENX          PIC X(6) VALUE "[1;32m". *> set green
