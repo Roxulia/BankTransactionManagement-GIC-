@@ -53,7 +53,7 @@
            using by REFERENCE LNK-UID,UserRecord,statusCode
 
            if statusCode not EQUAL "00"
-               move "99" to LNK-Status
+               move statuscode to LNK-Status
                go to exit-process
            ELSE
            open i-o UserFile

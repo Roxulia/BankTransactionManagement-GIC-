@@ -25,7 +25,7 @@
                move text-input(ws-indx:1) to ws-char
                COMPUTE ws-char-ascii = FUNCTION ORD(ws-char)
                *>DISPLAY ws-char-ascii
-               IF WS-CHAR-ASCII < 48 or WS-CHAR-ASCII > 57
+               IF WS-CHAR-ASCII < 48 or WS-CHAR-ASCII > 58
                     move "y" to containText
 
                END-IF

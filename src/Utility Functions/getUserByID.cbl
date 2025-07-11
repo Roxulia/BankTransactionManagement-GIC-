@@ -63,7 +63,7 @@
        USING InputUID1, ReturnUserData , statusCode.
        MAIN-PROCEDURE.
             MOVE 'N' TO RET-Found
-            IF InputUID1 = Cached-UID
+            IF InputUID1 = Cached-UID and InputUID1 not EQUAL zero
                DISPLAY "NO NEED FILE READ"
                MOVE C-UID       TO RET-UID
                MOVE C-UName     TO RET-UName

@@ -149,6 +149,11 @@
                        DISPLAY "Updated Info for ID ("userid")"
                        DISPLAY esc RESET-CODE
                        perform update-info-page
+                   when equal "96"
+                       DISPLAY esc GREEN-CODE
+                       DISPLAY "NOT FOUND USER WITH ID ("userid")"
+                       DISPLAY esc RESET-CODE
+                       perform update-info-page
                    when OTHER
                        DISPLAY ESC RED-CODE
                        DISPLAY "CANNOT PERFORM UPDATE PROCESS"
@@ -162,6 +167,11 @@
                    when equal "00"
                        DISPLAY esc GREEN-CODE
                        DISPLAY "Updated Info for ID ("userid")"
+                       DISPLAY esc RESET-CODE
+                       perform update-info-page
+                   when equal "96"
+                       DISPLAY esc GREEN-CODE
+                       DISPLAY "NOT FOUND ADMIN WITH ID ("userid")"
                        DISPLAY esc RESET-CODE
                        perform update-info-page
                    when OTHER
@@ -193,6 +203,8 @@
                            adminName , adminRole , statusCode
                        EVALUATE statusCode
                            when equal "00"
+                               display ESC GREEN-CODE"LOG IN SUCCESSFUL"
+                               DISPLAY ESC RESET-CODE
                                perform home-page
                            when equal "96"
                                DISPLAY ESC RED-CODE "ADMIN NOT FOUND!!"
@@ -209,7 +221,9 @@
                        perform login-page
                END-EVALUATE
            END-PERFORM
+           DISPLAY esc RED-CODE
            DISPLAY "Exitting the Program ...."
+           DISPLAY esc RESET-CODE
            stop run.
 
        choice-opt-home.
@@ -252,6 +266,8 @@
                        perform home-page
                END-EVALUATE
            END-PERFORM
+           DISPLAY esc RED-CODE
            display "Logging Out..."
+           DISPLAY esc RESET-CODE
            perform login-page.
        END PROGRAM AMain.
