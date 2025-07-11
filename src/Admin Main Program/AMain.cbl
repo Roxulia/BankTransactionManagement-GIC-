@@ -111,6 +111,7 @@
            DISPLAY "Enter ID to be deposited : "
            ACCEPT userid.
            perform until userid = "EXIT" or userid = "exit"
+           *>>CALL 'trxDeposit' USING userid statusCode
            EVALUATE statusCode
                when equal "00"
                    DISPLAY "Deposited Balance for ID ("userid")"
