@@ -21,7 +21,7 @@
        77  VALID-PHONE         PIC X VALUE 'N'.
 
        LINKAGE SECTION.
-       01  UPh           PIC 9(9).
+       01  UPh           PIC x(9).
 
        PROCEDURE DIVISION USING UPh.
 
@@ -33,7 +33,7 @@
                *> 2) Strip out non-digits
                MOVE SPACES TO DIGITS-ONLY
                MOVE FUNCTION TRIM(RAW-PHONE-IN) TO RAW-PHONE-IN
-
+               display "Raw" raw-phone-in
               *> 2) Count numeric chars manually
                MOVE 0 TO DIGIT-COUNT
                PERFORM VARYING I FROM 1 BY 1
@@ -47,14 +47,9 @@
                IF DIGIT-COUNT = 9
                    *> reset and extract
                    MOVE SPACES TO DIGITS-ONLY
-                   PERFORM VARYING I FROM 1 BY 1 UNTIL I > 20
-                       IF RAW-PHONE-IN(I:1) IS NUMERIC
-                          STRING RAW-PHONE-IN(I:1)
-                                 DELIMITED BY SIZE
-                                 INTO DIGITS-ONLY
-                       END-IF
-                   END-PERFORM
-                   MOVE FUNCTION NUMVAL(DIGITS-ONLY) TO UPh
+                   move raw-phone-in(1:9) to digits-only
+                   DISPLAY digits-only
+                   MOVE DIGITS-ONLy TO UPh
                    MOVE 'Y' TO VALID-PHONE
                ELSE
                   DISPLAY ESC REDX">> ERROR: You must enter "

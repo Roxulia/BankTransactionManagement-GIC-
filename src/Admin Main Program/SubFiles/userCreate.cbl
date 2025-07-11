@@ -21,17 +21,17 @@
        01  UserRecord.
            05  UID        PIC 9(5).
            05  UName      PIC X(20).
-           05  ULoginName PIC X(20).
-           05  UEncPsw    PIC X(255).
+           05  ULoginName PIC X(25).
+           05  UEncPsw    PIC X(32).
            05  UAddress   PIC X(20).
-           05  UPh        PIC 9(9).
+           05  UPh        PIC X(9).
            05  Balance    PIC 9(10)V99.
-           05  UDate      PIC 9(8).
+           05  UDate      PIC 9(6).
            05  UTime      PIC 9(6).
 
        WORKING-STORAGE SECTION.
        01  WS-FS               PIC XX.
-       01  CurrentDate         PIC 9(8).
+       01  CurrentDate         PIC 9(6).
        01  CurrentTime         PIC 9(6).
        01  Dup-Flag            PIC X VALUE 'N'.
        01  RPSW               PIC 9(6).
@@ -43,7 +43,7 @@
        01  I                   PIC 9(4)  COMP-5.
 
        *>For display colors
-       COPY "../../Utility Functions/colorCodes.cpy"
+       COPY "../../Utility Functions/colorCodes.cpy".
 
        LINKAGE SECTION.
        01  WS-ReturnCode       PIC 9(4) VALUE 0.
@@ -116,7 +116,8 @@
        *>Prompt display for PH NO and valid check
        ValidCheck-IniPsw.
 
-           CALL 'phoneValidCheck' USING BY CONTENT UPh
+           CALL '../../Utility Functions/bin/phoneValidCheck'
+           USING BY REFERENCE UPh
 
            *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
            *>Generate random initial password
@@ -158,16 +159,16 @@
        *> Call encryption submodule( to uncomment after encryption sub)
        Encryption-Call.
 
-           CALL '../../UtilityFunctions/bin/encryption'
-           USING BY CONTENT PlainPassword,EncryptedPassword
+           CALL '../../Utility Functions/bin/encryption'
+           USING BY REFERENCE PlainPassword,EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."
                MOVE 4 TO WS-ReturnCode
                GO TO End-Program
            END-IF
 
-           MOVE EncryptedPassword TO UEncPsw
-           DISPLAY UEncPsw. *>for test ,comment this line out
+           MOVE EncryptedPassword TO UEncPsw.
+           *>DISPLAY UEncPsw. *>for test ,comment this line out
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
        *>Writing a new record to user file

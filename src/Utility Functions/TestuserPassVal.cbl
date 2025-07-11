@@ -12,6 +12,7 @@
        WORKING-STORAGE SECTION.
        01  WS-USERNAME     PIC X(20).
        01  WS-PASSWORD     PIC X(20).
+       01  ws-text pic x(5).
        01  WS-RETURN-CODE  PIC 9(2).
            88 VALID-INPUT    VALUE 0.
            88 EMPTY-USER     VALUE 1.
@@ -32,6 +33,19 @@
            ACCEPT WS-PASSWORD.
 
        VALIDATE-INPUT.
+
+           move "1 0" to ws-text
+           call 'numberCheck' using REFERENCE ws-text WS-RETURN-CODE
+           perform DISPLAY-RESULT
+           move "10" to ws-text
+           call 'numberCheck' using REFERENCE ws-text WS-RETURN-CODE
+           perform DISPLAY-RESULT
+           move "1ab" to ws-text
+           call 'numberCheck' using REFERENCE ws-text WS-RETURN-CODE
+           perform DISPLAY-RESULT
+           move "10 " to ws-text
+           call 'numberCheck' using REFERENCE ws-text WS-RETURN-CODE
+           perform DISPLAY-RESULT
 
            move "" to WS-PASSWORD
            CALL 'userPassVal' USING
@@ -118,7 +132,5 @@
                     WITH NO ADVANCING
                    DISPLAY " 20 characters"
                WHEN 10
-                DISPLAY "Error: Password cannot be longer than"
-                    WITH NO ADVANCING
-                   DISPLAY " 20 characters"
+                DISPLAY "Not A Number"
            END-EVALUATE.

@@ -21,8 +21,8 @@
        01  AdminRecord.
            05  AID        PIC 9(5).
            05  AName      PIC X(20).
-           05  ALoginName PIC X(20).
-           05  AEncPsw    PIC X(255).
+           05  ALoginName PIC X(25).
+           05  AEncPsw    PIC X(32).
            05  role       PIC 9.
 
        WORKING-STORAGE SECTION.
@@ -37,6 +37,7 @@
        77  EncryptedPassword PIC X(32).
        77  NewRole           PIC 9(1).
        77  RoleStr           PIC X(10).
+       77  statuscode pic xx.
 
 
        LINKAGE SECTION.
@@ -48,7 +49,7 @@
        Main-Section.
 
            PERFORM Record-pointer
-
+           INITIALIZE Optcode
            PERFORM UNTIL OptCode = 4
                PERFORM Update-Menu
                PERFORM Process-option
@@ -119,9 +120,47 @@
                    ACCEPT NewPsw
 
                    *>Call encryption submodule
+                   CALL '../../Utility Functions/bin/userPassVal'
+                       using by REFERENCE newpsw STatuscode
+                   perform until statusCode equal "00"
+                   evaluate statusCode
+                   WHEN "01"
+                       DISPLAY "Error: Username cannot be empty"
+                   WHEN "02"
+                       DISPLAY "Error: Password cannot be empty"
+                   WHEN "03"
+                       DISPLAY "Error: Invalid length or format"
+                   WHEN "04"
+                       DISPLAY "Error: Password must contain at least "
+                        WITH NO ADVANCING
+                       DISPLAY "one uppercase letter"
+                   WHEN "05"
+                       DISPLAY "Error: Password must contain at least "
+                        WITH NO ADVANCING
+                       DISPLAY "one lowercase letter"
+                   WHEN "06"
+                       DISPLAY "Error: Password must contain at least "
+                        WITH NO ADVANCING
+                       DISPLAY "one number"
+                   WHEN "07"
+                       DISPLAY "Error: Password must contain at least "
+                        WITH NO ADVANCING
+                       DISPLAY "one special character"
+                   WHEN "08"
+                       DISPLAY "Error: Password must be at least 9"
+                       WITH NO ADVANCING
+                       DISPLAY "characters long"
+                   END-EVALUATE
+                   DISPLAY "Enter new Password: "
+                   ACCEPT NewPsw
+
+                   *>Call encryption submodule
+                   CALL '../../Utility Functions/bin/userPassVal'
+                       using by REFERENCE newpsw STatuscode
+                   END-PERFORM
 
                    CALL '../../UtilityFunctions/bin/encryption'
-                       USING BY CONTENT NewPsw EncryptedPassword
+                       USING BY REFERENCE NewPsw EncryptedPassword
                    IF RETURN-CODE NOT = 0
                        DISPLAY "Error encrypting password. Aborting."
                        MOVE '04' TO LNK-Status
