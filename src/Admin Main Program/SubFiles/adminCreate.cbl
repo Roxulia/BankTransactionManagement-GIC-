@@ -24,8 +24,8 @@
        01  AdminRecord.
            05  AID        PIC 9(5).
            05  AName      PIC X(20).
-           05  ALoginName PIC X(20).
-           05  AEncPsw    PIC X(255).
+           05  ALoginName PIC X(25).
+           05  AEncPsw    PIC X(32).
            05  role       PIC 9 value 2.
 
        WORKING-STORAGE SECTION.
@@ -110,8 +110,8 @@
 
            COMPUTE RPSW = FUNCTION RANDOM() * 1000000.
            MOVE RPSW TO PlainPassword.
-
-           MOVE 2 TO role.
+           DISPLAY "Enter Role(1 for Manager, 2 for staff):"
+           ACCEPT role
 
            *>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<*
 
@@ -145,8 +145,8 @@
        *> Call encryption submodule
        Encryption-Call.
 
-           CALL '../../UtilityFunctions/bin/encryption'
-           USING BY CONTENT PlainPassword
+           CALL '../../Utility Functions/bin/encryption'
+           USING BY REFERENCE PlainPassword
                                               EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."
