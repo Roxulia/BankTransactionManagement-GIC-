@@ -24,36 +24,41 @@
        01  AdminRecord.
            05  AID        PIC 9(5).
            05  AName      PIC X(20).
-           05  ALoginName PIC X(25).
-           05  AEncPsw    PIC X(32).
-           05  role       pic 9 value 2.
+           05  ALoginName PIC X(20).
+           05  AEncPsw    PIC X(255).
+           05  role       PIC 9 value 2.
 
        WORKING-STORAGE SECTION.
-       01  WS-FS            PIC XX.
-       01  Dup-Flag         PIC X VALUE 'N'.
-       01  RPSW               PIC 9(6).
-       01  PlainPassword      PIC X(20).
-       01  EncryptedPassword  PIC X(32).
-       01  PrevAID            PIC 9(5) value 00000.
-       01  EOF-Flag           PIC X value 'N'.
-       01  PTR                 PIC 9(4)  COMP-5.
-       01  I                   PIC 9(4)  COMP-5.
 
        *>For display colors
-       77  RED-CODE            PIC X(6) VALUE "[1;31m".*> set red
-       77  ESC                 PIC X    VALUE X"1B".   *> ASCII ESC
-       77  RESET-CODE          PIC X(4) VALUE "[0m".   *> reset
-       77  GREEN-CODE          PIC X(6) VALUE "[1;32m".*>set green
+       COPY "../../Utility Functions/colorCodes.cpy".
+
+       01  WS-FS               PIC XX.
+       01  Dup-Flag            PIC X VALUE 'N'.
+       01  RPSW                PIC 9(6).
+       01  PlainPassword       PIC X(20).
+       01  EncryptedPassword   PIC X(32).
+       01  PrevAID             PIC 9(5) value 00000.
+       01  EOF-Flag            PIC X value 'N'.
+       01  PTR                 PIC 9(4)  COMP-5.
+       01  I                   PIC 9(4)  COMP-5.
 
        LINKAGE SECTION.
        01  WS-ReturnCode       PIC 9(4) VALUE 0.
 
-       PROCEDURE DIVISION using WS-ReturnCode.
+       PROCEDURE DIVISION USING WS-ReturnCode.
 
        Main-Section.
+           PERFORM File-Check
+           PERFORM Generate-AID
+           PERFORM Info-Box
+           PERFORM Encryption-Call
+           PERFORM Write-Record
+           GOBACK.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Creating a new file to store data if not already exist
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>Creating a new file to store data if not already exist
+       File-Check.
 
            OPEN INPUT AdminFile
            IF WS-FS  = '35'
@@ -61,10 +66,11 @@
                OPEN OUTPUT AdminFile
                CLOSE AdminFile
            END-IF
-           CLOSE AdminFile
+           CLOSE AdminFile.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Opening the file for generating AID
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>Opening the file for generating AID
+       Generate-AID.
 
            OPEN INPUT AdminFile
            IF WS-FS NOT = '00'
@@ -89,27 +95,25 @@
                        *>DISPLAY 'NOT at end ' PrevUID
                END-READ
            END-PERFORM
-           CLOSE AdminFile
+           CLOSE AdminFile.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Prompt display for user input and generate a rnd password
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>Prompt display for user input and generate a rnd password
+       *>Generating Login name ( full name + ID )
+       Info-Box.
 
            DISPLAY "====== Create New Admin Account ======"
-           DISPLAY "Generated AID: " AID
+           DISPLAY "=  Generated AID: " ESC GREENX AID ESC RESETX
 
-           DISPLAY "Enter Full Name (max 20 chars):"
+           DISPLAY "=  Enter Full Name (max 20 chars):"
            ACCEPT AName
-
-           DISPLAY "Choose Role : "
-           DISPLAY "   1.Main Admin"
-           DISPLAY "   2.Moderator"
-           DISPLAY "Enter Role Code : " ACCEPT role
 
            COMPUTE RPSW = FUNCTION RANDOM() * 1000000.
            MOVE RPSW TO PlainPassword.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Generating Login name ( full name + ID )
+           MOVE 2 TO role.
+
+           *>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<*
 
            MOVE FUNCTION LOWER-CASE(AName) to ALoginName
 
@@ -127,51 +131,58 @@
                AID               DELIMITED BY SIZE
            INTO ALoginName
 
-           DISPLAY ESC RED-CODE"======================================"
+           DISPLAY ESC REDX"======================================"
            DISPLAY "!! REMEMBER YOUR LOGIN INFOS !! "
-           DISPLAY "~  LoginName : "ESC GREEN-CODE WITH NO ADVANCING
-           DISPLAY ALoginName ESC RED-CODE
-           DISPLAY "~  Password  : "ESC GREEN-CODE WITH NO ADVANCING
+           DISPLAY "~  LoginName : "ESC GREENX WITH NO ADVANCING
+           DISPLAY ALoginName ESC REDX
+           DISPLAY "~  Password  : "ESC GREENX WITH NO ADVANCING
            DISPLAY PlainPassword
-           DISPLAY ESC RED-CODE "!! DON'T FORGET TO" WITH NO ADVANCING
+           DISPLAY ESC REDX "!! DON'T FORGET TO" WITH NO ADVANCING
            DISPLAY " CHANGE YOUR PASSWORD !!"
-           DISPLAY "======================================="
+           DISPLAY "======================================="ESC RESETX.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-           *> Call encryption submodule
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *> Call encryption submodule
+       Encryption-Call.
 
-           CALL '../../Utility Functions/bin/encryption'
-           USING by REFERENCE PlainPassword,EncryptedPassword
+           CALL '../../UtilityFunctions/bin/encryption'
+           USING BY CONTENT PlainPassword
+                                              EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."
+               MOVE 4 TO WS-ReturnCode
                GO TO End-Program
            END-IF
 
            *>remove the line following if encryption.cbl is ready
            *>MOVE PlainPassword TO AEncPsw
 
-           MOVE EncryptedPassword TO AEncPsw
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>wRITING A NEW RECORD TO THE AdminAccounts.DAT
+           MOVE EncryptedPassword TO AEncPsw.
 
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>wRITING A NEW RECORD TO THE AdminAccounts.DAT
+       Write-Record.
            OPEN I-O AdminFile
            WRITE AdminRecord
                INVALID KEY
+                   DISPLAY "======================================="
                    DISPLAY "Error writing to file (Status=" WS-FS ")"
-
+                   DISPLAY "======================================="
+                   MOVE 2 TO WS-ReturnCode
                NOT INVALID KEY
-                   DISPLAY ESC GREEN-CODE "Admin account created"
+                   DISPLAY "======================================="
+                   DISPLAY ESC GREENX "Admin account created"
                        WITH NO ADVANCING
                    DISPLAY "successfully."
-
-                   display esc RESET-CODE
+                   DISPLAY "======================================="
+                   MOVE 0 TO WS-ReturnCode
+                   display esc RESETX
            END-WRITE
 
            CLOSE AdminFile.
 
-          *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-          *>Sub routine to end the program if something happened
-           End-Program.
-           exit program.
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>Sub routine to end the program if something happened
+       End-Program.
 
-       END PROGRAM adminCreate.
+           GOBACK.
