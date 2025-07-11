@@ -15,8 +15,14 @@
        01  loginOpt pic 9(2).
        01  adminName pic X(20) value "test admin".
        01  adminRole pic 9(1) value 1.
+       01  adminId pic 9(5).
        01  userid pic X(5).
        01  statusCode pic x(2) value "00".
+       *>For display colors
+       77  RED-CODE            PIC X(6) VALUE "[1;31m".*> set red
+       77  ESC                 PIC X    VALUE X"1B".   *> ASCII ESC
+       77  RESET-CODE          PIC X(4) VALUE "[0m".   *> reset
+       77  GREEN-CODE          PIC X(6) VALUE "[1;32m".*>set green
        PROCEDURE DIVISION.
        MAIN-PROCEDURE.
       *     call 'adminLogin'
@@ -54,6 +60,7 @@
                DISPLAY "=     2.View User List     ="
                DISPLAY "=     3.Update User Info   ="
                DISPLAY "=     4.Deposit to User    ="
+               DISPLAY "=     5.Update Your Info   ="
                display "=    99.Log Out            ="
                display "============================"
                PERFORM choice-opt-home
@@ -84,6 +91,7 @@
                DISPLAY "=============================="
                move 7 to homepageOpt
                perform choice-opt-update-info
+
            end-if.
 
        deposit-page.
@@ -151,13 +159,24 @@
            PERFORM UNTIL loginOpt = 99
                EVALUATE loginOpt
                    when EQUAL 1
-                       if statusCode = "00" THEN
-                           PERFORM home-page
-                       ELSE
-                           display "INVALID CREDENTIAL"
-                           perform login-page
+                       call '../SubFiles/bin/adminLogin'
+                           using adminId,
+                           adminName , adminRole , statusCode
+                       EVALUATE statusCode
+                           when equal "00"
+                               perform home-page
+                           when equal "96"
+                               DISPLAY ESC RED-CODE "ADMIN NOT FOUND!!"
+                               DISPLAY esc RESET-CODE
+                               perform login-page
+                           when equal "95"
+                               DISPLAY esc RED-CODE"INVALID CREDENTIAL!"
+                               DISPLAY esc RESET-CODE
+                               perform login-page
+                       END-EVALUATE
                    when OTHER
-                       DISPLAY "INVALID OPTION CODE"
+                       DISPLAY esc RED-CODE "INVALID OPTION CODE"
+                       DISPLAY esc RESET-CODE
                        perform login-page
                END-EVALUATE
            END-PERFORM
@@ -170,8 +189,9 @@
            perform UNTIL homepageOpt = 99
                EVALUATE homepageOpt
                    when EQUAL 1
-      *                call 'userCreate'
-                       display "Create User Page"
+                       call '../SubFiles/bin/userCreate'
+                       using statusCode
+                       DISPLAY SPACE
                        perform home-page
                    when  EQUAL 2
       *                call 'userList'
@@ -182,9 +202,16 @@
                    when  EQUAL 4
                        perform deposit-page
                    when EQUAL 5
-      *                call 'adminCreate'
-                       display "Create Admin Page"
-                       perform home-page
+                       if adminRole equal 1 then
+                           call '../SubFiles/bin/adminCreate'
+                           using statusCode
+                           display SPACE
+                           perform home-page
+                       else
+                           call '../SubFiles/bin/adminUpdate'
+                               using adminId
+                           perform home-page
+                       END-IF
                    when equal 6
       *                call 'adminList'
                        display "View Admin List"

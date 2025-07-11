@@ -9,8 +9,12 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT UserAccounts ASSIGN TO "userfile.txt"
-           ORGANIZATION IS LINE SEQUENTIAL.
+           SELECT UserAccounts
+           ASSIGN TO "../../../data/UserAccounts.dat"
+           ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS UID
+               FILE STATUS IS WS-FS.
        DATA DIVISION.
        FILE SECTION.
        FD UserAccounts.
@@ -32,6 +36,7 @@
        01 UserID       PIC x(5).
        01 StatusCode   PIC 9(1) VALUE ZERO.
        01 EOF-FLAG     PIC X(1) VALUE 'N'.
+       01  WS-FS pic x(2).
        LINKAGE SECTION.
        01 Return-Values.
            05 Return-UID PIC 9(5).
