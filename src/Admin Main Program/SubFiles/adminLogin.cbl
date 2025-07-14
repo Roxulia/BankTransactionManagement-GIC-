@@ -60,12 +60,14 @@
            end-if
            perform until eof equal 'y'
                read AdminFile into admin
+
                at end
                    move 'y' to eof
                    move "96" to statusCode
                    move SPACE to username
                    move 0 to arole
                not at end
+                   *>display admin
                    if ALoginName = loginname THEN
                        if AEncPsw = enc_password THEN
                            move "00" to statusCode

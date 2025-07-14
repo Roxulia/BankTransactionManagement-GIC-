@@ -17,6 +17,7 @@
        01  adminRole pic 9(1) value 1.
        01  adminId pic 9(5).
        01  userid pic X(5).
+       01  edit-id pic 9(5).
        01  statusCode pic x(2) value "00".
        *>For display colors
        77  RED-CODE            PIC X(6) VALUE "[1;31m".*> set red
@@ -110,6 +111,7 @@
            DISPLAY "Enter ID to be deposited : "
            ACCEPT userid.
            perform until userid = "EXIT" or userid = "exit"
+           *>>CALL 'trxDeposit' USING userid statusCode
            EVALUATE statusCode
                when equal "00"
                    DISPLAY "Deposited Balance for ID ("userid")"
@@ -135,19 +137,57 @@
            DISPLAY "Enter ID to be updated : "
            ACCEPT userid.
            perform until userid = "EXIT" or userid = "exit"
-      *     if homepageOpt equal 3
-      *        call 'userUpdate' using userid , statusCode
-      *     else if homepageOpt equal 7
-      *        call 'adminUpdate' using userid,statusCode
-      *     end-if
-           EVALUATE statusCode
-               when equal "00"
-                   DISPLAY "Updated Info for ID ("userid")"
-                   perform update-info-page
-               when OTHER
-                   DISPLAY "CANNOT PERFORM UPDATE PROCESS"
-                   perform update-info-page
-           END-EVALUATE
+           call '../../Utility Functions/bin/numberCheck' USING
+           by REFERENCE userid,statusCode
+           if statusCode equal "00"
+               move userid to edit-ID
+               if homepageOpt equal 3
+                  call '../SubFiles/bin/userUpdate'
+                  using by REFERENCE edit-id, statusCode
+                  EVALUATE statusCode
+                   when equal "00"
+                       DISPLAY esc GREEN-CODE
+                       DISPLAY "Updated Info for ID ("userid")"
+                       DISPLAY esc RESET-CODE
+                       perform update-info-page
+                   when equal "96"
+                       DISPLAY esc GREEN-CODE
+                       DISPLAY "NOT FOUND USER WITH ID ("userid")"
+                       DISPLAY esc RESET-CODE
+                       perform update-info-page
+                   when OTHER
+                       DISPLAY ESC RED-CODE
+                       DISPLAY "CANNOT PERFORM UPDATE PROCESS"
+                       DISPLAY esc RESET-CODE
+                       perform update-info-page
+               END-EVALUATE
+               else if homepageOpt equal 7
+                  call '../SubFiles/bin/adminUpdate'
+                  using by REFERENCE edit-id,statusCode
+                  EVALUATE statusCode
+                   when equal "00"
+                       DISPLAY esc GREEN-CODE
+                       DISPLAY "Updated Info for ID ("userid")"
+                       DISPLAY esc RESET-CODE
+                       perform update-info-page
+                   when equal "96"
+                       DISPLAY esc GREEN-CODE
+                       DISPLAY "NOT FOUND ADMIN WITH ID ("userid")"
+                       DISPLAY esc RESET-CODE
+                       perform update-info-page
+                   when OTHER
+                       DISPLAY esc RED-CODE
+                       DISPLAY "CANNOT PERFORM UPDATE PROCESS"
+                       DISPLAY esc RESET-CODE
+                       perform update-info-page
+               END-EVALUATE
+               end-if
+           Else
+           DISPLAY esc RED-CODE
+           DISPLAY "Invalid Input Type"
+           DISPLAY esc RESET-CODE
+           PERFORM update-info-page
+           end-if
            END-PERFORM
            DISPLAY "Going Back To Main Screen"
            perform home-page.
@@ -164,6 +204,8 @@
                            adminName , adminRole , statusCode
                        EVALUATE statusCode
                            when equal "00"
+                               display ESC GREEN-CODE"LOG IN SUCCESSFUL"
+                               DISPLAY ESC RESET-CODE
                                perform home-page
                            when equal "96"
                                DISPLAY ESC RED-CODE "ADMIN NOT FOUND!!"
@@ -180,7 +222,9 @@
                        perform login-page
                END-EVALUATE
            END-PERFORM
+           DISPLAY esc RED-CODE
            DISPLAY "Exitting the Program ...."
+           DISPLAY esc RESET-CODE
            stop run.
 
        choice-opt-home.
@@ -223,6 +267,8 @@
                        perform home-page
                END-EVALUATE
            END-PERFORM
+           DISPLAY esc RED-CODE
            display "Logging Out..."
+           DISPLAY esc RESET-CODE
            perform login-page.
        END PROGRAM AMain.

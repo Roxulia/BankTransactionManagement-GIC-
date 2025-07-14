@@ -9,6 +9,7 @@
        DATA DIVISION.
        WORKING-STORAGE SECTION.
        01 UID     PIC 9(5) value 1.
+       01  username pic x(20).
        01 STATUSCODE PIC X(2) VALUE ZEROS.
        01 OPTION     PIC 9(1) VALUE ZEROS.
        01 loginOpt pic 9(2).
@@ -18,7 +19,7 @@
 
            DISPLAY "================ USER LOGIN ===================".
       *      CALL 'USERLOGIN' USING UID STATUSCODE.
-             PERFORM MAIN-MENU
+             PERFORM login-page
            Stop run.
 
        login-page.
@@ -68,11 +69,20 @@
            PERFORM UNTIL loginOpt = 99
                EVALUATE loginOpt
                    when EQUAL 1
-                       if statusCode = "00" THEN
+                       call '../SubFiles/bin/userLogin'
+                       using by REFERENCE uid , username , STATUSCODE
+                       EVALUATE STATUSCODE
+                       when EQUAL "00"
                            PERFORM MAIN-MENU
-                       ELSE
-                           display "INVALID CREDENTIAL"
-                           perform login-page
+                       when equal "95"
+                           DISPLAY "INVALID CREDENTIAL"
+                           PERFORM login-page
+                       when EQUAL "96"
+                           DISPLAY "USER NOT FOUND"
+                           PERFORM login-page
+                       when EQUAL "99"
+                           DISPLAY "ERROR OCCURS"
+                           PERFORM login-page
                    when OTHER
                        DISPLAY "INVALID OPTION CODE"
                        perform login-page
@@ -88,7 +98,7 @@
            ACCEPT OPTION
             EVALUATE OPTION
                WHEN 1
-     **              CALL 'UPDATEPASSWORD' USING UID
+     **              CALL '../SubFiles/bin/updatePassword' USING UID
                         PERFORM MAIN-MENU
                WHEN 2
       **               CALL 'BALANCEINFO' USING UID

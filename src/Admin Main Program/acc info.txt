@@ -1,7 +1,10 @@
 username : tester100001
-password : 548387
+password : Abcd12345
 mod name : mod100002
 password : 306405
+admins
+~  LoginName : manager200002
+~  Password  : Abcd12345
 user accounts
-~  LoginName : zinzin00002              
-~  Password  : 184575     
+~  LoginName : zinzin00001
+~  Password  : Abcd1234@

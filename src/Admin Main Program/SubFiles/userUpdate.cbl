@@ -5,7 +5,7 @@
       * Tectonics: cobc
       ******************************************************************
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. UserUpdate.
+       PROGRAM-ID. userUpdate.
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
@@ -21,12 +21,13 @@
        01  UserRecord.
            05  UID        PIC 9(5).
            05  UName      PIC X(20).
-           05  ULoginName PIC X(20).
-           05  UEncPsw    PIC X(255).
+           05  ULoginName PIC X(25).
+           05  UEncPsw    PIC X(32).
            05  UAddress   PIC X(20).
-           05  UPh        PIC 9(9).
+           05  UPh        PIC x(9).
            05  Balance    PIC 9(10)V99.
-           05  UDate      PIC 9(8).
+           05  TrxCount   PIC 9(5).
+           05  UDate      PIC 9(6).
            05  UTime      PIC 9(6).
 
        WORKING-STORAGE SECTION.
@@ -37,8 +38,9 @@
        77  WS-FileStatus     PIC XX.
        77  OptCode           PIC 9(1).
        77  NewName           PIC X(20).
-       77  NewPsw            PIC X(255).
+       77  NewPsw            PIC X(20).
        77  EncryptedPassword PIC X(32).
+       77  statusCode pic xx.
 
        LINKAGE SECTION.
        01  LNK-UID           PIC 9(5).
@@ -48,8 +50,18 @@
 
        Main-Section.
 
-           PERFORM Record-pointer
+           call '../../Utility Functions/bin/getUserByID'
+           using by REFERENCE LNK-UID,UserRecord,statusCode
 
+           if statusCode not EQUAL "00"
+               move statuscode to LNK-Status
+               go to exit-process
+           ELSE
+           open i-o UserFile
+           if Ws-filestatus not EQUAL "00"
+               move "99" to LNK-Status
+               go to exit-process
+           end-if
            PERFORM UNTIL OptCode = 5
                PERFORM Update-Menu
                PERFORM Process-option
@@ -60,7 +72,7 @@
 
            CLOSE UserFile
 
-           GOBACK.
+           GO to exit-process.
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
        *> opening UserAccounts data file and retrieving the RECORD
@@ -114,12 +126,50 @@
                    ACCEPT NewPsw
 
                    *>Call encryption submodule
+                   CALL '../../Utility Functions/bin/userPassVal'
+                       using by REFERENCE newpsw STatuscode
+                   perform until statusCode equal "00"
+                   evaluate statusCode
+                   WHEN "01"
+                       DISPLAY "Error: Username cannot be empty"
+                   WHEN "02"
+                       DISPLAY "Error: Password cannot be empty"
+                   WHEN "03"
+                       DISPLAY "Error: Invalid length or format"
+                   WHEN "04"
+                       DISPLAY "Error: Password must contain at least "
+                        WITH NO ADVANCING
+                       DISPLAY "one uppercase letter"
+                   WHEN "05"
+                       DISPLAY "Error: Password must contain at least "
+                        WITH NO ADVANCING
+                       DISPLAY "one lowercase letter"
+                   WHEN "06"
+                       DISPLAY "Error: Password must contain at least "
+                        WITH NO ADVANCING
+                       DISPLAY "one number"
+                   WHEN "07"
+                       DISPLAY "Error: Password must contain at least "
+                        WITH NO ADVANCING
+                       DISPLAY "one special character"
+                   WHEN "08"
+                       DISPLAY "Error: Password must be at least 9"
+                       WITH NO ADVANCING
+                       DISPLAY "characters long"
+                   END-EVALUATE
+                   DISPLAY "Enter new Password: "
+                   ACCEPT NewPsw
 
-                   CALL '../../UtilityFunctions/bin/encryption'
-                       USING BY CONTENT NewPsw EncryptedPassword
+                   *>Call encryption submodule
+                   CALL '../../Utility Functions/bin/userPassVal'
+                       using by REFERENCE newpsw STatuscode
+                   END-PERFORM
+                   CALL '../../Utility Functions/bin/encryption'
+                       USING BY REFERENCE NewPsw EncryptedPassword
                    IF RETURN-CODE NOT = 0
-                       DISPLAY "Error encrypting password. Aborting."
+                       DISPLAY "Error encrypting password. Aborting"
                        MOVE '04' TO LNK-Status
+                       CONTINUE
                    END-IF
 
                    *>remove the line following if encryption.cbl is ready
@@ -133,7 +183,8 @@
                    ACCEPT UAddress
 
                WHEN 4
-                   CALL 'phoneValidCheck' USING BY CONTENT UPh
+                   CALL '../../Utility Functions/bin/phoneValidCheck'
+                   USING BY REFERENCE UPh
 
                WHEN 5
                    CLOSE UserFile
@@ -159,4 +210,7 @@
                    MOVE "00" TO LNK-Status
            END-REWRITE.
 
+       exit-process.
+           exit program.
+       end PROGRAM userUpdate.
        *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

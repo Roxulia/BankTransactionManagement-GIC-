@@ -13,7 +13,7 @@
        FD TrxFile.
        01 TrxRecord.
            05 TrxID         PIC 9(10).
-           05 UID           PIC 9(5).
+           05 senderID      PIC 9(5).
            05 ReceiverID    PIC 9(5).
            05 Description   PIC X(30).
            05 Amount        PIC 9(10)V99.
@@ -21,18 +21,41 @@
            05 TimeStamp     PIC 9(16).
 
        WORKING-STORAGE SECTION.
-       01 INPUT-UID         PIC 9(5).
        01 END-FILE          PIC X VALUE "N".
        01 BALANCE           PIC 9(12)V99 VALUE 0.
        01 TYPE-NAME         PIC X(10).
        01 DISPLAY-TIME      PIC X(16).
        01 WITHDRAW-AMT      PIC Z(10).99.
        01 DEPOSIT-AMT       PIC Z(10).99.
+       01  statusCode pic xx.
+       01  UserData.
+           05  UID        PIC 9(5).
+           05  UName      PIC X(20).
+           05  ULoginName PIC X(25).
+           05  UEncPsw    PIC X(32).
+           05  UAddress   PIC X(20).
+           05  UPh        PIC X(9).
+           05  UBalance    PIC 9(10)V99.
+           05  UDate      PIC 9(6).
+           05  UTime      PIC 9(6).
 
-       PROCEDURE DIVISION.
+       LINKAGE SECTION.
+       01  Input-uid pic 9(5).
+
+       PROCEDURE DIVISION using INPUT-UID.
        MAIN-PARA.
-           DISPLAY "Enter your User ID to generate report: ".
-           ACCEPT INPUT-UID.
+
+           call 'getUserByID' using by REFERENCE
+           Input-uid , UserData , statusCode
+
+           EVALUATE statusCode
+               when EQUAL "96"
+                   DISPLAY "User Not Found"
+                   exit PROGRAM
+               when EQUAL "99"
+                   DISPLAY "Unknown Error Occurs"
+                   exit PROGRAM
+           END-EVALUATE
 
            OPEN INPUT TrxFile.
 

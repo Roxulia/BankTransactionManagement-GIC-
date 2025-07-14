@@ -11,16 +11,17 @@
 
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01 WS-UID          PIC X(25).
+       01 WS-UID          PIC x(25) value 1.
+       01  statusCode pic xx.
        01 WS-UserData.
            05 WS-RET-UID      PIC 9(5).
            05 WS-RET-UName    PIC X(20).
            05 WS-RET-ULoginName PIC X(25).
            05 RET-UEncodedPassword PIC X(32).
            05 WS-RET-UAddress PIC X(20).
-           05 RET-UPhone PIC 9(9).
+           05 RET-UPhone PIC x(9).
            05 RET-UBalance PIC 9(10)V99.
-           05 RET-UDate PIC 9(8).
+           05 RET-UDate PIC 9(6).
            05 RET-UTime PIC 9(6).
            05 WS-RET-Found    PIC X(1).
 
@@ -30,9 +31,10 @@
            DISPLAY "Enter User ID to search: "
            ACCEPT WS-UID
            IF WS-UID NOT = 0
-           CALL "getUser" USING WS-UID, WS-UserData
+           CALL "getUserByLoginName"
+           USING by REFERENCE WS-UID, WS-UserData,statusCode
 
-           IF WS-RET-Found = "Y"
+           IF statusCode = "00"
                DISPLAY "User found!"
                DISPLAY "-------------------------"
                DISPLAY "UID: " WS-RET-UID
