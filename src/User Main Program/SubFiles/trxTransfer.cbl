@@ -42,17 +42,18 @@
            05 ReceiverID   PIC 9(5).
            05 Description  PIC X(30).
            05 Amount       PIC 9(10)V99.
-           05 T-Type       PIC X(20).
-           05 TimeStamp    PIC 9(16).
+           05 T-Type       PIC 9.
+           05 TimeStamp    PIC 9(12).
        01 USER-RECORD.
            05 U-UID       PIC 9(5).
            05 U-NAME      PIC X(20).
            05 U-PASSWORD  PIC X(20).
-           05 U-ADDRESS  PIC X(20).
-           05 U-PHONE    PIC 9(9).
-           05 U-BALANCE  PIC 9(10)V99.
-           05 U-DATE     PIC 9(8).
-           05 U-TIME     PIC 9(6).
+           05 U-ADDRESS   PIC X(20).
+           05 U-PHONE     PIC 9(9).
+           05 U-BALANCE   PIC 9(10)V99.
+           05 U-DATE      PIC 9(6).
+           05 U-TIME      PIC 9(6).
+           05  TrxCount   PIC 9(5).
        01 RECEIVER-RECORD.
            05 R-UID       PIC 9(5).
            05 R-NAME      PIC X(20).
@@ -60,22 +61,25 @@
            05 R-ADDRESS  PIC X(20).
            05 R-PHONE    PIC 9(9).
            05 R-BALANCE  PIC 9(10)V99.
-           05 R-DATE     PIC 9(8).
+           05 R-DATE     PIC 9(6).
            05 R-TIME     PIC 9(6).
        WORKING-STORAGE SECTION.
        01 WS-SenderUID   PIC 9(5) VALUE ZERO.
        01 WS-ReceiverUID  PIC 9(5) VALUE ZERO.
        01 WS-Amount      PIC 9(10)V99 VALUE ZERO.
        01 EOF-FLAG          PIC X VALUE 'N'.
-       01 Current-Date   PIC 9(8) VALUE ZERO.
+       01 Current-Date   PIC 9(6) VALUE ZERO.
        01 Current-Time   PIC 9(6) VALUE ZERO.
        01 SENDER-FOUND      PIC X VALUE 'N'.
        01 RECEIVER-FOUND    PIC X VALUE 'N'.
        01 TEMP-BALANCE      PIC 9(10)V99 VALUE ZERO.
        01 WS-FS1            PIC XX.
        01 WS-FS2            PIC XX.
-       01 WS-TRXID             PIC 9(10) VALUE 1.
-       
+       01 WS-TRXID          PIC 9(10) VALUE 1.
+       01 WS-TrxBaseID     PIC 9(10).
+       01 WS-TrxDepoPrefix PIC 9(10).
+       01 WS-TrxFullID     PIC 9(10).
+       COPY "../../Utility Functions/trxConstants.cpy".
        LINKAGE SECTION.
        01 LS-SenderID    PIC 9(5).
        01 LS-StatusCode     PIC X(2) VALUE SPACES.
@@ -126,6 +130,20 @@
            MOVE USERDATA TO RECEIVER-RECORD
            MOVE 'Y' TO RECEIVER-FOUND
            .
+           PERFORM TRXID-GENERATE.
+           *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+       *>Generate a unique trxid ( TrxCount+1) + S,R,D,W + SenderID
+       *> Sent, received , deposit , withdraw , D here since this sub file is for deposit
+       TRXID-GENERATE.
+ 
+           ADD 1 TO TrxCount
+           MOVE TrxCount TO TrxID.
+ 
+           STRING
+               FUNCTION NUMVAL(WS-TrxBaseID) DELIMITED BY SIZE
+               WS-TrxDepoPrefix DELIMITED BY SIZE
+               FUNCTION NUMVAL(WS-SenderUID) DELIMITED BY SIZE
+               INTO WS-TrxFullID.
 
             PROCESS-TRANSFER.
            SUBTRACT WS-AMOUNT FROM U-Balance GIVING TEMP-BALANCE
