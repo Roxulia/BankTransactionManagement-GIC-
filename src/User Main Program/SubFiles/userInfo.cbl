@@ -9,59 +9,61 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT testfile
-           ASSIGN TO "../../../data/UserAccounts.dat"
-           ORGANIZATION IS INDEXED
-               ACCESS MODE IS DYNAMIC
-               RECORD KEY IS UID
-               FILE STATUS IS WS-FS.
        DATA DIVISION.
        FILE SECTION.
-       FD testfile.
-       01 userdata.
-           05 UID      PIC 9(5).
-           05 UName    PIC X(20).
-           05 ULoginName PIC X(20).
-           05 UEncPsw  PIC X(255).
-           05 UAddress PIC X(20).
-           05 Phone    PIC 9(9).
-           05 Balance  PIC 9(10)V99.
-           05 UDate    PIC 9(8).
-           05 UTime    PIC 9(6).
        WORKING-STORAGE SECTION.
        01 InputUID PIC 9(5).
        01 Found    PIC X(1) VALUE 'N'.
        01 EOF-Flag PIC X(1) VALUE 'N'.
+       01  optCode pic x.
        01  ws-fs pic x(2).
+       01  statuscode pic xx.
+       01  UserRecord.
+           05  UID        PIC 9(5).
+           05  UName      PIC X(20).
+           05  ULoginName PIC X(25).
+           05  UEncPsw    PIC X(32).
+           05  UAddress   PIC X(20).
+           05  UPh        PIC x(9).
+           05  Balance    PIC 9(10)V99.
+           05  TrxCount   PIC 9(5).
+           05  UDate      PIC 9(6).
+           05  UTime      PIC 9(6).
+
+       copy '../../Utility Functions/colorCodes.cpy'.
        linkage SECTION.
        01 InputUID1 PIC 9(5).
 
        PROCEDURE DIVISION using InputUID1.
        MAIN-PROCEDURE.
-            DISPLAY "Enter User ID(UID):"
-            ACCEPT InputUID.
+            INITIALIZE InputUID
+            move InputUID1 to InputUID
+            call '../../Utility Functions/bin/getUserByID'
+               using by REFERENCE inputUID,UserRecord,statusCode
+            EVALUATE statuscode
+               when EQUAL "96"
+                   display esc redx "User Not Found"
+                   DISPLAY esc resetx
 
-            OPEN INPUT testfile.
-            PERFORM UNTIL EOF-Flag = 'Y'
-               READ testfile INTO userdata
-               AT END
-               MOVE 'Y' TO EOF-Flag
-               NOT AT END
-               IF  UID = InputUID THEN
-                   MOVE 'Y' TO Found
-                   MOVE 'Y' TO EOF-Flag
-               END-IF
-               END-READ
-               END-PERFORM
-               CLOSE testfile.
+               when EQUAL "99"
+                   DISPLAY esc redx
+                   DISPLAY "Error Occurs"
+                   DISPLAY esc resetx
 
-               IF Found = 'Y'
-                   DISPLAY "Username: " UName
-                   DISPLAY "UAddress: " UAddress
-                   DISPLAY "Phone: "    Phone
-                   DISPLAY "Balance: "  Balance
-               ELSE
-                   DISPLAY "User not found."
-               END-IF.
-            STOP RUN.
+               when EQUAL "00"
+                   DISPLAY esc greenx
+                   DISPLAY "========User Profile Info========"
+                   DISPLAY "UserName : " UName
+                   DISPLAY "Address : " UAddress
+                   DISPLAY "Phone : " UPh
+                   DISPLAY "Balance : " Balance
+                   DISPLAY "================================="
+                   DISPLAY esc redx
+                   DISPLAY "enter any key to exit : "
+                   ACCEPT optCode
+                   DISPLAY esc resetx
+
+           END-EVALUATE
+           exit PROGRAM.
+
        END PROGRAM userInfo.

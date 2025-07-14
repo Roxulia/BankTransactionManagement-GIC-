@@ -6,5 +6,5 @@ admins
 ~  LoginName : manager200002
 ~  Password  : Abcd12345
 user accounts
-~  LoginName : zinzin00001
-~  Password  : Abcd1234@
+~  LoginName : palpal00001
+~  Password  : Abcd12345

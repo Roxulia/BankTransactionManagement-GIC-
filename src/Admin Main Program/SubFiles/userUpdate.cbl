@@ -41,6 +41,7 @@
        77  NewPsw            PIC X(20).
        77  EncryptedPassword PIC X(32).
        77  statusCode pic xx.
+       77  ws-uid pic 9(5).
 
        LINKAGE SECTION.
        01  LNK-UID           PIC 9(5).
@@ -49,9 +50,11 @@
        PROCEDURE DIVISION USING LNK-UID LNK-Status.
 
        Main-Section.
-
+           INITIALIZE optcode
+           INITIALIZE ws-uid
+           move LNK-UID to ws-uid
            call '../../Utility Functions/bin/getUserByID'
-           using by REFERENCE LNK-UID,UserRecord,statusCode
+           using by REFERENCE ws-UID,UserRecord,statusCode
 
            if statusCode not EQUAL "00"
                move statuscode to LNK-Status
@@ -99,6 +102,9 @@
 
            DISPLAY "========================================"
            DISPLAY "=  Current Name : " ESC GREENX UName ESC RESETX
+           DISPLAY "=  Current Password : "ESC GREENX "????" ESC RESETX
+           DISPLAY "=  Current Address : "ESC GREENX UAddress ESC RESETX
+           DISPLAY "=  Current Phone : " ESC GREENX UPh ESC RESETX
            DISPLAY "========================================"
            DISPLAY "=  Which field to update?"
            DISPLAY "=  1. Name"
