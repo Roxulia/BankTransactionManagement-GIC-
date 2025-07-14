@@ -181,7 +181,7 @@
            ACCEPT  CurrentTime     FROM    TIME
            MOVE    CurrentDate     TO      UDate
            MOVE    CurrentTime     TO      UTime
-
+      *     DISPLAY UserRecord
            OPEN I-O UserFile
            WRITE UserRecord
                INVALID KEY

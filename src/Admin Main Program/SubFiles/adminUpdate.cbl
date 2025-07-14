@@ -38,6 +38,7 @@
        77  NewRole           PIC 9(1).
        77  RoleStr           PIC X(10).
        77  statuscode pic xx.
+       77  ws-aid pic 9(5).
 
 
        LINKAGE SECTION.
@@ -47,7 +48,9 @@
        PROCEDURE DIVISION USING LNK-AID LNK-Status.
 
        Main-Section.
-
+           INITIALIZE optcode
+           INITIALIZE ws-aid
+           move lnk-aid to ws-aid
            PERFORM Record-pointer
            INITIALIZE Optcode
            PERFORM UNTIL OptCode = 4
@@ -66,7 +69,7 @@
        *> opening AdminAccounts data file and retrieving the RECORD
        Record-pointer.
 
-           MOVE LNK-AID TO AID
+           MOVE ws-AID TO AID
            OPEN I-O AdminFile
            IF WS-FileStatus NOT = '00'
                MOVE '99' TO LNK-Status

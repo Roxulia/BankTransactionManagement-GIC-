@@ -22,6 +22,7 @@
            05 UAddress      PIC X(20).
            05 Phone         PIC x(9).
            05 Balance       PIC 9(10)V99.
+           05 trxCount      pic 9(5).
            05 UDate         PIC 9(6).
            05 UTime         PIC 9(6).
 
@@ -36,13 +37,13 @@
 
        PROCEDURE DIVISION using LS-UID.
        MAIN-LOGIC.
-
-           OPEN INPUT UserFile.
+           move "N" to END-FILE
+           OPEN INPUT UserFile
 
            if ws-fs not EQUAL "00" THEN
                display "File openning error"
                exit PROGRAM
-           end-if.
+           end-if
 
            PERFORM UNTIL END-FILE = "Y"
                READ UserFile
@@ -59,12 +60,12 @@
                            MOVE "Y" TO END-FILE
                        END-IF
                END-READ
-           END-PERFORM.
+           END-PERFORM
 
            IF WS-FOUND NOT = "Y"
                DISPLAY "User ID not found."
-           END-IF.
+           END-IF
 
-           CLOSE UserFile.
+           CLOSE UserFile
 
            exit program.
