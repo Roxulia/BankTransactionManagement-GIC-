@@ -98,7 +98,7 @@
            ACCEPT OPTION
             EVALUATE OPTION
                WHEN 1
-     **              CALL 'UPDATEPASSWORD' USING UID
+     **              CALL '../SubFiles/bin/updatePassword' USING UID
                         PERFORM MAIN-MENU
                WHEN 2
       **               CALL 'BALANCEINFO' USING UID

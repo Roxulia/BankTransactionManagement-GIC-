@@ -5,142 +5,170 @@
       * Tectonics: cobc
       ******************************************************************
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. txrTransferTest.
+       PROGRAM-ID. txrTransfer.
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT testfile ASSIGN TO 'userfile.txt'
-           ORGANIZATION IS SEQUENTIAL.
-           SELECT Transactions ASSIGN TO "Transactions.txt"
-           ORGANIZATION IS  SEQUENTIAL.
+           SELECT USERACCOUNTS 
+           ASSIGN TO "../../../data/UserAccounts.dat"
+               ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS UID
+               FILE STATUS IS WS-FS2.
+           SELECT TRANSACTIONS 
+           ASSIGN TO "../../../data/Transactions.dat"
+               ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS TRXID
+               FILE STATUS IS WS-FS1.
+
        DATA DIVISION.
        FILE SECTION.
-       FD testfile.
-       01 userdata.
+       FD USERACCOUNTS.
+       01 USERDATA.
            05 UID          PIC 9(5).
            05 UName        PIC X(20).
-           05 ULoginName   PIC X(20).
-           05 UEncPsw      PIC X(255).
+           05 UEncPsw      PIC X(32).
            05 UAddress     PIC X(20).
-           05 Phone        PIC 9(9).
+           05 UPhone        PIC 9(9).
            05 Balance      PIC 9(10)V99.
            05 UDate        PIC 9(8).
            05 UTime        PIC 9(6).
+    
        FD Transactions.
-       01 TrxRecord.
+       01 TRXRECORD.
            05 TrxID        PIC 9(10).
-           05 TrxUID          PIC 9(5).
+           05 SenderID     PIC 9(5).
            05 ReceiverID   PIC 9(5).
            05 Description  PIC X(30).
            05 Amount       PIC 9(10)V99.
            05 T-Type       PIC X(20).
            05 TimeStamp    PIC 9(16).
+       01 USER-RECORD.
+           05 U-UID       PIC 9(5).
+           05 U-NAME      PIC X(20).
+           05 U-PASSWORD  PIC X(20).
+           05 U-ADDRESS  PIC X(20).
+           05 U-PHONE    PIC 9(9).
+           05 U-BALANCE  PIC 9(10)V99.
+           05 U-DATE     PIC 9(8).
+           05 U-TIME     PIC 9(6).
+       01 RECEIVER-RECORD.
+           05 R-UID       PIC 9(5).
+           05 R-NAME      PIC X(20).
+           05 R-PASSWORD  PIC X(20).
+           05 R-ADDRESS  PIC X(20).
+           05 R-PHONE    PIC 9(9).
+           05 R-BALANCE  PIC 9(10)V99.
+           05 R-DATE     PIC 9(8).
+           05 R-TIME     PIC 9(6).
        WORKING-STORAGE SECTION.
-       01 SenderUID        PIC 9(5) VALUE ZERO.
-       01 ReceiverUID      PIC 9(5).
-       01 TransferAmount   PIC 9(10)V99.
-       01 FoundSender      PIC X VALUE 'N'.
-       01 FoundReceiver    PIC X VALUE 'N'.
-       01 EOF-FLAG         PIC X VALUE 'N'.
-       01 DateTime         PIC X(16) VALUES SPACES.
-       01 TrxTID           PIC 9(10) VALUE 1000000000.
-       01 EOF            PIC X VALUE "N".
-       01 SenderBalance    PIC 9(10)V99.
-       01 ReceiverBalance  PIC 9(10)V99.
-       PROCEDURE DIVISION.
-       MAIN-PROCEDURE.
-            DISPLAY "Enter Sender's UID:"
-            ACCEPT SenderUID.
+       01 WS-SenderUID   PIC 9(5) VALUE ZERO.
+       01 WS-ReceiverUID  PIC 9(5) VALUE ZERO.
+       01 WS-Amount      PIC 9(10)V99 VALUE ZERO.
+       01 EOF-FLAG          PIC X VALUE 'N'.
+       01 Current-Date   PIC 9(8) VALUE ZERO.
+       01 Current-Time   PIC 9(6) VALUE ZERO.
+       01 SENDER-FOUND      PIC X VALUE 'N'.
+       01 RECEIVER-FOUND    PIC X VALUE 'N'.
+       01 TEMP-BALANCE      PIC 9(10)V99 VALUE ZERO.
+       01 WS-FS1            PIC XX.
+       01 WS-FS2            PIC XX.
+       01 WS-TRXID             PIC 9(10) VALUE 1.
+       
+       LINKAGE SECTION.
+       01 LS-SenderID    PIC 9(5).
+       01 LS-StatusCode     PIC X(2) VALUE SPACES.
+       PROCEDURE DIVISION USING LS-SenderID LS-StatusCode.
+        MAIN-PROCEDURE.
+            MOVE LS-SENDERID TO WS-SenderUID
+            DISPLAY "Enter Receiver's UID:".
+           ACCEPT WS-RECEIVERUID.
 
-            DISPLAY "Enter Receiver's UID:"
-            ACCEPT ReceiverID.
+           DISPLAY "Enter Transfer Amount:".
+           ACCEPT WS-AMOUNT.
 
-            DISPLAY "Enter Transfer Amount:"
-            ACCEPT TransferAmount.
-
-            OPEN I-O testfile.
-
-            *>Find Sender
-
-           PERFORM UNTIL EOF = "Y"
-            READ testfile
-            AT END
-            EXIT PROGRAM
-            END-READ
-
-             IF UID = SenderUID THEN
-                 MOVE Balance TO SenderBalance
-                 IF SenderBalance >= Amount THEN
-                     COMPUTE SenderBalance = SenderBalance - Amount
-                     MOVE SenderBalance TO Balance
-                     MOVE FUNCTION CURRENT-DATE TO UDate
-                     REWRITE userdata
-                     MOVE "Y" TO FoundSender
-                END-IF
-             END-IF
-            END-PERFORM.
-
-            IF FoundSender NOT ="Y"
-                DISPLAY "Sender not Found or Insufficient Funds."
-                CLOSE testfile
-            END-IF.
-
-            REWRITE-SENDER-FINISHED.
-                CLOSE testfile.
-                OPEN I-O testfile.
-
-                PERFORM UNTIL EOF = "Y"
-                READ testfile
-                AT END
-                EXIT PROGRAM
-                END-READ
-
-
-               IF UID = ReceiverUID THEN
-                   MOVE Balance TO ReceiverBalance
-                   COMPUTE ReceiverBalance = ReceiverBalance+Amount
-                   MOVE ReceiverBalance TO Balance
-                   MOVE FUNCTION CURRENT-DATE TO UDate
-                   REWRITE userdata
-                   MOVE "Y" TO FoundReceiver
-               END-IF
-           END-PERFORM.
-
-               IF FoundReceiver NOT = "Y"
+           OPEN I-O USERACCOUNTS
+           
+           PERFORM FIND-SENDER
+           PERFORM FIND-RECEIVER
+           IF SENDER-FOUND = 'Y' AND RECEIVER-FOUND = 'Y'
+               AND U-Balance >= WS-AMOUNT
+               THEN
+                   PERFORM PROCESS-TRANSFER
+                   DISPLAY "Transfer Successful."
+               ELSE
+                   DISPLAY 
+            "Transfer Failed: Insufficient balance or invalid user ID."
+                   MOVE "99" TO LS-StatusCode
+           END-IF      
+           
+            CLOSE UserAccounts.
+            GOBACK.
+             
+             FIND-SENDER.
+           MOVE WS-SENDERUID TO UID
+           READ USERACCOUNTS INVALID KEY
+               DISPLAY "Sender not found."
+               MOVE 'N' TO SENDER-FOUND
+               GOBACK
+           END-READ
+           MOVE USERDATA TO USER-RECORD
+           MOVE 'Y' TO SENDER-FOUND
+           .
+           FIND-RECEIVER.
+           MOVE WS-RECEIVERUID TO UID
+           READ USERACCOUNTS INVALID KEY
                DISPLAY "Receiver not found."
-               CLOSE testfile
-               STOP RUN
-           END-IF.
-           Close testfile
+               MOVE 'N' TO RECEIVER-FOUND
+               GOBACK
+           END-READ
+           MOVE USERDATA TO RECEIVER-RECORD
+           MOVE 'Y' TO RECEIVER-FOUND
+           .
 
+            PROCESS-TRANSFER.
+           SUBTRACT WS-AMOUNT FROM U-Balance GIVING TEMP-BALANCE
+           MOVE TEMP-BALANCE TO U-Balance
+           REWRITE USER-RECORD
+           
 
-           OPEN OUTPUT Transactions
+           ADD WS-AMOUNT TO R-Balance GIVING TEMP-BALANCE
+           MOVE TEMP-BALANCE TO R-Balance
+           REWRITE RECEIVER-RECORD
+           
+           PERFORM LOG-TRANSACTIONS
+           MOVE "00" TO LS-StatusCode
+           .
 
-           *> Sender Log
-           ADD 1 TO TrxTID
-           MOVE TrxTID TO TrxID
-           MOVE SenderUID TO TrxUID
-           MOVE ReceiverUID TO ReceiverID
-           MOVE "Sent to UID " TO Description
-           MOVE TransferAmount TO Amount
-           MOVE "2" TO T-Type
-           MOVE FUNCTION CURRENT-DATE TO TimeStamp
-           WRITE TrxRecord.
+           LOG-TRANSACTIONS.
+           OPEN EXTEND TRANSACTIONS
 
+           MOVE FUNCTION CURRENT-DATE (1:8) TO CURRENT-DATE
+           MOVE FUNCTION CURRENT-DATE (9:6) TO CURRENT-TIME
 
+           *> Log sender transaction
+           MOVE WS-SENDERUID TO SENDERID OF TRXRECORD
+           MOVE WS-RECEIVERUID TO RECEIVERID OF TRXRECORD
+           MOVE "FUND TRANSFER SENT" TO DESCRIPTION OF TRXRECORD
+           MOVE WS-AMOUNT TO AMOUNT OF TRXRECORD
+           MOVE "SEND" TO T-TYPE OF TRXRECORD
+           STRING CURRENT-DATE DELIMITED BY SIZE
+                  CURRENT-TIME DELIMITED BY SIZE
+                  INTO TIMESTAMP OF TRXRECORD
+           WRITE TRXRECORD
 
-           *> Receiver Log
-            ADD 1 TO TrxTID
-           MOVE TrxTID TO TrxID
-           MOVE ReceiverUID TO TrxUID
-           MOVE SenderUID TO ReceiverID
-           MOVE "Received from UID " TO Description
-           MOVE TransferAmount TO Amount
-           MOVE "1" TO T-Type
-           MOVE FUNCTION CURRENT-DATE TO TimeStamp
-           WRITE TrxRecord.
-           CLOSE Transactions
+           *> Log receiver transaction
+           MOVE WS-RECEIVERUID TO SENDERID OF TRXRECORD
+           MOVE WS-SENDERUID TO RECEIVERID OF TRXRECORD
+           MOVE "FUND TRANSFER RECEIVED" TO DESCRIPTION OF TRXRECORD
+           MOVE WS-AMOUNT TO AMOUNT OF TRXRECORD
+           MOVE "RECEIVE" TO T-TYPE OF TRXRECORD
+           STRING CURRENT-DATE DELIMITED BY SIZE
+                  CURRENT-TIME DELIMITED BY SIZE
+                  INTO TIMESTAMP OF TRXRECORD
+           WRITE TRXRECORD
 
-           DISPLAY "Transfer successful.".
-
-       END PROGRAM txrTransferTest.
+           CLOSE TRANSACTIONS
+           .
+       END PROGRAM txrTransfer.

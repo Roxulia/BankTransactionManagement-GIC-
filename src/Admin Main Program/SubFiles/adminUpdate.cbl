@@ -76,7 +76,7 @@
            READ AdminFile KEY IS AID
                INVALID KEY
                    DISPLAY "Admin ID not found"
-                   MOVE '99' TO LNK-Status
+                   MOVE '96' TO LNK-Status
                    CLOSE AdminFile
                    GOBACK
            END-READ

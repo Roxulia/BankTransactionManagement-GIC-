@@ -26,6 +26,7 @@
            05  UAddress   PIC X(20).
            05  UPh        PIC X(9).
            05  Balance    PIC 9(10)V99.
+           05  TrxCount   PIC 9(5).
            05  UDate      PIC 9(6).
            05  UTime      PIC 9(6).
 
@@ -34,7 +35,7 @@
        01  CurrentDate         PIC 9(6).
        01  CurrentTime         PIC 9(6).
        01  Dup-Flag            PIC X VALUE 'N'.
-       01  RPSW               PIC 9(6).
+       01  RPSW                PIC 9(6).
        01  PlainPassword       PIC X(20).
        01  EncryptedPassword   PIC X(32).
        01  PrevUID             PIC 9(5) value 00000.
@@ -175,6 +176,7 @@
        Write-Record.
 
            MOVE    0               TO      Balance
+           MOVE    0               TO      TrxCount
            ACCEPT  CurrentDate     FROM    DATE
            ACCEPT  CurrentTime     FROM    TIME
            MOVE    CurrentDate     TO      UDate

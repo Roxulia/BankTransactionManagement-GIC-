@@ -26,6 +26,7 @@
            05  UAddress   PIC X(20).
            05  UPh        PIC x(9).
            05  Balance    PIC 9(10)V99.
+           05  TrxCount   PIC 9(5).
            05  UDate      PIC 9(6).
            05  UTime      PIC 9(6).
 
@@ -53,7 +54,7 @@
            using by REFERENCE LNK-UID,UserRecord,statusCode
 
            if statusCode not EQUAL "00"
-               move "99" to LNK-Status
+               move statuscode to LNK-Status
                go to exit-process
            ELSE
            open i-o UserFile
