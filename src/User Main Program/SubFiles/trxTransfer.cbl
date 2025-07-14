@@ -5,7 +5,7 @@
       * Tectonics: cobc
       ******************************************************************
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. txrTransfer.
+       PROGRAM-ID. trxTransfer.
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
@@ -28,11 +28,13 @@
        01 USERDATA.
            05 UID          PIC 9(5).
            05 UName        PIC X(20).
+           05 ULoginName   PIC X(25).
            05 UEncPsw      PIC X(32).
            05 UAddress     PIC X(20).
-           05 UPhone        PIC 9(9).
+           05 UPh          PIC x(9).
            05 Balance      PIC 9(10)V99.
-           05 UDate        PIC 9(8).
+           05 TrxCount     PIC 9(5).
+           05 UDate        PIC 9(6).
            05 UTime        PIC 9(6).
     
        FD Transactions.
@@ -44,29 +46,11 @@
            05 Amount       PIC 9(10)V99.
            05 T-Type       PIC 9.
            05 TimeStamp    PIC 9(12).
-       01 USER-RECORD.
-           05 U-UID       PIC 9(5).
-           05 U-NAME      PIC X(20).
-           05 U-PASSWORD  PIC X(20).
-           05 U-ADDRESS   PIC X(20).
-           05 U-PHONE     PIC 9(9).
-           05 U-BALANCE   PIC 9(10)V99.
-           05 U-DATE      PIC 9(6).
-           05 U-TIME      PIC 9(6).
-           05  TrxCount   PIC 9(5).
-       01 RECEIVER-RECORD.
-           05 R-UID       PIC 9(5).
-           05 R-NAME      PIC X(20).
-           05 R-PASSWORD  PIC X(20).
-           05 R-ADDRESS  PIC X(20).
-           05 R-PHONE    PIC 9(9).
-           05 R-BALANCE  PIC 9(10)V99.
-           05 R-DATE     PIC 9(6).
-           05 R-TIME     PIC 9(6).
+       
        WORKING-STORAGE SECTION.
-       01 WS-SenderUID   PIC 9(5) VALUE ZERO.
+       01 WS-SenderUID    PIC 9(5) VALUE ZERO.
        01 WS-ReceiverUID  PIC 9(5) VALUE ZERO.
-       01 WS-Amount      PIC 9(10)V99 VALUE ZERO.
+       01 WS-Amount       PIC 9(10)V99 VALUE ZERO.
        01 EOF-FLAG          PIC X VALUE 'N'.
        01 Current-Date   PIC 9(6) VALUE ZERO.
        01 Current-Time   PIC 9(6) VALUE ZERO.
@@ -79,20 +63,47 @@
        01 WS-TrxBaseID     PIC 9(10).
        01 WS-TrxDepoPrefix PIC 9(10).
        01 WS-TrxFullID     PIC 9(10).
+       01 WS-TrxCount      Pic 9(5).
+       01  statusCode pic xx.
+       01 USER-RECORD.
+           05 U-UID       PIC 9(5).
+           05 U-NAME      PIC X(20).
+           05 U-LoginName PIC X(25).
+           05 U-EncPsw    PIC X(32).
+           05 U-ADDRESS   PIC X(20).
+           05 U-PHONE     PIC x(9).
+           05 U-BALANCE   PIC 9(10)V99.
+           05 U-TrxCount  PIC 9(5).
+           05 U-DATE      PIC 9(6).
+           05 U-TIME      PIC 9(6).
+           
+       01 RECEIVER-RECORD.
+           05 R-UID        PIC 9(5).
+           05 R-NAME       PIC X(20).
+           05 R-ULoginName PIC X(25).
+           05 R-EncPsw     PIC X(32).
+           05 R-ADDRESS    PIC X(20).
+           05 R-PHONE      PIC x(9).
+           05 R-BALANCE    PIC 9(10)V99.
+           05 R-TrxCount   PIC 9(5).
+           05 R-DATE       PIC 9(6).
+           05 R-TIME       PIC 9(6).
        COPY "../../Utility Functions/trxConstants.cpy".
        LINKAGE SECTION.
        01 LS-SenderID    PIC 9(5).
        01 LS-StatusCode     PIC X(2) VALUE SPACES.
        PROCEDURE DIVISION USING LS-SenderID LS-StatusCode.
-        MAIN-PROCEDURE.
-            MOVE LS-SENDERID TO WS-SenderUID
+           
+       MAIN-PROCEDURE.
+            *>MOVE LS-SENDERID TO WS-SenderUID
+            DISPLAY "Enter SenderID : "
+            ACCEPT WS-SenderUID
             DISPLAY "Enter Receiver's UID:".
            ACCEPT WS-RECEIVERUID.
 
            DISPLAY "Enter Transfer Amount:".
            ACCEPT WS-AMOUNT.
 
-           OPEN I-O USERACCOUNTS
            
            PERFORM FIND-SENDER
            PERFORM FIND-RECEIVER
@@ -107,28 +118,37 @@
                    MOVE "99" TO LS-StatusCode
            END-IF      
            
-            CLOSE UserAccounts.
             GOBACK.
              
-             FIND-SENDER.
+           FIND-SENDER.
            MOVE WS-SENDERUID TO UID
-           READ USERACCOUNTS INVALID KEY
-               DISPLAY "Sender not found."
-               MOVE 'N' TO SENDER-FOUND
-               GOBACK
-           END-READ
-           MOVE USERDATA TO USER-RECORD
-           MOVE 'Y' TO SENDER-FOUND
+           call '../../../Utility Functions/bin/getUserByID'
+           using by REFERENCE WS-SenderUID,USER-RECORD,statusCode
+           
+           if statusCode  EQUAL "00"
+               DISPLAY "Fecth Sender"
+               DISPLAY USER-RECORD
+               move U-TrxCount to WS-TrxCount
+               MOVE 'Y' TO SENDER-FOUND
+           else
+               DISPLAY statusCode
+           end-if
+           
            .
            FIND-RECEIVER.
            MOVE WS-RECEIVERUID TO UID
-           READ USERACCOUNTS INVALID KEY
-               DISPLAY "Receiver not found."
-               MOVE 'N' TO RECEIVER-FOUND
-               GOBACK
-           END-READ
-           MOVE USERDATA TO RECEIVER-RECORD
+           MOVE WS-SENDERUID TO UID
+           call '../../../Utility Functions/bin/getUserByID'
+           using by REFERENCE WS-SenderUID,RECEIVER-RECORD,statusCode
+           
+           if statusCode  EQUAL "00"
+               DISPLAY "Fetch Receiver"
+              DISPLAY RECEIVER-RECORD
            MOVE 'Y' TO RECEIVER-FOUND
+           ELSE
+               DISPLAY statusCode
+           end-if
+           
            .
            PERFORM TRXID-GENERATE.
            *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -136,8 +156,8 @@
        *> Sent, received , deposit , withdraw , D here since this sub file is for deposit
        TRXID-GENERATE.
  
-           ADD 1 TO TrxCount
-           MOVE TrxCount TO TrxID.
+           ADD 1 TO ws-TrxCount
+           MOVE ws-TrxCount TO TrxID.
  
            STRING
                FUNCTION NUMVAL(WS-TrxBaseID) DELIMITED BY SIZE
@@ -146,14 +166,18 @@
                INTO WS-TrxFullID.
 
             PROCESS-TRANSFER.
+            open I-O USERACCOUNTS
            SUBTRACT WS-AMOUNT FROM U-Balance GIVING TEMP-BALANCE
            MOVE TEMP-BALANCE TO U-Balance
-           REWRITE USER-RECORD
+           move USER-RECORD to USERDATA
+           REWRITE USERDATA
            
 
            ADD WS-AMOUNT TO R-Balance GIVING TEMP-BALANCE
            MOVE TEMP-BALANCE TO R-Balance
-           REWRITE RECEIVER-RECORD
+           move RECEIVER-RECORD to USERDATA
+           REWRITE USERDATA
+           close USERACCOUNTS
            
            PERFORM LOG-TRANSACTIONS
            MOVE "00" TO LS-StatusCode
@@ -189,4 +213,4 @@
 
            CLOSE TRANSACTIONS
            .
-       END PROGRAM txrTransfer.
+       END PROGRAM trxTransfer.
