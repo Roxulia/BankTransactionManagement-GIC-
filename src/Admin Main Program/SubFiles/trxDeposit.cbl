@@ -41,47 +41,40 @@
 
        FD  TrxFile.
        01  TransactionRecord.
-           05  TrxID       PIC 9(10).
+           05  TrxID       PIC X(11).
            05  SenderID    PIC 9(5).
            05  ReceiverID  PIC 9(5).
            05  Description PIC X(30).
            05  Amount      PIC 9(10).
-           05  TrxType     PIC 9.  *>  1 = SENT
-                                   *>  2 = RECEIVED
-                                   *>  3 = DEPOSIT
-                                   *>  4 = WITHDRAW
+           05  TrxType     PIC 9.
            05  TimeStamp   PIC 9(16).
 
        WORKING-STORAGE SECTION.
 
-       *>For display colors
        COPY "../../Utility Functions/colorCodes.cpy".
 
        01  WS-FS               PIC XX.
        01  depoAmo             PIC 9(10).
+       01  depoStr             PIC X(10).
 
        01  CurrentDate         PIC 9(6).
        01  CurrentTime         PIC 9(6).
 
-       01  WS-TrxBaseID        PIC 9(5).
-       01  WS-TrxFullID        PIC X(10).
+       01  minDspDepo          PIC Z(10).
+       01  maxDspDepo          PIC Z(10).
+       01  depoDsp             PIC Z(10).
 
+       01  tempInput           PIC X(10).
 
-       01  minDspDepo      PIC Z(10).
-       01  maxDspDepo      PIC Z(10).
-       01  depoDsp         PIC Z(10).
-
-       *>For trxConstant VALUES
        COPY "../../Utility Functions/trxConstants.cpy".
 
-      *LINKAGE section.
+       LINKAGE section.
+       01  userId              PIC 9(5).
+       01  optStatus           PIC 9(2).
 
-       01  userId          PIC 9(5).
-       01  optStatus       PIC 9(2).
-
-       PROCEDURE DIVISION.*> using REFERENCE userId,optStatus.
+       PROCEDURE DIVISION using REFERENCE userId,optStatus.
        Main-Section.
-           PERFORM TEST-HELPER
+           *>PERFORM TEST-HELPER
            PERFORM RECORD-POINTER
            PERFORM TRXID-GENERATE
            PERFORM AMOUNT-VALID-PROMPT-BOX
@@ -89,14 +82,22 @@
            PERFORM WRITE-TRX
            PERFORM BALANCE-UPDATE
            GOBACK.
-       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-       *>Find the designated user record from the user file .
+
+       *>>>>> Helper function to test the function standalone <<<<<<<<<*
+       *>>>>> Not needed in main runtime <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
        TEST-HELPER.
+
            DISPLAY "================================================="
            DISPLAY "ENTER UID TO MAKE DEPOSIT :"
-           ACCEPT userId.
-       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-       *>Find the designated user record from the user file .
+           ACCEPT tempInput
+           IF FUNCTION UPPER-CASE(tempInput) = "EXIT"
+               MOVE 99 TO optStatus
+               GOBACK
+           END-IF
+           MOVE FUNCTION NUMVAL(tempInput) TO userId.
+
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>>>>> Finding the desired user record in the UserFile <<<<<<<<<*
        RECORD-POINTER.
 
            OPEN I-O UserFile
@@ -109,23 +110,23 @@
                    GOBACK
            END-READ.
 
-       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-       *>Generate a unique trxid ( TrxCount+1) + S,R,D,W + SenderID
-       *> Sent, received , deposit , withdraw , D here since this sub file is for deposit
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>>>>> TrxID generator to get a unique ID every transaction <<<<*
        TRXID-GENERATE.
 
            ADD 1 TO TrxCount
-           MOVE TrxCount TO TrxID.
 
            STRING
-               FUNCTION NUMVAL(WS-TrxBaseID) DELIMITED BY SIZE
+               TrxCount DELIMITED BY SIZE
                WS-TrxDepoPrefix DELIMITED BY SIZE
-               FUNCTION NUMVAL(userId) DELIMITED BY SIZE
-               INTO WS-TrxFullID.
+               userId DELIMITED BY SIZE
+               INTO TrxID
+           END-STRING
 
-       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-       *>Prompt box display for accepting amount deposit and validate Amount
-       *>loop the amount prompt box, until the amount is valid or entered 'EXIT'
+           DISPLAY "Generated TrxID: " TrxID.
+
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>>>>>>>>>>>> To show prompt and ask input from user<<<<<<<<<<<<*
        AMOUNT-VALID-PROMPT-BOX.
 
            MOVE minAmoDepo to minDspDepo
@@ -137,21 +138,23 @@
                DISPLAY "(Min: " FUNCTION TRIM(minDspDepo)
                    WITH NO ADVANCING
                DISPLAY " Max: " FUNCTION TRIM(maxDspDepo) "):"
-               ACCEPT depoAmo
-
-               IF depoAmo < minAmoDepo
-                   OR depoAmo > maxAmoDepo
-                   DISPLAY "==========================================="
+               DISPLAY " or type 'exit' to go back to mainmenu..."
+               ACCEPT depoStr
+               IF FUNCTION UPPER-CASE(depoStr) = "EXIT"
+                   MOVE 99 TO optStatus
+                   CLOSE UserFile
+                   GOBACK
+               END-IF
+               MOVE FUNCTION NUMVAL(depoStr) TO depoAmo
+               IF depoAmo < minAmoDepo OR depoAmo > maxAmoDepo
                    DISPLAY ESC REDX "Amount out of allowed range."
                    DISPLAY ESC RESETX
-                   DISPLAY "==========================================="
                END-IF
-           END-PERFORM.
+           END-PERFORM
+           MOVE depoAmo TO depoDsp.
 
-           MOVE depoAmo    to depoDsp.
-
-       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-       *>Creating a new file to store data if not already exist
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>> checking the file availability and creating one if not exist<<<*
        File-Check.
 
            OPEN INPUT TrxFile
@@ -162,8 +165,8 @@
            END-IF
            CLOSE TrxFile.
 
-       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-       *>Write a new record in TrxFile
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>>>>>>>>>>>> writing a new transaction record in the TrxFile <<<*
        WRITE-TRX.
 
            MOVE userId    TO SenderID
@@ -180,33 +183,36 @@
            OPEN I-O TrxFile
            WRITE TransactionRecord
               INVALID KEY
-               DISPLAY ESC REDX "Writing transaction failed." ESC RESETX
+                   DISPLAY ESC REDX "Writing transaction failed."
+                   DISPLAY ESC RESETX
                    MOVE 97 TO optStatus
                    CLOSE TrxFile
                    GOBACK
            END-WRITE
            DISPLAY "================================================="
-           DISPLAY ESC GREENX FUNCTION TRIM(depoDsp)WITH NO ADVANCING
-           DISPLAY " successfully deposited" WITH NO ADVANCING
-           DISPLAY ESC RESETX "into account ID :"ESC GREENX ReceiverID
+           DISPLAY ESC GREENX FUNCTION TRIM(depoDsp) WITH NO ADVANCING
+           DISPLAY " successfully deposited into account ID :"
+               WITH NO ADVANCING
+           DISPLAY ESC GREENX userId
            DISPLAY ESC RESETX
-           DISPLAY "================================================="
            CLOSE TrxFile.
 
-       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-       *>Update the balance in UserRecord and increment the TrxCount
+       *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
+       *>>>>>>> Updating balance in the user file <<<<<<<<<<<<<<<<<<<<<*
        BALANCE-UPDATE.
 
            ADD depoAmo TO Balance
+           DISPLAY "================================================="
            REWRITE UserRecord
                INVALID KEY
-                   DISPLAY ESC REDX "Updating user balance failed." ESC RESETX
+                   DISPLAY ESC REDX "Updating user balance failed."
+                   DISPLAY ESC RESETX
                    MOVE 97 TO optStatus
                    CLOSE UserFile
                    GOBACK
            END-REWRITE
-           DISPLAY ESC GREENX" Balance updated for ID :" ReceiverID
+
+           DISPLAY ESC GREENX "Balance updated for ID : "userId
            DISPLAY ESC RESETX
-           DISPLAY "================================================="
            MOVE 00 TO optStatus
            CLOSE UserFile.
