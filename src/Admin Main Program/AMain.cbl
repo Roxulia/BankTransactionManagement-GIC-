@@ -263,7 +263,9 @@
                    when equal 7
                        perform update-info-page
                    when OTHER
+                       display esc RED-CODE
                        display "INVALID OPTION CODE"
+                       display esc RESET-CODE
                        perform home-page
                END-EVALUATE
            END-PERFORM

@@ -26,6 +26,7 @@
            05 UAddress PIC X(20).
            05 UPhone PIC x(9).
            05 UBalance PIC 9(10)V99.
+           05 trxCount pic 9(5).
            05 UDate PIC 9(6).
            05 UTime PIC 9(6).
 
@@ -39,6 +40,7 @@
            05 C-UAddress  PIC X(20).
            05 C-UPhone    PIC x(9).
            05 C-UBalance  PIC 9(10)V99.
+           05 C-trxCount pic 9(5).
            05 C-UDate     PIC 9(6).
            05 C-UTime     PIC 9(6).
        01 EOF-Flag PIC X(1) VALUE 'N'.
@@ -56,6 +58,7 @@
            05 RET-UAddress PIC X(20).
            05 RET-UPhone PIC x(9).
            05 RET-UBalance PIC 9(10)V99.
+           05 RET-trxCount pic 9(5).
            05 RET-UDate PIC 9(6).
            05 RET-UTime PIC 9(6).
 
@@ -72,6 +75,7 @@
                MOVE C-UAddress  TO RET-UAddress
                MOVE C-UPhone    TO RET-UPhone
                MOVE C-UBalance  TO RET-UBalance
+               move C-trxCount to RET-trxCount
                MOVE C-UDate     TO RET-UDate
                MOVE C-UTime     TO RET-UTime
                MOVE 'Y' TO RET-Found
@@ -103,6 +107,7 @@
                                 MOVE UPhone TO RET-UPhone
                             END-IF
                             MOVE UBalance TO RET-UBalance
+                            move trxCount to RET-trxCount
                             MOVE UDate TO RET-UDate
                             MOVE UTime TO RET-UTime
                             MOVE 'Y' TO RET-Found
@@ -115,6 +120,7 @@
                            MOVE RET-UAddress     TO C-UAddress
                            MOVE RET-UPhone       TO C-UPhone
                            MOVE RET-UBalance     TO C-UBalance
+                           move RET-trxCount to C-trxCount
                            MOVE RET-UDate        TO C-UDate
                            MOVE RET-UTime        TO C-UTime
                            move "00" to statusCode

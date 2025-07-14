@@ -4,8 +4,11 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT TrxFile ASSIGN TO "Transactions.txt"
-               ORGANIZATION IS LINE SEQUENTIAL.
+           SELECT TrxFile ASSIGN TO '../../../data/Transactions.dat'
+               ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS TrxID
+               FILE STATUS IS WS-FS.
      **     SELECT TRANSACTIONS ASSIGN TO "C:\Users\W24016\Desktop
       *     \BankTransactionManagement-GIC-hsy\src\Utility Functions\Transactions.dat"
        DATA DIVISION.
@@ -18,7 +21,7 @@
            05 Description   PIC X(30).
            05 Amount        PIC 9(10)V99.
            05 T-Type        PIC X(1).
-           05 TimeStamp     PIC 9(16).
+           05 TimeStamp     PIC 9(12).
 
        WORKING-STORAGE SECTION.
        01 END-FILE          PIC X VALUE "N".
@@ -27,6 +30,7 @@
        01 DISPLAY-TIME      PIC X(16).
        01 WITHDRAW-AMT      PIC Z(10).99.
        01 DEPOSIT-AMT       PIC Z(10).99.
+       01  ws-fs pic xx.
        01  statusCode pic xx.
        01  UserData.
            05  UID        PIC 9(5).
@@ -36,6 +40,7 @@
            05  UAddress   PIC X(20).
            05  UPh        PIC X(9).
            05  UBalance    PIC 9(10)V99.
+           05  trxCount pic 9(5).
            05  UDate      PIC 9(6).
            05  UTime      PIC 9(6).
 

@@ -26,6 +26,7 @@
            05 UAddress PIC X(20).
            05 UPhone PIC x(9).
            05 UBalance PIC 9(10)V99.
+           05 UtrxCount pic 9(5).
            05 UDate PIC 9(6).
            05 UTime PIC 9(6).
 
@@ -39,11 +40,13 @@
            05 C-UAddress  PIC X(20).
            05 C-UPhone    PIC x(9).
            05 C-UBalance  PIC 9(10)V99.
+           05 C-TrxCount  pic 9(5).
            05 C-UDate     PIC 9(6).
            05 C-UTime     PIC 9(6).
        01 EOF-Flag PIC X(1) VALUE 'N'.
        01 ws-fs pic x(2).
        01  ret-found pic x.
+       01  ws-uid pic 9(5).
 
        LINKAGE SECTION.
        01 InputUID1 PIC 9(5).
@@ -56,14 +59,17 @@
            05 RET-UAddress PIC X(20).
            05 RET-UPhone PIC x(9).
            05 RET-UBalance PIC 9(10)V99.
+           05 RET-TrxCount PIC 9(5).
            05 RET-UDate PIC 9(6).
            05 RET-UTime PIC 9(6).
 
        PROCEDURE DIVISION
        USING InputUID1, ReturnUserData , statusCode.
        MAIN-PROCEDURE.
+            INITIALIZE ws-uid
+            move InputUID1 to ws-uid
             MOVE 'N' TO RET-Found
-            IF InputUID1 = Cached-UID and InputUID1 not EQUAL zero
+            IF ws-uid = Cached-UID and ws-uid not EQUAL zero
                DISPLAY "NO NEED FILE READ"
                MOVE C-UID       TO RET-UID
                MOVE C-UName     TO RET-UName
@@ -72,6 +78,7 @@
                MOVE C-UAddress  TO RET-UAddress
                MOVE C-UPhone    TO RET-UPhone
                MOVE C-UBalance  TO RET-UBalance
+               Move C-TrxCount  to RET-TrxCount
                MOVE C-UDate     TO RET-UDate
                MOVE C-UTime     TO RET-UTime
                MOVE 'Y' TO RET-Found
@@ -90,7 +97,8 @@
                         move "96" to statusCode
                     NOT AT END
                         *>DISPLAY userdata
-                        IF UID = InputUID1
+                        IF UID = ws-uid
+                            *>DISPLAY userdata
                             MOVE UID         TO RET-UID
                             MOVE UName       TO RET-UName
                             MOVE ULoginName  TO RET-ULoginName
@@ -101,11 +109,12 @@
                                 MOVE UPhone TO RET-UPhone
                             END-IF
                             MOVE UBalance TO RET-UBalance
+                            move UtrxCount to RET-TrxCount
                             MOVE UDate TO RET-UDate
                             MOVE UTime TO RET-UTime
                             MOVE 'Y' TO RET-Found
                             MOVE 'Y' TO EOF-Flag  *> Stop after finding
-                           MOVE InputUID1        TO Cached-UID
+                           MOVE ws-uid        TO Cached-UID
                            MOVE RET-UID          TO C-UID
                            MOVE RET-UName        TO C-UName
                            MOVE RET-ULoginName   TO C-ULogin
@@ -113,6 +122,7 @@
                            MOVE RET-UAddress     TO C-UAddress
                            MOVE RET-UPhone       TO C-UPhone
                            MOVE RET-UBalance     TO C-UBalance
+                           move RET-TrxCount     to C-TrxCount
                            MOVE RET-UDate        TO C-UDate
                            MOVE RET-UTime        TO C-UTime
                            move "00" to statusCode
