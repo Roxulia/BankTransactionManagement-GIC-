@@ -102,7 +102,7 @@
 
            DISPLAY "========================================"
            DISPLAY "=  Current Name : " ESC GREENX UName ESC RESETX
-           DISPLAY "=  Current Password : " ESC GREENX "???" ESC RESETX
+           DISPLAY "=  Current Password : "ESC GREENX "????" ESC RESETX
            DISPLAY "=  Current Address : "ESC GREENX UAddress ESC RESETX
            DISPLAY "=  Current Phone : " ESC GREENX UPh ESC RESETX
            DISPLAY "========================================"
