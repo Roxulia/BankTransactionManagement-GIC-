@@ -11,13 +11,13 @@
        INPUT-OUTPUT SECTION.
 
            FILE-CONTROL.
-           SELECT UserFile ASSIGN TO '../../../../data/UserAccounts.dat'
+           SELECT UserFile ASSIGN TO '../../../data/UserAccounts.dat'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
                FILE STATUS IS WS-FS.
 
-           SELECT TrxFile ASSIGN TO '../../../../data/Transactions.dat'
+           SELECT TrxFile ASSIGN TO '../../../data/Transactions.dat'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS TrxID
@@ -45,9 +45,9 @@
            05  SenderID    PIC 9(5).
            05  ReceiverID  PIC 9(5).
            05  Description PIC X(30).
-           05  Amount      PIC 9(10).
+           05  Amount      PIC 9(10)v99.
            05  TrxType     PIC 9.
-           05  TimeStamp   PIC 9(16).
+           05  TimeStamp   PIC 9(12).
 
        WORKING-STORAGE SECTION.
 
@@ -74,6 +74,8 @@
 
        PROCEDURE DIVISION using REFERENCE userId,optStatus.
        Main-Section.
+           INITIALIZE depoAmo
+           INITIALIZE depoStr
            *>PERFORM TEST-HELPER
            PERFORM RECORD-POINTER
            PERFORM TRXID-GENERATE
@@ -81,7 +83,7 @@
            PERFORM File-Check
            PERFORM WRITE-TRX
            PERFORM BALANCE-UPDATE
-           GOBACK.
+           exit program.
 
        *>>>>> Helper function to test the function standalone <<<<<<<<<*
        *>>>>> Not needed in main runtime <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
