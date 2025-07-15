@@ -174,8 +174,9 @@
                    CALL '../SubFiles/bin/trxWithdraw' USING
                    by REFERENCE UID
                WHEN 2
-                   display "fu"
   *****            CALL 'TRXTRANSFER' USING UID
+                   call '../SubFiles/bin/trxTransfer'
+                   using by REFERENCE uid STATUSCODE
                WHEN OTHER
                    DISPLAY "Invalid Option."
            END-EVALUATE.

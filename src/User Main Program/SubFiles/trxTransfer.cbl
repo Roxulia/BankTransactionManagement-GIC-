@@ -39,7 +39,7 @@
 
        FD Transactions.
        01 TRXRECORD.
-           05 TrxID        PIC 9(10).
+           05 TrxID        PIC x(11).
            05 SenderID     PIC 9(5).
            05 ReceiverID   PIC 9(5).
            05 Description  PIC X(30).
@@ -51,12 +51,12 @@
        01 WS-SenderUID    PIC 9(5) VALUE ZERO.
        01 WS-ReceiverUID  PIC 9(5) VALUE ZERO.
        01 WS-Amount       PIC 9(10)V99 VALUE ZERO.
+       01  TEMP-BALANCE   pic s9(10)v99.
        01 EOF-FLAG          PIC X VALUE 'N'.
        01 Current-Date   PIC 9(6) VALUE ZERO.
        01 Current-Time   PIC 9(6) VALUE ZERO.
        01 SENDER-FOUND      PIC X VALUE 'N'.
        01 RECEIVER-FOUND    PIC X VALUE 'N'.
-       01 TEMP-BALANCE      PIC 9(10)V99 VALUE ZERO.
        01 WS-FS1            PIC XX.
        01 WS-FS2            PIC XX.
        01 WS-TRXID          PIC 9(10) VALUE 1.
@@ -89,128 +89,148 @@
            05 R-DATE       PIC 9(6).
            05 R-TIME       PIC 9(6).
        COPY "../../Utility Functions/trxConstants.cpy".
+       COPY "../../Utility Functions/colorCodes.cpy".
        LINKAGE SECTION.
        01 LS-SenderID    PIC 9(5).
        01 LS-StatusCode     PIC X(2) VALUE SPACES.
        PROCEDURE DIVISION USING LS-SenderID LS-StatusCode.
 
        MAIN-PROCEDURE.
+            initialize WS-Amount
+            initialize WS-ReceiverUID
+            INITIALIZE WS-SenderUID
             MOVE LS-SENDERID TO WS-SenderUID
+            PERFORM FIND-SENDER
             *>DISPLAY "Enter SenderID : "
             *>ACCEPT WS-SenderUID
-            DISPLAY "Enter Receiver's UID:".
-           ACCEPT WS-RECEIVERUID.
+
+
+           perform FIND-RECEIVER
 
            DISPLAY "Enter Transfer Amount:".
-           ACCEPT WS-AMOUNT.
+           ACCEPT WS-AMOUNT
 
+           perform validate_amount
+           perform TRXID-GENERATE
+           PERFORM write-transaction
+           perform BALANCE-UPDATE
 
-           PERFORM FIND-SENDER
-           PERFORM FIND-RECEIVER
-           IF SENDER-FOUND = 'Y' AND RECEIVER-FOUND = 'Y'
-               AND U-Balance >= WS-AMOUNT
-               THEN
-                   PERFORM PROCESS-TRANSFER
-                   DISPLAY "Transfer Successful."
-               ELSE
-                   DISPLAY
-            "Transfer Failed: Insufficient balance or invalid user ID."
-                   MOVE "99" TO LS-StatusCode
-           END-IF
+           exit program.
 
-            GOBACK.
-
-           FIND-SENDER.
-           MOVE WS-SENDERUID TO UID
+       FIND-SENDER.
            call '../../Utility Functions/bin/getUserByID'
            using by REFERENCE WS-SenderUID,USER-RECORD,statusCode
 
-           if statusCode  EQUAL "00"
-               DISPLAY "Fecth Sender"
-               DISPLAY USER-RECORD
-               move U-TrxCount to WS-TrxCount
-               MOVE 'Y' TO SENDER-FOUND
-           else
-               DISPLAY statusCode
-           end-if
+           if statusCode  EQUAL "99"
+               display "FILE ERROR"
+               exit PROGRAM
+           else if statusCode EQUAL "96"
+               DISPLAY "SENDER NOT FOUND"
+               exit PROGRAM
+           end-if.
 
-           .
-           FIND-RECEIVER.
-           MOVE WS-RECEIVERUID TO UID
-           MOVE WS-SENDERUID TO UID
+
+       FIND-RECEIVER.
+           DISPLAY "Enter Receiver's UID:".
+           ACCEPT WS-RECEIVERUID
+           if WS-SenderUID = WS-ReceiverUID
+               DISPLAY "CAN'T TRANSFER TO URSELF"
+               exit PROGRAM
+           initialize statusCode
            call '../../Utility Functions/bin/getUserByID'
-           using by REFERENCE WS-SenderUID,RECEIVER-RECORD,statusCode
-
-           if statusCode  EQUAL "00"
-               DISPLAY "Fetch Receiver"
-              DISPLAY RECEIVER-RECORD
-           MOVE 'Y' TO RECEIVER-FOUND
-           ELSE
-               DISPLAY statusCode
+           using by REFERENCE WS-ReceiverUID,RECEIVER-RECORD,statusCode
+           if statusCode  EQUAL "99"
+               display "FILE ERROR"
+               exit PROGRAM
+           else if statusCode EQUAL "96"
+               DISPLAY "RECEIVER NOT FOUND"
+               exit PROGRAM
            end-if
+           DISPLAY RECEIVER-RECORD.
 
-           .
-           PERFORM TRXID-GENERATE.
+
+       validate_amount.
+           compute TEMP-BALANCE = u-Balance - WS-AMOUNT
+           if TEMP-BALANCE < minaccountbalance
+               display "Ur Minimum Account Balance Reached"
+               exit PROGRAM
+           END-IF.
+
            *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
        *>Generate a unique trxid ( TrxCount+1) + S,R,D,W + SenderID
        *> Sent, received , deposit , withdraw , D here since this sub file is for deposit
        TRXID-GENERATE.
 
-           ADD 1 TO ws-TrxCount
-           MOVE ws-TrxCount TO TrxID.
+           ADD 1 TO u-TrxCount
 
            STRING
-               FUNCTION NUMVAL(WS-TrxBaseID) DELIMITED BY SIZE
+               u-TrxCount DELIMITED BY SIZE
                WS-TrxDepoPrefix DELIMITED BY SIZE
-               FUNCTION NUMVAL(WS-SenderUID) DELIMITED BY SIZE
-               INTO WS-TrxFullID.
+               u-UID DELIMITED BY SIZE
+               INTO TrxID
+           END-STRING
 
-       PROCESS-TRANSFER.
-            open I-O USERACCOUNTS
-           SUBTRACT WS-AMOUNT FROM U-Balance GIVING TEMP-BALANCE
-           MOVE TEMP-BALANCE TO U-Balance
+           DISPLAY "Generated TrxID: " TrxID.
+
+       BALANCE-UPDATE.
+
+           subtract WS-Amount from u-Balance
+           add WS-Amount to R-BALANCE
+           open I-O USERACCOUNTS
            move USER-RECORD to USERDATA
+
+           DISPLAY "================================================="
            REWRITE USERDATA
-           close USERACCOUNTS
-           open i-o USERACCOUNTS
-           ADD WS-AMOUNT TO R-Balance GIVING TEMP-BALANCE
-           MOVE TEMP-BALANCE TO R-Balance
+               INVALID KEY
+                   DISPLAY ESC REDX "Updating user balance failed."
+                   DISPLAY ESC RESETX
+                   CLOSE USERACCOUNTS
+                   exit PROGRAM
+           END-REWRITE
+           DISPLAY ESC GREENX "Balance updated for ID : " uId
+           DISPLAY ESC RESETX
            move RECEIVER-RECORD to USERDATA
-           REWRITE USERDATA
            close USERACCOUNTS
 
-           PERFORM LOG-TRANSACTIONS
-           MOVE "00" TO LS-StatusCode
-           .
+           open i-o USERACCOUNTS
 
-           LOG-TRANSACTIONS.
-           OPEN EXTEND TRANSACTIONS
+           DISPLAY "================================================="
+           REWRITE USERDATA
+               INVALID KEY
+                   DISPLAY ESC REDX "Updating user balance failed."
+                   DISPLAY ESC RESETX
+                   CLOSE USERACCOUNTS
+                   exit PROGRAM
+           END-REWRITE
+           DISPLAY ESC GREENX "Balance updated for ID : " uId
+           DISPLAY ESC RESETX
+           CLOSE USERACCOUNTS.
 
-           MOVE FUNCTION CURRENT-DATE (1:8) TO CURRENT-DATE
-           MOVE FUNCTION CURRENT-DATE (9:6) TO CURRENT-TIME
-
-           *> Log sender transaction
-           MOVE WS-SENDERUID TO SENDERID OF TRXRECORD
-           MOVE WS-RECEIVERUID TO RECEIVERID OF TRXRECORD
-           MOVE "FUND TRANSFER SENT" TO DESCRIPTION OF TRXRECORD
-           MOVE WS-AMOUNT TO AMOUNT OF TRXRECORD
-           MOVE "SEND" TO T-TYPE OF TRXRECORD
-           STRING CURRENT-DATE DELIMITED BY SIZE
-                  CURRENT-TIME DELIMITED BY SIZE
-                  INTO TIMESTAMP OF TRXRECORD
-           WRITE TRXRECORD
-
-           *> Log receiver transaction
-           MOVE WS-RECEIVERUID TO SENDERID OF TRXRECORD
-           MOVE WS-SENDERUID TO RECEIVERID OF TRXRECORD
-           MOVE "FUND TRANSFER RECEIVED" TO DESCRIPTION OF TRXRECORD
-           MOVE WS-AMOUNT TO AMOUNT OF TRXRECORD
-           MOVE "RECEIVE" TO T-TYPE OF TRXRECORD
-           STRING CURRENT-DATE DELIMITED BY SIZE
-                  CURRENT-TIME DELIMITED BY SIZE
-                  INTO TIMESTAMP OF TRXRECORD
-           WRITE TRXRECORD
-
-           CLOSE TRANSACTIONS
-           .
+       write-transaction.
+           MOVE u-UID    TO SenderID
+           MOVE R-UID    TO ReceiverID
+           MOVE "Transfer" TO Description
+           MOVE WS-AMOUNT   TO Amount
+           MOVE 4         TO T-Type
+           ACCEPT Current-Date FROM DATE
+           ACCEPT Current-Time FROM TIME
+           STRING Current-Date DELIMITED BY SIZE
+                  Current-Time DELIMITED BY SIZE
+                  INTO TimeStamp
+           END-STRING
+           OPEN extend Transactions
+           WRITE TrxRecord
+              INVALID KEY
+                   DISPLAY ESC REDX "Writing transaction failed."
+                   DISPLAY ESC RESETX
+                   CLOSE Transactions
+                   exit PROGRAM
+           END-WRITE
+           DISPLAY "================================================="
+           DISPLAY ESC GREENX FUNCTION TRIM(WS-AMOUNT) WITH NO ADVANCING
+           DISPLAY " successfully transfer to account ID :"
+               WITH NO ADVANCING
+           DISPLAY ESC GREENX R-UID
+           DISPLAY ESC RESETX
+           CLOSE Transactions.
        END PROGRAM trxTransfer.
