@@ -97,6 +97,7 @@
            DISPLAY "========================================"
            DISPLAY "=  Current Name : " ESC GREENX AName ESC RESETX
            DISPLAY "=  Current Role : " ESC GREENX RoleStr ESC RESETX
+           DISPLAY "=  Current Password : " ESC GREENX "????" ESC RESETX
            DISPLAY "========================================"
            DISPLAY "=  Which field to update?"
            DISPLAY "=  1. Name"
