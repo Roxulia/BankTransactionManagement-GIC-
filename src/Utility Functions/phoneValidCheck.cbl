@@ -24,7 +24,7 @@
        01  UPh           PIC x(9).
 
        PROCEDURE DIVISION USING UPh.
-
+           move 'N' to valid-phone
            PERFORM UNTIL VALID-PHONE = 'Y'
                DISPLAY "==========================================="
                DISPLAY "=  Enter new Phone Number: "
