@@ -9,13 +9,13 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT USERACCOUNTS 
+           SELECT USERACCOUNTS
            ASSIGN TO "../../../data/UserAccounts.dat"
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
                FILE STATUS IS WS-FS2.
-           SELECT TRANSACTIONS 
+           SELECT TRANSACTIONS
            ASSIGN TO "../../../data/Transactions.dat"
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
@@ -36,7 +36,7 @@
            05 TrxCount     PIC 9(5).
            05 UDate        PIC 9(6).
            05 UTime        PIC 9(6).
-    
+
        FD Transactions.
        01 TRXRECORD.
            05 TrxID        PIC 9(10).
@@ -46,7 +46,7 @@
            05 Amount       PIC 9(10)V99.
            05 T-Type       PIC 9.
            05 TimeStamp    PIC 9(12).
-       
+
        WORKING-STORAGE SECTION.
        01 WS-SenderUID    PIC 9(5) VALUE ZERO.
        01 WS-ReceiverUID  PIC 9(5) VALUE ZERO.
@@ -61,7 +61,7 @@
        01 WS-FS2            PIC XX.
        01 WS-TRXID          PIC 9(10) VALUE 1.
        01 WS-TrxBaseID     PIC 9(10).
-       01 WS-TrxDepoPrefix PIC 9(10).
+      * 01 WS-TrxDepoPrefix1 PIC 9(10).
        01 WS-TrxFullID     PIC 9(10).
        01 WS-TrxCount      Pic 9(5).
        01  statusCode pic xx.
@@ -76,7 +76,7 @@
            05 U-TrxCount  PIC 9(5).
            05 U-DATE      PIC 9(6).
            05 U-TIME      PIC 9(6).
-           
+
        01 RECEIVER-RECORD.
            05 R-UID        PIC 9(5).
            05 R-NAME       PIC X(20).
@@ -93,18 +93,18 @@
        01 LS-SenderID    PIC 9(5).
        01 LS-StatusCode     PIC X(2) VALUE SPACES.
        PROCEDURE DIVISION USING LS-SenderID LS-StatusCode.
-           
+
        MAIN-PROCEDURE.
-            *>MOVE LS-SENDERID TO WS-SenderUID
-            DISPLAY "Enter SenderID : "
-            ACCEPT WS-SenderUID
+            MOVE LS-SENDERID TO WS-SenderUID
+            *>DISPLAY "Enter SenderID : "
+            *>ACCEPT WS-SenderUID
             DISPLAY "Enter Receiver's UID:".
            ACCEPT WS-RECEIVERUID.
 
            DISPLAY "Enter Transfer Amount:".
            ACCEPT WS-AMOUNT.
 
-           
+
            PERFORM FIND-SENDER
            PERFORM FIND-RECEIVER
            IF SENDER-FOUND = 'Y' AND RECEIVER-FOUND = 'Y'
@@ -113,18 +113,18 @@
                    PERFORM PROCESS-TRANSFER
                    DISPLAY "Transfer Successful."
                ELSE
-                   DISPLAY 
+                   DISPLAY
             "Transfer Failed: Insufficient balance or invalid user ID."
                    MOVE "99" TO LS-StatusCode
-           END-IF      
-           
+           END-IF
+
             GOBACK.
-             
+
            FIND-SENDER.
            MOVE WS-SENDERUID TO UID
-           call '../../../Utility Functions/bin/getUserByID'
+           call '../../Utility Functions/bin/getUserByID'
            using by REFERENCE WS-SenderUID,USER-RECORD,statusCode
-           
+
            if statusCode  EQUAL "00"
                DISPLAY "Fecth Sender"
                DISPLAY USER-RECORD
@@ -133,14 +133,14 @@
            else
                DISPLAY statusCode
            end-if
-           
+
            .
            FIND-RECEIVER.
            MOVE WS-RECEIVERUID TO UID
            MOVE WS-SENDERUID TO UID
-           call '../../../Utility Functions/bin/getUserByID'
+           call '../../Utility Functions/bin/getUserByID'
            using by REFERENCE WS-SenderUID,RECEIVER-RECORD,statusCode
-           
+
            if statusCode  EQUAL "00"
                DISPLAY "Fetch Receiver"
               DISPLAY RECEIVER-RECORD
@@ -148,37 +148,37 @@
            ELSE
                DISPLAY statusCode
            end-if
-           
+
            .
            PERFORM TRXID-GENERATE.
            *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
        *>Generate a unique trxid ( TrxCount+1) + S,R,D,W + SenderID
        *> Sent, received , deposit , withdraw , D here since this sub file is for deposit
        TRXID-GENERATE.
- 
+
            ADD 1 TO ws-TrxCount
            MOVE ws-TrxCount TO TrxID.
- 
+
            STRING
                FUNCTION NUMVAL(WS-TrxBaseID) DELIMITED BY SIZE
                WS-TrxDepoPrefix DELIMITED BY SIZE
                FUNCTION NUMVAL(WS-SenderUID) DELIMITED BY SIZE
                INTO WS-TrxFullID.
 
-            PROCESS-TRANSFER.
+       PROCESS-TRANSFER.
             open I-O USERACCOUNTS
            SUBTRACT WS-AMOUNT FROM U-Balance GIVING TEMP-BALANCE
            MOVE TEMP-BALANCE TO U-Balance
            move USER-RECORD to USERDATA
            REWRITE USERDATA
-           
-
+           close USERACCOUNTS
+           open i-o USERACCOUNTS
            ADD WS-AMOUNT TO R-Balance GIVING TEMP-BALANCE
            MOVE TEMP-BALANCE TO R-Balance
            move RECEIVER-RECORD to USERDATA
            REWRITE USERDATA
            close USERACCOUNTS
-           
+
            PERFORM LOG-TRANSACTIONS
            MOVE "00" TO LS-StatusCode
            .

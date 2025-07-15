@@ -25,7 +25,9 @@
 
        WORKING-STORAGE SECTION.
        01 END-FILE          PIC X VALUE "N".
-       01 BALANCE           PIC 9(12)V99 VALUE 0.
+       01 BALANCE           PIC s9(12)V99 VALUE 0.
+       01 withdraw         pic s9(10)v99.
+       01 deposit           pic s9(10)v99.
        01 format-balance pic zzzzzzzzzzz9.99.
        01 TYPE-NAME         PIC X(10).
        01 DISPLAY-TIME      PIC X(16).
@@ -55,6 +57,8 @@
        MAIN-PARA.
            move "n" to END-FILE
            initialize balance
+           INITIALIZE WITHDRAW
+           INITIALIZE deposit
            call '../../Utility Functions/bin/getUserByID'
            using by REFERENCE
            Input-uid , UserData , statusCode
@@ -82,26 +86,27 @@
                    "-----------------------------------------------"
 
            PERFORM UNTIL END-FILE = "Y"
-               READ TrxFile
+               READ TrxFile into TrxRecord
                    AT END
                        MOVE "Y" TO END-FILE
                    NOT AT END
-                       IF UID = INPUT-UID
+                       *>display TrxRecord
+                       IF SenderID = INPUT-UID or ReceiverID = Input-uid
                            MOVE SPACES TO TYPE-NAME
                            MOVE zeroS TO WITHDRAW-AMT
                            MOVE zeroS TO DEPOSIT-AMT
-
+                           display TrxRecord
                            MOVE TimeStamp TO DISPLAY-TIME
 
-                           IF TrxType = "1"
+                           IF TrxType equal 1
                                MOVE Amount TO DEPOSIT-AMT
-                               ADD Amount TO BALANCE
-                           ELSE IF TrxType = "2" OR TrxType = "4"
+                               add Amount to deposit
+                           ELSE IF TrxType equal 2 OR TrxType = 4
                                MOVE Amount TO WITHDRAW-AMT
-                               SUBTRACT Amount FROM BALANCE
-                           ELSE IF TrxType = "3"
+                               add Amount to withdraw
+                           ELSE IF TrxType = 3
                                MOVE Amount TO DEPOSIT-AMT
-                               ADD Amount TO BALANCE
+                               add Amount to deposit
                            END-IF
 
                            DISPLAY DISPLAY-TIME
@@ -110,6 +115,7 @@
                        END-IF
                END-READ
            END-PERFORM.
+           compute BALANCE = DEPOSIT - WITHDRAW
            move BALANCE to format-balance
            DISPLAY "-----------------------------------------------"
                    "-----------------------------------------------"

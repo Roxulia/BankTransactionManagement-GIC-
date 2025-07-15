@@ -19,18 +19,22 @@
        PROCEDURE DIVISION.
        MAIN-LOGIC.
            INITIALIZE uid
-           DISPLAY "================ USER LOGIN ===================".
+           DISPLAY color-pink
+           "================ USER LOGIN ==================="
+           DISPLAY esc resetx
       *      CALL 'USERLOGIN' USING UID STATUSCODE.
              PERFORM login-page
            Stop run.
 
        login-page.
+           display color-pink
            DISPLAY "==============================================="
-           DISPLAY "=======Bank Transaction Management(USER)======"
+           DISPLAY "=======Bank Transaction Management(USER)======="
            DISPLAY "==============================================="
            DISPLAY "=                1.Login                      ="
            DISPLAY "=               99.Exit                       ="
            DISPLAY "==============================================="
+           DISPLAY esc resetx
            perform choice-opt-login.
 
       *     IF STATUSCODE NOT EQUAL "00"
@@ -46,6 +50,7 @@
            DISPLAY "****************  Welcome **********************"
            DISPLAY SPACE
            call '../SubFiles/bin/balanceInfo' using UID
+           display  color-yellow
            DISPLAY "===== USER MENU =====".
            DISPLAY "1. Update Password".
            DISPLAY "2. User Profile".
@@ -53,6 +58,7 @@
            DISPLAY "4. View Passbook Report".
            DISPLAY "5. Exit".
            DISPLAY "====================="
+           display esc resetx
       *     DISPLAY "Enter your option: " .
            perform choice-opt-home
 
@@ -107,7 +113,7 @@
 
        choice-opt-home.
            DISPLAY SPACE
-           Display "Enter your option code:"
+           Display "Enter your option code :"
            ACCEPT OPTION
             EVALUATE OPTION
                WHEN 1
@@ -156,7 +162,8 @@
 
        TRANSACTION-MENU.
            DISPLAY SPACE
-           DISPLAY "===== TRANSACTION MENU =====".
+           DISPLAY color-blue "===== TRANSACTION MENU ====="
+           display        esc resetx
            DISPLAY "1. Withdraw".
            DISPLAY "2. Transfer".
            DISPLAY "Enter your choice: ".
@@ -164,8 +171,8 @@
 
            EVALUATE OPTION
                WHEN 1
-               display "fu"
-     **             CALL 'TRXWITHDRAW' USING UID
+                   CALL '../SubFiles/bin/trxWithdraw' USING
+                   by REFERENCE UID
                WHEN 2
                    display "fu"
   *****            CALL 'TRXTRANSFER' USING UID
