@@ -51,6 +51,7 @@
                DISPLAY "=     5.Create Admin       ="
                DISPLAY "=     6.View Admin List    ="
                DISPLAY "=     7.Update Admin Info  ="
+               DISPLAY "=     8.Generate Report    ="
                display "=    99.Log Out            ="
                display "============================"
                PERFORM choice-opt-home
@@ -62,6 +63,7 @@
                DISPLAY "=     3.Update User Info   ="
                DISPLAY "=     4.Deposit to User    ="
                DISPLAY "=     5.Update Your Info   ="
+               display "=     6.Generate Report    ="
                display "=    99.Log Out            ="
                display "============================"
                PERFORM choice-opt-home
@@ -107,28 +109,56 @@
            DISPLAY "=============================="
            perform choice-opt-deposit.
 
+       generate-report-page.
+           display "=============================="
+           DISPLAY "=    Generate Trx Report     ="
+           DISPLAY "=============================="
+           display "=============================="
+           DISPLAY "=           NOTE:            ="
+           display "=    U can enter user ID     ="
+           DISPLAY "=            OR              ="
+           DISPLAY "=    'EXIT' to go back       ="
+           DISPLAY "=============================="
+           perform choice-opt-genrp.
+
+       choice-opt-genrp.
+           DISPLAY "Enter User ID : "
+           ACCEPT userid.
+           perform until userid = "EXIT" or userid = "exit"
+           call '../../Utility Functions/bin/numberCheck' USING
+           by REFERENCE userid,statusCode
+           if statusCode equal "00"
+               move userid to edit-ID
+               CALL '../../Utility Functions/bin/generateReport'
+               USING REFERENCE edit-id
+               perform generate-report-page
+           Else
+               DISPLAY esc RED-CODE
+               DISPLAY "Invalid Input Type"
+               DISPLAY esc RESET-CODE
+               PERFORM generate-report-page
+           end-if
+           END-PERFORM
+           DISPLAY "Going Back To Main Screen"
+           perform home-page.
+
        choice-opt-deposit.
            DISPLAY "Enter ID to be deposited : "
            ACCEPT userid.
            perform until userid = "EXIT" or userid = "exit"
-           *>>CALL 'trxDeposit' USING userid statusCode
-           EVALUATE statusCode
-               when equal "00"
-                   DISPLAY "Deposited Balance for ID ("userid")"
-                   perform deposit-page
-               when EQUAL "01"
-                   DISPLAY "ERROR IN MAKING TRANSACTION"
-                   PERFORM deposit-page
-               when EQUAL "98"
-                   DISPLAY "DEPOSIT AMOUNT INVALID"
-                   PERFORM deposit-page
-               when equal "99"
-                   DISPLAY "INVALID USER ID"
-                   perform deposit-page
-               when OTHER
-                   DISPLAY "CANNOT PERFORM DEPOSIT PROCESS"
-                   perform deposit-page
-           END-EVALUATE
+           call '../../Utility Functions/bin/numberCheck' USING
+           by REFERENCE userid,statusCode
+           if statusCode equal "00"
+               move userid to edit-ID
+               CALL '../SubFiles/bin/trxDeposit'
+               USING REFERENCE edit-id statusCode
+               perform deposit-page
+           Else
+               DISPLAY esc RED-CODE
+               DISPLAY "Invalid Input Type"
+               DISPLAY esc RESET-CODE
+               PERFORM deposit-page
+           end-if
            END-PERFORM
            DISPLAY "Going Back To Main Screen"
            perform home-page.
@@ -257,11 +287,18 @@
                            perform home-page
                        END-IF
                    when equal 6
-      *                call 'adminList'
-                       display "View Admin List"
-                       perform home-page
+                       if adminRole equal 1 then
+                           call 'adminList'
+                           display "View Admin List"
+                           perform home-page
+                       else
+                           perform generate-report-page
+                       END-IF
+      *
                    when equal 7
                        perform update-info-page
+                   when equal 8
+                       perform generate-report-page
                    when OTHER
                        display esc RED-CODE
                        display "INVALID OPTION CODE"
