@@ -45,7 +45,7 @@
            05  trxCount pic 9(5).
            05  UDate      PIC 9(6).
            05  UTime      PIC 9(6).
-
+           
        copy '../Utility Functions/colorCodes.cpy'.
 
        LINKAGE SECTION.
@@ -55,7 +55,7 @@
        MAIN-PARA.
            move "n" to END-FILE
            initialize balance
-           call '../../Utility Functions/bin/getUserByID'
+           call '../../Utility Functions/bin/getUserByID' 
            using by REFERENCE
            Input-uid , UserData , statusCode
 
@@ -76,7 +76,7 @@
            display esc greenx
            DISPLAY "==============================================="
                    "=============================================="
-           DISPLAY "  Date-Time           Withdraw        Deposit  "
+           DISPLAY "  Date-Time           Withdraw        Deposit  " 
                    "  Description"
            DISPLAY "-----------------------------------------------"
                    "-----------------------------------------------"
@@ -86,7 +86,7 @@
                    AT END
                        MOVE "Y" TO END-FILE
                    NOT AT END
-                       IF UID = INPUT-UID
+                       IF SenderID = INPUT-UID or ReceiverID = Input-uid
                            MOVE SPACES TO TYPE-NAME
                            MOVE zeroS TO WITHDRAW-AMT
                            MOVE zeroS TO DEPOSIT-AMT
@@ -104,7 +104,7 @@
                                ADD Amount TO BALANCE
                            END-IF
 
-                           DISPLAY DISPLAY-TIME
+                           DISPLAY DISPLAY-TIME 
                                    "  " WITHDRAW-AMT "  " DEPOSIT-AMT
                                    "  " Description
                        END-IF
@@ -118,10 +118,10 @@
                    "==============================================="
            display esc resetx
            CLOSE TrxFile
-
+           
            DISPLAY esc redx
            display "Press any key to exit : "
            accept anykey
            DISPLAY esc resetx
-
+           
            exit program.

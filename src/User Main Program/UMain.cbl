@@ -1,6 +1,6 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. UMain.
-       AUTHOR. YOUR-NAME.
+       AUTHOR. Hsu Shwe Yay.
 
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
@@ -13,24 +13,31 @@
        01 STATUSCODE PIC X(2) VALUE ZEROS.
        01 OPTION     PIC 9(1) VALUE ZEROS.
        01 loginOpt pic 9(2).
-
+       01 COLOR-BLUE           PIC X(5) VALUE X"1B5B33346D".  *> Blue (Esc[34m)
+       01 COLOR-RESET          PIC X(4) VALUE X"1B5B306D".    *> Reset to default (Esc[0m)
+       01 color-pink pic x(5) value X"1B5B33356D". *> Esc[35m"
+       01 Color-yellow   PIC X(5) VALUE X"1B5B33336D".
        COPY "../Utility Functions/colorCodes.cpy".
 
        PROCEDURE DIVISION.
        MAIN-LOGIC.
            INITIALIZE uid
+           DISPLAY color-pink
            DISPLAY "================ USER LOGIN ===================".
       *      CALL 'USERLOGIN' USING UID STATUSCODE.
              PERFORM login-page
+           DISPLAY COLOR-RESET
            Stop run.
 
        login-page.
+           DISPLAY color-pink
            DISPLAY "==============================================="
            DISPLAY "=======Bank Transaction Management(USER)======"
            DISPLAY "==============================================="
            DISPLAY "=                1.Login                      ="
            DISPLAY "=               99.Exit                       ="
            DISPLAY "==============================================="
+           DISPLAY COLOR-RESET
            perform choice-opt-login.
 
       *     IF STATUSCODE NOT EQUAL "00"
@@ -46,13 +53,15 @@
            DISPLAY "****************  Welcome **********************"
            DISPLAY SPACE
            call '../SubFiles/bin/balanceInfo' using UID
-           DISPLAY "===== USER MENU =====".
+           DISPLAY Color-yellow
+           DISPLAY "===== USER MENU ====="
            DISPLAY "1. Update Password".
            DISPLAY "2. User Profile".
            DISPLAY "3. Make Transaction".
            DISPLAY "4. View Passbook Report".
            DISPLAY "5. Exit".
            DISPLAY "====================="
+           DISPLAY COLOR-RESET
       *     DISPLAY "Enter your option: " .
            perform choice-opt-home
 
@@ -142,7 +151,7 @@
                         PERFORM MAIN-MENU
                WHEN 5
                    DISPLAY esc redx
-                   DISPLAY "Exiting User Menu..."
+                   DISPLAY  "Exiting User Menu..."
                    DISPLAY esc resetx
                    perform login-page
                WHEN OTHER
@@ -156,10 +165,12 @@
 
        TRANSACTION-MENU.
            DISPLAY SPACE
-           DISPLAY "===== TRANSACTION MENU =====".
+
+           DISPLAY COLOR-BLUE "===== TRANSACTION MENU ====="COLOR-RESET
            DISPLAY "1. Withdraw".
            DISPLAY "2. Transfer".
            DISPLAY "Enter your choice: ".
+
            ACCEPT OPTION
 
            EVALUATE OPTION
