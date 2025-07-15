@@ -171,9 +171,9 @@
        *>>>>>>>>>>>> writing a new transaction record in the TrxFile <<<*
        WRITE-TRX.
 
-           MOVE userId    TO SenderID
-           MOVE userId    TO ReceiverID
-           MOVE "Admin Deposit" TO Description
+           MOVE userId             TO SenderID
+           MOVE userId             TO ReceiverID
+           MOVE WS-DepoDescript    TO Description
            MOVE depoAmo   TO Amount
            MOVE 3         TO TrxType
            ACCEPT CurrentDate FROM DATE
