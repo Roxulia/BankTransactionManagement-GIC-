@@ -137,7 +137,8 @@
                        PERFORM TRANSACTION-MENU
                         PERFORM MAIN-MENU
                WHEN 4
-     **                CALL 'GENERATEREPORT' USING UID
+                     CALL '../../Utility Functions/bin/generateReport'
+                     USING UID
                         PERFORM MAIN-MENU
                WHEN 5
                    DISPLAY esc redx
