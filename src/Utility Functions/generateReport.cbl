@@ -91,24 +91,23 @@
                        MOVE "Y" TO END-FILE
                    NOT AT END
                        *>display TrxRecord
-                       IF SenderID = INPUT-UID or ReceiverID = Input-uid
-                           MOVE SPACES TO TYPE-NAME
-                           MOVE zeroS TO WITHDRAW-AMT
-                           MOVE zeroS TO DEPOSIT-AMT
-                           display TrxRecord
+                       MOVE SPACES TO TYPE-NAME
+                       MOVE zeroS TO WITHDRAW-AMT
+                       MOVE zeroS TO DEPOSIT-AMT
+                       IF SenderID = INPUT-UID
+
+                           *>display TrxRecord
                            MOVE TimeStamp TO DISPLAY-TIME
+                           MOVE Amount to WITHDRAW-AMT
+                           Add Amount to withdraw
+                           DISPLAY DISPLAY-TIME
+                                   "  " WITHDRAW-AMT "  " DEPOSIT-AMT
+                                   "  " Description
+                       else if ReceiverID = Input-uid
 
-                           IF TrxType equal 1
-                               MOVE Amount TO DEPOSIT-AMT
-                               add Amount to deposit
-                           ELSE IF TrxType equal 2 OR TrxType = 4
-                               MOVE Amount TO WITHDRAW-AMT
-                               add Amount to withdraw
-                           ELSE IF TrxType = 3
-                               MOVE Amount TO DEPOSIT-AMT
-                               add Amount to deposit
-                           END-IF
-
+                           MOVE TimeStamp TO DISPLAY-TIME
+                           MOVE Amount to deposit-AMT
+                           Add Amount to deposit
                            DISPLAY DISPLAY-TIME
                                    "  " WITHDRAW-AMT "  " DEPOSIT-AMT
                                    "  " Description
