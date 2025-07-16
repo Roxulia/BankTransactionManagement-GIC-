@@ -10,6 +10,11 @@
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
                FILE STATUS IS WS-FS.
+           SELECT TrxFile ASSIGN TO '../../../data/Transactions.dat'
+               ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS TrxID
+               FILE STATUS IS WS-FS.
 
        DATA DIVISION.
         FILE SECTION.
@@ -25,26 +30,46 @@
            05 UTrxCount PIC 9(5).
            05 UDate PIC 9(6).
            05 UTime PIC 9(6).
+
+       FD  TrxFile.
+       01  TransactionRecord.
+           05  TrxID       PIC X(11).
+           05  SenderID    PIC 9(5).
+           05  ReceiverID  PIC 9(5).
+           05  Description PIC X(30).
+           05  Amount      PIC 9(10)v99.
+           05  TrxType     PIC 9.
+           05  TimeStamp   PIC 9(12).
+
        WORKING-STORAGE SECTION.
        01 WS-UID          PIC x(25).
        01 ws-fs pic x(2).
+       01  eof pic x.
        01  statusCode pic xx.
-       01 WS-UserData.
-           05 WS-RET-UID      PIC 9(5).
-           05 WS-RET-UName    PIC X(20).
-           05 WS-RET-ULoginName PIC X(25).
-           05 RET-UEncodedPassword PIC X(32).
-           05 WS-RET-UAddress PIC X(20).
-           05 RET-UPhone PIC x(9).
-           05 RET-UBalance PIC 9(10)V99.
-           05 RET-TrxCount PIC 9(5).
-           05 RET-UDate PIC 9(6).
-           05 RET-UTime PIC 9(6).
-           05 WS-RET-Found    PIC X(1).
-       01 WS-INPUT-DATA.
-           05 WS-INPUT-DATE      PIC 9(6).
-           05 WS-INITIAL-AMOUNT  PIC 9(10)V99.
-            05 WS-INPUT-TIME PIC 9(6).
+       01  currentdate pic 9(6).
+       01  currenttime pic 9(6).
+       01  current-yr pic 9(2).
+       01  interest pic v999 value 0.002.
+       01  temp-balance pic 9(10)v99.
+       01  record_count pic 9(11).
+       01  WS-CURRENT-DATE-FIELDS.
+           05  WS-CURR-DATE.
+               10  WS-CURR-YEAR    PIC 9(4).
+               10  WS-CURR-MONTH   PIC 9(2).
+               10  WS-CURR-DAY     PIC 9(2).
+           05  WS-CURR-TIME.
+               10  WS-CURR-HOUR    PIC 9(2).
+               10  WS-CURR-MINUTES PIC 9(2).
+               10  WS-CURR-SECONDS PIC 9(2).
+       01  ws-user-udate.
+           05  udate-yr pic 9(2).
+           05  udate-month pic 9(2).
+           05  udate-day pic 99.
+       01  ws-user-utime.
+           05  utime-hr pic 99.
+           05  utime-mm pic 99.
+           05  utime-ss pic 99.
+
        01 WS-OUTPUT-DATA.
            05 WS-UPDATED-DATE.
                10 WS-UPD-YEAR    PIC 9(2).
@@ -55,55 +80,94 @@
            05 WS-TOTAL-MONTHS    PIC 9(4).
            05 WS-OUTPUT-TIME PIC 9(6).
 
+       copy 'trxConstants.cpy'.
+
        PROCEDURE DIVISION.
        MAIN-PROGRAM.
-
-           DISPLAY "Enter User ID to search: "
-           ACCEPT WS-UID
-           IF WS-UID NOT = 0
-           CALL "getUserByLoginName"
-           USING by REFERENCE WS-UID, WS-UserData,statusCode
-           IF statusCode = "00"
-               MOVE RET-UDate TO WS-INPUT-DATE
-               MOVE RET-UTime TO WS-INPUT-TIME
-      *>          COMPUTE RET-UBalance = RET-UBalance + 10000
-               MOVE RET-UBalance TO WS-INITIAL-AMOUNT
-      *>          DISPLAY "OG : " RET-UBalance
-      *>          Testing
-      *>          MOVE 250621 TO WS-INPUT-DATE
-               CALL "INTEREST-CALC" USING WS-INPUT-DATA, WS-OUTPUT-DATA
-               MOVE WS-UPDATED-DATE TO RET-UDate
-               MOVE WS-FINAL-AMOUNT TO RET-UBalance
-               MOVE WS-OUTPUT-TIME TO RET-UTime
-
-           *> Display results
-                DISPLAY "-------------------------"
-               DISPLAY "UID: " WS-RET-UID
-               DISPLAY "Name: " WS-RET-UName
-               DISPLAY "Login Name: " WS-RET-ULoginName
-               DISPLAY "Encoded Password:"RET-UEncodedPassword
-               DISPLAY "ADDRESS: " WS-RET-UAddress
-               DISPLAY "Phone Number:  " RET-UPhone
-               DISPLAY "Balance:  " RET-UBalance
-               DISPLAY "Trx Count:  " RET-TrxCount
-               DISPLAY "Date:  " RET-UDate
-               DISPLAY "Total Monts for Interest: " WS-TOTAL-MONTHS
-               DISPLAY "Time:  " RET-UTime
-               DISPLAY "-----------------------------------------"
-               MOVE WS-UserData TO userdata
-                open i-o userfile
-                   REWRITE userdata
-                       INVALID KEY
-                           MOVE "99" TO WS-FS
-                       NOT INVALID KEY
-                           MOVE "00" TO WS-FS
-                   END-REWRITE
-                   close userfile
-`
+           move 'n' to eof
+           move 0 to record_count
+           move FUNCTION CURRENT-DATE to WS-CURRENT-DATE-FIELDS
+           if WS-CURR-DAy = payday
+               perform interest-add
            ELSE
-               DISPLAY "User not found!"
+               DISPLAY WS-CURR-DAY " " WS-CURR-TIME
+           end-if
+           stop run
+           .
 
+       interest-add.
+           open i-o userfile
+           if ws-fs not equal "00"
+               display "FILE ERROR"
+               close userfile
+               stop run
            END-IF
-           END-IF
-           STOP RUN.
+           perform until eof = 'y'
+               read userfile into userdata
+               at end
+                   move 'y' to eof
+                   DISPLAY "Done" record_count "record"
+               not at END
+                   *>DISPLAY userdata
+                   move UDate to ws-user-udate
+                   compute current-yr = FUNCTION mod(WS-CURR-YEAR,100)
+                   if currentdate > ws-user-udate
+                       add 1 to record_count
+                       compute temp-balance = UBalance * interest
+                       compute UBalance = UBalance + temp-balance
+                       move current-yr to udate-yr
+                       move WS-CURR-MONTH to udate-month
+                       move WS-CURR-DAY to udate-day
+                       move ws-user-udate to UDate
+                       move WS-CURR-TIME to UTime
+                       PERFORM TRXID-GENERATE
+                       REWRITE userdata
+                           INVALID KEY
+                               display "Error in updating"
+                           not INVALID KEY
+                               DISPLAY "Successfully updated"
+                               move temp-balance to Amount
+                               move UID to ReceiverID
+                               move 0 to SenderID
+                               move 'Interest' to Description
+                               move 2 to TrxType
+                               ACCEPT CurrentDate FROM DATE
+                               ACCEPT CurrentTime FROM TIME
+                               STRING CurrentDate DELIMITED BY SIZE
+                                      CurrentTime DELIMITED BY SIZE
+                                      INTO TimeStamp
+                               END-STRING
+                               open i-o TrxFile
+                               WRITE TransactionRecord
+                                  INVALID KEY
+                                       DISPLAY
+                                       "Writing transaction failed."
+
+
+                                       CLOSE TrxFile
+                                   not INVALID KEY
+                                       display "Added TransactionRecord"
+                               END-WRITE
+                               close TrxFile
+                       END-REWRITE
+                   END-IF
+               END-READ
+           END-PERFORM
+           close userfile
+           .
+
+       TRXID-GENERATE.
+
+           ADD 1 TO UTrxCount
+
+           STRING
+               UTrxCount DELIMITED BY SIZE
+               WS-TrxDepoPrefix DELIMITED BY SIZE
+               UId DELIMITED BY SIZE
+               INTO TrxID
+           END-STRING
+
+           DISPLAY "Generated TrxID: " TrxID.
+
+
        END PROGRAM Maintenance.
