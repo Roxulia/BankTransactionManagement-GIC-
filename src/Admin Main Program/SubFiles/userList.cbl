@@ -10,7 +10,7 @@
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
            SELECT UserAccounts
-               ASSIGN TO "/../../../data/UserAccounts.DAT"
+               ASSIGN TO "../../../../data/UserAccounts.DAT"
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
@@ -37,7 +37,13 @@
        77  WS-SKIP-COUNT PIC 9(4).
        77  WS-REC-COUNT  PIC 9(2).
        77  WS-TEXT       PIC X(50).
-
+       77  WS-EOF        PIC X value 'N'.
+       77  WS-LAST-PAGE  PIC 9(3) value 0. 
+       01  WS-DISPLAY-LINE.
+           05 WS-UID     PIC X(6).
+           05 WS-UNAME   PIC X(20).
+           05 WS-ADDRESS PIC X(20).
+           05 WS-PHONE   PIC X(9).
        PROCEDURE DIVISION.
        MAIN-LOGIC.
            OPEN INPUT UserAccounts
@@ -53,17 +59,24 @@
            ACCEPT WS-CHOICE
            EVALUATE WS-CHOICE
              WHEN 1
-               IF WS-PAGE > 1
+               IF WS-PAGE > 1 
                   SUBTRACT 1 FROM WS-PAGE
+                  display "CONDITION : 1"
                   PERFORM DISPLAY-PAGE
-               ELSE
-                  DISPLAY "Already at first page."
+               ELSE IF WS-PAGE = 1                
+                  PERFORM DISPLAY-PAGE
                END-IF
-             WHEN 2
-               ADD 1 TO WS-PAGE
-               PERFORM DISPLAY-PAGE
+             WHEN 2 
+               IF WS-EOF = 'N'
+                   ADD 1 TO WS-PAGE
+                   PERFORM DISPLAY-PAGE
+               ELSE
+                   MOVE WS-LAST-PAGE TO WS-PAGE
+                   PERFORM DISPLAY-PAGE
+               END-IF
              WHEN 3
-               EXIT PROGRAM
+               CLOSE UserAccounts
+               GOBACK
              WHEN OTHER
                DISPLAY "Invalid choice."
            END-EVALUATE
@@ -80,7 +93,7 @@
            END-IF
 
            *> Skip records from previous pages
-           COMPUTE WS-SKIP-COUNT = (WS-PAGE - 1) * 10
+           COMPUTE WS-SKIP-COUNT = (WS-PAGE - 1) * 4
            PERFORM VARYING WS-REC-COUNT FROM 1 BY 1
                    UNTIL WS-REC-COUNT > WS-SKIP-COUNT
                READ UserAccounts
@@ -89,28 +102,31 @@
            END-PERFORM
 
            *> Display header
-           DISPLAY "*********************************************"
+           DISPLAY "***************************************************"
            STRING  " Page " WS-PAGE " "
              DELIMITED BY SIZE
              INTO WS-TEXT
            END-STRING
            DISPLAY WS-TEXT
            DISPLAY "***************************************************"
-           DISPLAY "UID  UName      Address       Phone    UDate  UTime"
+           DISPLAY "UID   UName              Address              Phone"
            DISPLAY "---------------------------------------------------"
 
            *> Read and display up to 10 records
            PERFORM VARYING WS-REC-COUNT FROM 1 BY 1
-                   UNTIL WS-REC-COUNT > 10
+                   UNTIL WS-REC-COUNT > 4
                READ UserAccounts
                    AT END
                      DISPLAY "-- End of file reached --"
+                     MOVE WS-PAGE TO WS-LAST-PAGE
+                     MOVE 'Y' TO WS-EOF
                      EXIT PERFORM
                NOT AT END
-                     DISPLAY UID " " UName " " UAddress " " Phone
+                     MOVE UID TO WS-UID
+                     MOVE UName TO WS-UNAME
+                     MOVE UAddress TO WS-ADDRESS
+                     MOVE Phone TO WS-PHONE
+                     DISPLAY WS-DISPLAY-LINE
                END-READ
-           END-PERFORM
-
-           DISPLAY "(Showing page " WS-PAGE ")"
-           .
+           END-PERFORM.
        END PROGRAM userListPaging.
