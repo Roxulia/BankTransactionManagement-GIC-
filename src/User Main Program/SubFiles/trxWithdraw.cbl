@@ -57,6 +57,8 @@
        01 CURRENT-TIME       PIC 9(6) VALUE ZERO.
        01 USER-FOUND         PIC X VALUE 'N'.
        01 TEMP-BALANCE       PIC s9(10)V99 VALUE ZERO.
+       01  password pic x(20).
+       01  enc_psw pic x(32).
        01  ws-fs1 pic x(2).
        01  statusCode pic x(2).
        01  C-user.
@@ -92,7 +94,7 @@
                    DISPLAY "User Not Found"
                    exit PROGRAM
                when equal "00"
-                   DISPLAY c-user
+                   *>DISPLAY c-user
                    perform withdraw_process
                    exit program
            END-EVALUATE.
@@ -110,12 +112,21 @@
                    exit PROGRAM
                END-IF
            END-IF
+           perform validate-user
            perform TRXID-GENERATE
            perform WRITE-TRANSACTION
            perform BALANCE-UPDATE
 
            .
-
+       validate-user.
+           DISPLAY "Enter Password : "
+           accept password
+           call '../../Utility Functions/bin/encryption'
+           using by REFERENCE password enc_psw
+           if enc_psw not equal c-UEncPsw
+               display esc redx "INVALID CREDENTIAL" esc resetx
+               exit PROGRAM
+           end-if.
 
 
        TRXID-GENERATE.

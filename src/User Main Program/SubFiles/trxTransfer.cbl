@@ -65,6 +65,8 @@
        01 WS-TrxFullID     PIC 9(10).
        01 WS-TrxCount      Pic 9(5).
        01  statusCode pic xx.
+       01  password pic x(20).
+       01  enc_psw pic x(32).
        01 USER-RECORD.
            05 U-UID       PIC 9(5).
            05 U-NAME      PIC X(20).
@@ -111,6 +113,7 @@
            ACCEPT WS-AMOUNT
 
            perform validate_amount
+           perform validate-user
            perform TRXID-GENERATE
            PERFORM write-transaction
            perform BALANCE-UPDATE
@@ -136,18 +139,25 @@
            if WS-SenderUID = WS-ReceiverUID
                DISPLAY "CAN'T TRANSFER TO URSELF"
                exit PROGRAM
+           end-if
            initialize statusCode
            call '../../Utility Functions/bin/getUserByID'
            using by REFERENCE WS-ReceiverUID,RECEIVER-RECORD,statusCode
-           if statusCode  EQUAL "99"
+           if statusCode not EQUAL "00"
                display "FILE ERROR"
                exit PROGRAM
-           else if statusCode EQUAL "96"
-               DISPLAY "RECEIVER NOT FOUND"
-               exit PROGRAM
            end-if
-           DISPLAY RECEIVER-RECORD.
+           .
 
+       validate-user.
+           DISPLAY "Enter Password : "
+           accept password
+           call '../../Utility Functions/bin/encryption'
+           using by REFERENCE password enc_psw
+           if enc_psw not equal U-EncPsw
+               display esc redx "INVALID CREDENTIAL" esc resetx
+               exit program
+           end-if.
 
        validate_amount.
            compute TEMP-BALANCE = u-Balance - WS-AMOUNT
@@ -218,7 +228,7 @@
                   Current-Time DELIMITED BY SIZE
                   INTO TimeStamp
            END-STRING
-           OPEN extend Transactions
+           OPEN i-o Transactions
            WRITE TrxRecord
               INVALID KEY
                    DISPLAY ESC REDX "Writing transaction failed."

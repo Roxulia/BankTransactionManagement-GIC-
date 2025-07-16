@@ -66,22 +66,22 @@
        USING InputLoginName, ReturnUserData , statusCode .
        MAIN-PROCEDURE.
             MOVE 'N' TO RET-Found
-            IF InputLoginName = Cached-UID
-               DISPLAY "NO NEED FILE READ"
-               MOVE C-UID       TO RET-UID
-               MOVE C-UName     TO RET-UName
-               MOVE C-ULogin    TO RET-ULoginName
-               MOVE C-UPassword TO RET-UEncodedPassword
-               MOVE C-UAddress  TO RET-UAddress
-               MOVE C-UPhone    TO RET-UPhone
-               MOVE C-UBalance  TO RET-UBalance
-               move C-trxCount to RET-trxCount
-               MOVE C-UDate     TO RET-UDate
-               MOVE C-UTime     TO RET-UTime
-               MOVE 'Y' TO RET-Found
-               move "00" to statusCode
-               GOBACK
-           END-IF
+      *      IF InputLoginName = Cached-UID
+               *>DISPLAY "NO NEED FILE READ"
+      *         MOVE C-UID       TO RET-UID
+      *         MOVE C-UName     TO RET-UName
+      *         MOVE C-ULogin    TO RET-ULoginName
+      *         MOVE C-UPassword TO RET-UEncodedPassword
+      *         MOVE C-UAddress  TO RET-UAddress
+      *         MOVE C-UPhone    TO RET-UPhone
+      *         MOVE C-UBalance  TO RET-UBalance
+      *         move C-trxCount to RET-trxCount
+      *         MOVE C-UDate     TO RET-UDate
+      *         MOVE C-UTime     TO RET-UTime
+      *         MOVE 'Y' TO RET-Found
+      *         move "00" to statusCode
+      *         GOBACK
+      *     END-IF
             OPEN INPUT testfile
             IF WS-FS NOT = "00"
                DISPLAY "File Status: " WS-FS
