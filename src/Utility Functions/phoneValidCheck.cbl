@@ -48,7 +48,7 @@
                    *> reset and extract
                    MOVE SPACES TO DIGITS-ONLY
                    move raw-phone-in(1:9) to digits-only
-                   DISPLAY digits-only
+                   *>DISPLAY digits-only
                    MOVE DIGITS-ONLy TO UPh
                    MOVE 'Y' TO VALID-PHONE
                ELSE
