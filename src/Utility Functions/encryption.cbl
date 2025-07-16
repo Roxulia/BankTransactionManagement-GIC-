@@ -1,3 +1,10 @@
+      ******************************************************************
+      * Author: Sat Paing Thu
+      * Date: 04.07.2025
+      * Update Date: 16.07.2025
+      * Purpose: Password Encryption
+      * Tectonics: cobc
+      ******************************************************************
        IDENTIFICATION DIVISION.
        PROGRAM-ID. encryption.
 
@@ -108,3 +115,4 @@
 
                MOVE FUNCTION CHAR(WS-TEMP) TO WS-HASH-TMP(WS-I:1)
            END-PERFORM.
+       END PROGRAM encryption.
