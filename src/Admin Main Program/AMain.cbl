@@ -21,9 +21,10 @@
        01  statusCode pic x(2) value "00".
        *>For display colors
        77  RED-CODE            PIC X(6) VALUE "[1;31m".*> set red
-       77  ESC                 PIC X    VALUE X"1B".   *> ASCII ESC
+      *77  ESC                 PIC X    VALUE X"1B".   *> ASCII ESC
        77  RESET-CODE          PIC X(4) VALUE "[0m".   *> reset
        77  GREEN-CODE          PIC X(6) VALUE "[1;32m".*>set green
+       copy '../Utility Functions/colorCodes.cpy'.
        PROCEDURE DIVISION.
        MAIN-PROCEDURE.
       *     call 'adminLogin'
@@ -31,15 +32,18 @@
             STOP RUN.
 
        login-page.
+           DISPLAY color-blue
            DISPLAY "==============================================="
            DISPLAY "=======Bank Transaction Management(Admin)======"
            DISPLAY "==============================================="
            DISPLAY "=                1.Login                      ="
            DISPLAY "=               99.Exit                       ="
            DISPLAY "==============================================="
+           display esc resetx
            perform choice-opt-login.
 
        home-page.
+           DISPLAY color-blue
            DISPLAY "=======Welcome " adminName "======="
            DISPLAY SPACE
            if adminRole = 1 THEN
@@ -54,6 +58,7 @@
                DISPLAY "=     8.Generate Report    ="
                display "=    99.Log Out            ="
                display "============================"
+               DISPLAY esc resetx
                PERFORM choice-opt-home
 
            else
@@ -66,11 +71,13 @@
                display "=     6.Generate Report    ="
                display "=    99.Log Out            ="
                display "============================"
+               DISPLAY esc resetx
                PERFORM choice-opt-home
            end-if.
 
        update-info-page.
            if homepageOpt equal 3
+               DISPLAY color-blue
                display "=============================="
                DISPLAY "=      Update User Info      ="
                DISPLAY "=============================="
@@ -80,9 +87,11 @@
                DISPLAY "=            OR              ="
                DISPLAY "=    'EXIT' to go back       ="
                DISPLAY "=============================="
+               DISPLAY esc resetx
                move 3 to homepageOpt
                perform choice-opt-update-info
            else if homepageOpt equal 7
+               DISPLAY color-blue
                display "=============================="
                DISPLAY "=      Update Admin Info     ="
                DISPLAY "=============================="
@@ -92,12 +101,14 @@
                DISPLAY "=            OR              ="
                DISPLAY "=    'EXIT' to go back       ="
                DISPLAY "=============================="
+               DISPLAY esc RESET-CODE
                move 7 to homepageOpt
                perform choice-opt-update-info
 
            end-if.
 
        deposit-page.
+           DISPLAY color-blue
            display "=============================="
            DISPLAY "=    Deposit to User Acc     ="
            DISPLAY "=============================="
@@ -107,9 +118,11 @@
            DISPLAY "=            OR              ="
            DISPLAY "=    'EXIT' to go back       ="
            DISPLAY "=============================="
+           DISPLAY esc resetx
            perform choice-opt-deposit.
 
        generate-report-page.
+           DISPLAY color-blue
            display "=============================="
            DISPLAY "=    Generate Trx Report     ="
            DISPLAY "=============================="
@@ -119,6 +132,7 @@
            DISPLAY "=            OR              ="
            DISPLAY "=    'EXIT' to go back       ="
            DISPLAY "=============================="
+           DISPLAY esc resetx
            perform choice-opt-genrp.
 
        choice-opt-genrp.
