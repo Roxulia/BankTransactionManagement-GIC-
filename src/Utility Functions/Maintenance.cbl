@@ -20,10 +20,10 @@
            05 ULoginName PIC X(25).
            05 UEncodedPassword PIC X(32).
            05 UAddress PIC X(20).
-           05 UPhone PIC 9(9).
+           05 UPhone PIC x(9).
            05 UBalance PIC 9(10)V99.
            05 UTrxCount PIC 9(5).
-           05 UDate PIC 9(8).
+           05 UDate PIC 9(6).
            05 UTime PIC 9(6).
        WORKING-STORAGE SECTION.
        01 WS-UID          PIC x(25).

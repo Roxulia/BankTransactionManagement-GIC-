@@ -5,7 +5,7 @@
 
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01 WS-INTEREST-RATE      PIC V9999 VALUE 0.0002.
+       01 WS-INTEREST-RATE      PIC V9999 VALUE 0.002.
 
        *> Current Date Fields
        01  WS-CURRENT-DATE-FIELDS.
