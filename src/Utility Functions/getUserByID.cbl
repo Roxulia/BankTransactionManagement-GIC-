@@ -69,22 +69,22 @@
             INITIALIZE ws-uid
             move InputUID1 to ws-uid
             MOVE 'N' TO RET-Found
-            IF ws-uid = Cached-UID and ws-uid not EQUAL zero
-               DISPLAY "NO NEED FILE READ"
-               MOVE C-UID       TO RET-UID
-               MOVE C-UName     TO RET-UName
-               MOVE C-ULogin    TO RET-ULoginName
-               MOVE C-UPassword TO RET-UEncodedPassword
-               MOVE C-UAddress  TO RET-UAddress
-               MOVE C-UPhone    TO RET-UPhone
-               MOVE C-UBalance  TO RET-UBalance
-               Move C-TrxCount  to RET-TrxCount
-               MOVE C-UDate     TO RET-UDate
-               MOVE C-UTime     TO RET-UTime
-               MOVE 'Y' TO RET-Found
-               move "00" to statusCode
-               go to back-to-main
-           END-IF
+      *      IF ws-uid = Cached-UID and ws-uid not EQUAL zero
+               *>DISPLAY "NO NEED FILE READ"
+      *         MOVE C-UID       TO RET-UID
+      *         MOVE C-UName     TO RET-UName
+      *         MOVE C-ULogin    TO RET-ULoginName
+      *         MOVE C-UPassword TO RET-UEncodedPassword
+      *         MOVE C-UAddress  TO RET-UAddress
+      *         MOVE C-UPhone    TO RET-UPhone
+      *         MOVE C-UBalance  TO RET-UBalance
+      *         Move C-TrxCount  to RET-TrxCount
+      *         MOVE C-UDate     TO RET-UDate
+      *         MOVE C-UTime     TO RET-UTime
+      *         MOVE 'Y' TO RET-Found
+      *         move "00" to statusCode
+      *         go to back-to-main
+      *     END-IF
             OPEN INPUT testfile
             IF WS-FS NOT = "00"
                move "99" to statusCode

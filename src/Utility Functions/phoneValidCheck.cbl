@@ -24,7 +24,7 @@
        01  UPh           PIC x(9).
 
        PROCEDURE DIVISION USING UPh.
-
+           move 'N' to valid-phone
            PERFORM UNTIL VALID-PHONE = 'Y'
                DISPLAY "==========================================="
                DISPLAY "=  Enter new Phone Number: "
@@ -48,7 +48,7 @@
                    *> reset and extract
                    MOVE SPACES TO DIGITS-ONLY
                    move raw-phone-in(1:9) to digits-only
-                   DISPLAY digits-only
+                   *>DISPLAY digits-only
                    MOVE DIGITS-ONLy TO UPh
                    MOVE 'Y' TO VALID-PHONE
                ELSE
