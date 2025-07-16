@@ -1,110 +1,132 @@
       ******************************************************************
-      * Author: Nyan Ye Thu
+      * Author: Nyan Ye Thu, Myo Thein Chit
       * Date: 15/7/2025
-      * Purpose: Read and show all user account details.
-      * Tectonics: cobc
+      * Purpose: Read and page through user account details (10 records per page).
+      * Tectonics: OpenCOBOL (GnuCOBOL)
       ******************************************************************
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. userList.
-        ENVIRONMENT DIVISION.
+       PROGRAM-ID. userListPaging.
+       ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
            SELECT UserAccounts
-           ASSIGN TO "../../../../data/UserAccounts.dat"
-           ORGANIZATION IS INDEXED
+               ASSIGN TO "../../../../data/UserAccounts.DAT"
+               ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
                FILE STATUS IS WS-FS.
 
        DATA DIVISION.
        FILE SECTION.
-       FD UserAccounts.
-       01 UserRecord.
+       FD  UserAccounts.
+       01  UserRecord.
            05 UID         PIC 9(5).
            05 UName       PIC X(20).
            05 ULoginName  PIC X(25).
            05 UEncPsw     PIC X(32).
-           05 UAddress     PIC X(20).
+           05 UAddress    PIC X(20).
            05 Phone       PIC X(9).
            05 Balance     PIC 9(10)V99.
            05 UDate       PIC 9(6).
            05 UTime       PIC 9(6).
+
        WORKING-STORAGE SECTION.
-       01 EOF-FLAG        PIC X VALUE 'N'.
-       01 Choice          PIC 9(1) VALUE 0.
-       01 More-Data       PIC X Value 'Y'.
-       01 I               PIC 9(2) value 0.
-       01 J               PIC 9(2) value 0.
-       01 ws-fs pic x(2).
+       77  WS-FS         PIC XX.
+       77  WS-PAGE       PIC 9(3) VALUE 1.
+       77  WS-CHOICE     PIC 9 VALUE 0.
+       77  WS-SKIP-COUNT PIC 9(4).
+       77  WS-REC-COUNT  PIC 9(2).
+       77  WS-TEXT       PIC X(50).
+       77  WS-EOF        PIC X value 'N'.
+       77  WS-LAST-PAGE  PIC 9(3) value 0. 
+       01  WS-DISPLAY-LINE.
+           05 WS-UID     PIC X(6).
+           05 WS-UNAME   PIC X(20).
+           05 WS-ADDRESS PIC X(20).
+           05 WS-PHONE   PIC X(9).
        PROCEDURE DIVISION.
-       MAIN-PROCEDURE.
-             MAIN-PROCEDURE.
+       MAIN-LOGIC.
+           OPEN INPUT UserAccounts
+           PERFORM DISPLAY-PAGE
+           PERFORM MENU-LOOP
+           CLOSE UserAccounts
+           STOP RUN.
 
+      *-------------------------------------------------------------------*
+       MENU-LOOP.
+           DISPLAY "---------------------------------------------"
+           DISPLAY "Options: 1=Prev page, 2=Next page, 3=Exit"
+           ACCEPT WS-CHOICE
+           EVALUATE WS-CHOICE
+             WHEN 1
+               IF WS-PAGE > 1 
+                  SUBTRACT 1 FROM WS-PAGE
+                  display "CONDITION : 1"
+                  PERFORM DISPLAY-PAGE
+               ELSE IF WS-PAGE = 1                
+                  PERFORM DISPLAY-PAGE
+               END-IF
+             WHEN 2 
+               IF WS-EOF = 'N'
+                   ADD 1 TO WS-PAGE
+                   PERFORM DISPLAY-PAGE
+               ELSE
+                   MOVE WS-LAST-PAGE TO WS-PAGE
+                   PERFORM DISPLAY-PAGE
+               END-IF
+             WHEN 3
+               CLOSE UserAccounts
+               GOBACK
+             WHEN OTHER
+               DISPLAY "Invalid choice."
+           END-EVALUATE
+           GO TO MENU-LOOP.
 
+      *-------------------------------------------------------------------*
+       DISPLAY-PAGE.
+           *> Reposition by closing/re-opening
+           CLOSE UserAccounts
+           OPEN INPUT UserAccounts
+           IF WS-FS NOT = "00"
+               DISPLAY "ERROR: Unable to OPEN UserAccounts," WS-FS
+               STOP RUN
+           END-IF
 
-           OPEN INPUT UserAccounts.
+           *> Skip records from previous pages
+           COMPUTE WS-SKIP-COUNT = (WS-PAGE - 1) * 4
+           PERFORM VARYING WS-REC-COUNT FROM 1 BY 1
+                   UNTIL WS-REC-COUNT > WS-SKIP-COUNT
+               READ UserAccounts
+                   AT END EXIT PERFORM
+               END-READ
+           END-PERFORM
 
+           *> Display header
+           DISPLAY "***************************************************"
+           STRING  " Page " WS-PAGE " "
+             DELIMITED BY SIZE
+             INTO WS-TEXT
+           END-STRING
+           DISPLAY WS-TEXT
+           DISPLAY "***************************************************"
+           DISPLAY "UID   UName              Address              Phone"
+           DISPLAY "---------------------------------------------------"
 
-
-               DISPLAY "*********************************************"
-               DISPLAY " User List Report "
-               DISPLAY "*********************************************"
-               DISPLAY "UID  UName Address Phone UDate UTime"
-                   DISPLAY "------------------------------------------"
-              PERFORM UNTIL Choice = 'Exit'
-
-               IF Choice = '1'
-              PERFORM UNTIL I >= 2
-                READ UserAccounts INTO UserRecord
+           *> Read and display up to 10 records
+           PERFORM VARYING WS-REC-COUNT FROM 1 BY 1
+                   UNTIL WS-REC-COUNT > 4
+               READ UserAccounts
                    AT END
-                       MOVE 'Y' TO EOF-FLAG
-                       DISPLAY "End of Files"
-                       CONTINUE
-                   NOT AT END
-                       DISPLAY UID SPACE
-                               UName SPACE
-                               *>ULoginName SPACE
-                               uAddress SPACE
-                               Phone SPACE
-                               UDate SPACE
-                               UTime
-                      Add 1 to I
-
-                   END-READ
-
-               END-PERFORM
-
-               ELSE IF Choice ='2'
-                   PERFORM Until J >= 2
-                READ UserAccounts INTO UserRecord
-                   AT END
-                       MOVE 'Y' TO EOF-FLAG
-                       DISPLAY "End of Files"
-                       CONTINUE
-                   NOT AT END
-                       DISPLAY UID SPACE
-                               UName SPACE
-                               *>ULoginName SPACE
-                               uAddress SPACE
-                               Phone SPACE
-                               UDate SPACE
-                               UTime
-                      Add 1 to J
-
-                   END-READ
-
-               END-PERFORM
-               ELSE IF Choice = '3'
-                   EXIT PROGRAM
-                END-IF
-
-               DISPLAY "Enter Options to see User Data."
-               Display "1. Show Previous ten User's Data."
-               Display "2. Show Next ten User's Data."
-               Display "3. Exit"
-               ACCEPT Choice
-             END-PERFORM.
-           CLOSE UserAccounts.
-
-          STOP RUN.
-       END PROGRAM userList.
+                     DISPLAY "-- End of file reached --"
+                     MOVE WS-PAGE TO WS-LAST-PAGE
+                     MOVE 'Y' TO WS-EOF
+                     EXIT PERFORM
+               NOT AT END
+                     MOVE UID TO WS-UID
+                     MOVE UName TO WS-UNAME
+                     MOVE UAddress TO WS-ADDRESS
+                     MOVE Phone TO WS-PHONE
+                     DISPLAY WS-DISPLAY-LINE
+               END-READ
+           END-PERFORM.
+       END PROGRAM userListPaging.
