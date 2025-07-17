@@ -123,10 +123,10 @@
            using by REFERENCE WS-SenderUID,USER-RECORD,statusCode
 
            if statusCode  EQUAL "99"
-               display "FILE ERROR"
+               display esc redx"FILE ERROR" esc resetx
                exit PROGRAM
            else if statusCode EQUAL "96"
-               DISPLAY "SENDER NOT FOUND"
+               DISPLAY esc redx "SENDER NOT FOUND" esc resetx
                exit PROGRAM
            end-if.
 
@@ -135,14 +135,14 @@
            DISPLAY "Enter Receiver's UID:".
            ACCEPT WS-RECEIVERUID
            if WS-SenderUID = WS-ReceiverUID
-               DISPLAY "CAN'T TRANSFER TO URSELF"
+               DISPLAY esc redx "CAN'T TRANSFER TO URSELF" esc resetx
                exit PROGRAM
            end-if
            initialize statusCode
            call '../../Utility Functions/bin/getUserByID'
            using by REFERENCE WS-ReceiverUID,RECEIVER-RECORD,statusCode
            if statusCode not EQUAL "00"
-               display "FILE ERROR"
+               display esc redx "FILE ERROR" esc resetx
                exit PROGRAM
            end-if
            .
@@ -160,7 +160,8 @@
        validate_amount.
            compute TEMP-BALANCE = u-Balance - WS-AMOUNT
            if TEMP-BALANCE < minaccountbalance
-               display "Ur Minimum Account Balance Reached"
+               display esc redx"Ur Minimum Account Balance Reached"
+               DISPLAY esc resetx
                exit PROGRAM
            END-IF.
 
