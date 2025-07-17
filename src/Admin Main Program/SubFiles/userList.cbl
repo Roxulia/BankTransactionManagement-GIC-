@@ -5,12 +5,12 @@
       * Tectonics: OpenCOBOL (GnuCOBOL)
       ******************************************************************
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. userListPaging.
+       PROGRAM-ID. userList.
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
            SELECT UserAccounts
-               ASSIGN TO "../../../../data/UserAccounts.DAT"
+               ASSIGN TO "../../../data/UserAccounts.DAT"
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
@@ -27,7 +27,8 @@
            05 UAddress    PIC X(20).
            05 Phone       PIC X(9).
            05 Balance     PIC 9(10)V99.
-           05 UDate       PIC 9(6).
+           05 trxCount    pic 9(5).
+           05 UDate       PIC 9(8).
            05 UTime       PIC 9(6).
 
        WORKING-STORAGE SECTION.
@@ -38,7 +39,7 @@
        77  WS-REC-COUNT  PIC 9(2).
        77  WS-TEXT       PIC X(50).
        77  WS-EOF        PIC X value 'N'.
-       77  WS-LAST-PAGE  PIC 9(3) value 0. 
+       77  WS-LAST-PAGE  PIC 9(3) value 0.
        01  WS-DISPLAY-LINE.
            05 WS-UID     PIC X(6).
            05 WS-UNAME   PIC X(20).
@@ -46,27 +47,52 @@
            05 WS-PHONE   PIC X(9).
        PROCEDURE DIVISION.
        MAIN-LOGIC.
+           move 1 to  ws-page
+           INITIALIZE ws-last-page
+           move 'N' to ws-eof
+           INITIALIZE ws-choice
+           move 0 to ws-choice
            OPEN INPUT UserAccounts
            PERFORM DISPLAY-PAGE
-           PERFORM MENU-LOOP
            CLOSE UserAccounts
-           STOP RUN.
+           exit program.
 
       *-------------------------------------------------------------------*
        MENU-LOOP.
-           DISPLAY "---------------------------------------------"
-           DISPLAY "Options: 1=Prev page, 2=Next page, 3=Exit"
+           DISPLAY "--------------------------------------------------"
+           if ws-page = 1 and ws-eof = 'Y'
+           DISPLAY "Options:                            3=Exit"
+           DISPLAY "--------------------------------------------------"
+           else
+               if ws-eof = 'N' and ws-page = 1
+           DISPLAY "Options:               2=Next Page, 3=Exit"
+           DISPLAY "--------------------------------------------------"
+           else
+               if ws-eof = 'N' and ws-page not EQUAL 1
+           DISPLAY "Options:  1=Prev Page, 2=Next Page, 3=Exit"
+           DISPLAY "--------------------------------------------------"
+           else
+               if ws-eof = 'Y' and ws-page not EQUAL 1
+           DISPLAY "Options:  1=Prev Page,            , 3=Exit"
+           DISPLAY "--------------------------------------------------"
+           ELSE
+           DISPLAY "Options:  1=Prev Page, 2=Next Page, 3=Exit"
+           DISPLAY "--------------------------------------------------"
+           end-if
+           END-IF
+           END-IF
+           END-IF
+           Display "Choice : "
            ACCEPT WS-CHOICE
            EVALUATE WS-CHOICE
              WHEN 1
-               IF WS-PAGE > 1 
+               IF WS-PAGE > 1
                   SUBTRACT 1 FROM WS-PAGE
-                  display "CONDITION : 1"
                   PERFORM DISPLAY-PAGE
-               ELSE IF WS-PAGE = 1                
+               ELSE IF WS-PAGE = 1
                   PERFORM DISPLAY-PAGE
                END-IF
-             WHEN 2 
+             WHEN 2
                IF WS-EOF = 'N'
                    ADD 1 TO WS-PAGE
                    PERFORM DISPLAY-PAGE
@@ -76,24 +102,25 @@
                END-IF
              WHEN 3
                CLOSE UserAccounts
-               GOBACK
+               exit program
              WHEN OTHER
                DISPLAY "Invalid choice."
-           END-EVALUATE
-           GO TO MENU-LOOP.
+               perform DISPLAY-PAGE
+           END-EVALUATE.
 
       *-------------------------------------------------------------------*
        DISPLAY-PAGE.
            *> Reposition by closing/re-opening
            CLOSE UserAccounts
            OPEN INPUT UserAccounts
+           move 'N' to ws-eof
            IF WS-FS NOT = "00"
                DISPLAY "ERROR: Unable to OPEN UserAccounts," WS-FS
                STOP RUN
            END-IF
 
            *> Skip records from previous pages
-           COMPUTE WS-SKIP-COUNT = (WS-PAGE - 1) * 4
+           COMPUTE WS-SKIP-COUNT = (WS-PAGE - 1) * 5
            PERFORM VARYING WS-REC-COUNT FROM 1 BY 1
                    UNTIL WS-REC-COUNT > WS-SKIP-COUNT
                READ UserAccounts
@@ -114,7 +141,7 @@
 
            *> Read and display up to 10 records
            PERFORM VARYING WS-REC-COUNT FROM 1 BY 1
-                   UNTIL WS-REC-COUNT > 4
+                   UNTIL WS-REC-COUNT > 5
                READ UserAccounts
                    AT END
                      DISPLAY "-- End of file reached --"
@@ -128,5 +155,6 @@
                      MOVE Phone TO WS-PHONE
                      DISPLAY WS-DISPLAY-LINE
                END-READ
-           END-PERFORM.
-       END PROGRAM userListPaging.
+           END-PERFORM
+           perform MENU-LOOP.
+       END PROGRAM userList.

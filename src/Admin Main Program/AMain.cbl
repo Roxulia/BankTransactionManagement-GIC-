@@ -282,8 +282,7 @@
                        DISPLAY SPACE
                        perform home-page
                    when  EQUAL 2
-      *                call 'userList'
-                       display "View User List"
+                       call '../SubFiles/bin/userList'
                        perform home-page
                    when  EQUAL 3
                        perform update-info-page
@@ -302,8 +301,8 @@
                        END-IF
                    when equal 6
                        if adminRole equal 1 then
-                           call 'adminList'
-                           display "View Admin List"
+                           call '../SubFiles/bin/adminList'
+
                            perform home-page
                        else
                            perform generate-report-page

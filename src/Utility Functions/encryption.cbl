@@ -60,6 +60,7 @@
            END-PERFORM
 
            MOVE WS-HASH-TMP TO LS-HASHED-PW
+           *>DISPLAY LS-HASHED-PW
 
            GOBACK.
 
