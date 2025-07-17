@@ -27,7 +27,7 @@
            05  UPh        PIC X(9).
            05  Balance    PIC 9(10)V99.
            05  trxCount    pic 9(5).
-           05  UDate      PIC 9(6).
+           05  UDate      PIC 9(8).
            05  UTime      PIC 9(6).
        LINKAGE SECTION.
        01  username pic x(20).

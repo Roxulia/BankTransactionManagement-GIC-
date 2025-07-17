@@ -34,7 +34,7 @@
            05 UPh          PIC x(9).
            05 Balance      PIC 9(10)V99.
            05 TrxCount     PIC 9(5).
-           05 UDate        PIC 9(6).
+           05 UDate        PIC 9(8).
            05 UTime        PIC 9(6).
 
        FD Transactions.
@@ -45,7 +45,7 @@
            05 Description  PIC X(30).
            05 Amount       PIC 9(10)V99.
            05 T-Type       PIC 9.
-           05 TimeStamp    PIC 9(12).
+           05 TimeStamp    PIC 9(14).
 
        WORKING-STORAGE SECTION.
        01 WS-SenderUID    PIC 9(5) VALUE ZERO.
@@ -53,8 +53,6 @@
        01 WS-Amount       PIC 9(10)V99 VALUE ZERO.
        01  TEMP-BALANCE   pic s9(10)v99.
        01 EOF-FLAG          PIC X VALUE 'N'.
-       01 Current-Date   PIC 9(6) VALUE ZERO.
-       01 Current-Time   PIC 9(6) VALUE ZERO.
        01 SENDER-FOUND      PIC X VALUE 'N'.
        01 RECEIVER-FOUND    PIC X VALUE 'N'.
        01 WS-FS1            PIC XX.
@@ -76,7 +74,7 @@
            05 U-PHONE     PIC x(9).
            05 U-BALANCE   PIC 9(10)V99.
            05 U-TrxCount  PIC 9(5).
-           05 U-DATE      PIC 9(6).
+           05 U-DATE      PIC 9(8).
            05 U-TIME      PIC 9(6).
 
        01 RECEIVER-RECORD.
@@ -88,7 +86,7 @@
            05 R-PHONE      PIC x(9).
            05 R-BALANCE    PIC 9(10)V99.
            05 R-TrxCount   PIC 9(5).
-           05 R-DATE       PIC 9(6).
+           05 R-DATE       PIC 9(8).
            05 R-TIME       PIC 9(6).
        COPY "../../Utility Functions/trxConstants.cpy".
        COPY "../../Utility Functions/colorCodes.cpy".
@@ -175,7 +173,7 @@
 
            STRING
                u-TrxCount DELIMITED BY SIZE
-               WS-TrxDepoPrefix DELIMITED BY SIZE
+               WS-TrxSentPrefix DELIMITED BY SIZE
                u-UID DELIMITED BY SIZE
                INTO TrxID
            END-STRING
@@ -222,12 +220,7 @@
            MOVE "Transfer" TO Description
            MOVE WS-AMOUNT   TO Amount
            MOVE 4         TO T-Type
-           ACCEPT Current-Date FROM DATE
-           ACCEPT Current-Time FROM TIME
-           STRING Current-Date DELIMITED BY SIZE
-                  Current-Time DELIMITED BY SIZE
-                  INTO TimeStamp
-           END-STRING
+           move FUNCTION CURRENT-DATE(1:14) to TimeStamp
            OPEN i-o Transactions
            WRITE TrxRecord
               INVALID KEY

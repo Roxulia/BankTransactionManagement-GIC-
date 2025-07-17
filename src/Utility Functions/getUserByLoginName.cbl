@@ -27,7 +27,7 @@
            05 UPhone PIC x(9).
            05 UBalance PIC 9(10)V99.
            05 trxCount pic 9(5).
-           05 UDate PIC 9(6).
+           05 UDate PIC 9(8).
            05 UTime PIC 9(6).
 
        WORKING-STORAGE SECTION.
@@ -41,7 +41,7 @@
            05 C-UPhone    PIC x(9).
            05 C-UBalance  PIC 9(10)V99.
            05 C-trxCount pic 9(5).
-           05 C-UDate     PIC 9(6).
+           05 C-UDate     PIC 9(8).
            05 C-UTime     PIC 9(6).
        01 EOF-Flag PIC X(1) VALUE 'N'.
        01 ws-fs pic x(2).
@@ -59,7 +59,7 @@
            05 RET-UPhone PIC x(9).
            05 RET-UBalance PIC 9(10)V99.
            05 RET-trxCount pic 9(5).
-           05 RET-UDate PIC 9(6).
+           05 RET-UDate PIC 9(8).
            05 RET-UTime PIC 9(6).
 
        PROCEDURE DIVISION
