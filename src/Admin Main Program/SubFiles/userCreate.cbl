@@ -42,6 +42,7 @@
        01  EOF-Flag            PIC X value 'N'.
        01  PTR                 PIC 9(4)  COMP-5.
        01  I                   PIC 9(4)  COMP-5.
+       01  statusCode          pic xx.
 
        *>For display colors
        COPY "../../Utility Functions/colorCodes.cpy".
@@ -108,8 +109,18 @@
            DISPLAY "----- Create New User Account -----"
            DISPLAY "Generated UID: " UID.
 
-           DISPLAY "Enter Full Name (max 20 chars): "
+           DISPLAY "=  Enter Full Name (max 20 chars):"
            ACCEPT UName
+           call '../../Utility Functions/bin/userNameVal'
+           using by REFERENCE UName , statusCode
+           
+           perform until statusCode equal "00"
+               DISPLAY esc redx "Invalid Name" esc resetx
+               DISPLAY "=  Enter Full Name (max 20 chars):"
+               ACCEPT UName
+               call '../../Utility Functions/bin/userNameVal'
+               using by REFERENCE UName , statusCode
+           END-PERFORM
 
            DISPLAY "Enter Address (max 20 chars): "
            ACCEPT UAddress.
@@ -189,10 +200,9 @@
                    DISPLAY "Error writing to file (Status=" WS-FS ")"
                    MOVE 2 TO WS-ReturnCode
                NOT INVALID KEY
-                   DISPLAY 
-                   ESC GREENX "User account created successfully."
-                       
-                   
+                   DISPLAY ESC GREENX "User account created"
+                       WITH NO ADVANCING
+                   DISPLAY "successfully."
                    DISPLAY ESC RESETX
                    MOVE 0 TO WS-ReturnCode
            END-WRITE
