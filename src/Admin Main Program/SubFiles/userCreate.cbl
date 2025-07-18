@@ -189,9 +189,10 @@
                    DISPLAY "Error writing to file (Status=" WS-FS ")"
                    MOVE 2 TO WS-ReturnCode
                NOT INVALID KEY
-                   DISPLAY ESC GREENX "User account created"
-                       WITH NO ADVANCING
-                   DISPLAY "successfully."
+                   DISPLAY 
+                   ESC GREENX "User account created successfully."
+                       
+                   
                    DISPLAY ESC RESETX
                    MOVE 0 TO WS-ReturnCode
            END-WRITE
