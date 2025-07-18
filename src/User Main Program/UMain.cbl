@@ -11,23 +11,22 @@
        01 UID     PIC 9(5).
        01  username pic x(20).
        01 STATUSCODE PIC X(2) VALUE ZEROS.
-       01 OPTION     PIC 9(1) VALUE ZEROS.
-       01 loginOpt pic 9(2).
+       01 OPTION     PIC x(1) VALUE ZEROS.
+       01 loginOpt pic x(2).
 
        COPY "../Utility Functions/colorCodes.cpy".
 
        PROCEDURE DIVISION.
        MAIN-LOGIC.
            INITIALIZE uid
-           DISPLAY color-pink
-           "================ USER LOGIN ==================="
-           DISPLAY esc resetx
+           
       *      CALL 'USERLOGIN' USING UID STATUSCODE.
-             PERFORM login-page
+           PERFORM login-page
            Stop run.
 
        login-page.
-           display color-pink
+           DISPLAY color-pink
+           "================ USER LOGIN ==================="
            DISPLAY "==============================================="
            DISPLAY "=======Bank Transaction Management(USER)======="
            DISPLAY "==============================================="
@@ -37,19 +36,15 @@
            DISPLAY esc resetx
            perform choice-opt-login.
 
-      *     IF STATUSCODE NOT EQUAL "00"
-      *         DISPLAY "Login failed. Exiting..."
-      *         GO TO END-PROGRAM
-      *     END-IF.
-           DISPLAY esc greenx
-           DISPLAY "Login successful!"
-           DISPLAY esc resetx.
 
        MAIN-MENU.
            DISPLAY SPACE
+           display esc greenx
            DISPLAY "****************  Welcome **********************"
            DISPLAY SPACE
+
            call '../SubFiles/bin/balanceInfo' using UID
+           display esc resetx
            display  color-yellow
            DISPLAY "===== USER MENU =====".
            DISPLAY "1. Update Password".
@@ -72,11 +67,10 @@
        choice-opt-login.
            DISPLAY "Choosen Option Code : "
            accept loginOpt
-           display SPACE
-
-           PERFORM UNTIL loginOpt = 99
+           
+           PERFORM UNTIL loginOpt EQUAL "99"
                EVALUATE loginOpt
-                   when EQUAL 1
+                   when EQUAL "1"
                        call '../SubFiles/bin/userLogin'
                        using by REFERENCE uid , username , STATUSCODE
                        EVALUATE STATUSCODE
@@ -98,6 +92,7 @@
                            DISPLAY "ERROR OCCURS"
                            DISPLAY esc resetx
                            PERFORM login-page
+                       END-EVALUATE
                    when OTHER
                        DISPLAY esc redx
                        DISPLAY "INVALID OPTION CODE"
@@ -116,7 +111,7 @@
            Display "Enter your option code :"
            ACCEPT OPTION
             EVALUATE OPTION
-               WHEN 1
+               WHEN "1"
                    CALL '../SubFiles/bin/updatePassword'
                    USING by REFERENCE UID STATUSCODE
                    EVALUATE STATUSCODE
@@ -136,17 +131,17 @@
                            DISPLAY esc resetx
                            perform MAIN-MENU
                    END-EVALUATE
-               WHEN 2
+               WHEN "2"
                         CALL '../SubFiles/bin/userInfo' USING UID
                         PERFORM MAIN-MENU
-               WHEN 3
+               WHEN "3"
                        PERFORM TRANSACTION-MENU
                         PERFORM MAIN-MENU
-               WHEN 4
+               WHEN "4"
                      CALL '../../Utility Functions/bin/generateReport'
                      USING UID
                         PERFORM MAIN-MENU
-               WHEN 5
+               WHEN "5"
                    DISPLAY esc redx
                    DISPLAY "Exiting User Menu..."
                    DISPLAY esc resetx
@@ -170,10 +165,10 @@
            ACCEPT OPTION
 
            EVALUATE OPTION
-               WHEN 1
+               WHEN "1"
                    CALL '../SubFiles/bin/trxWithdraw' USING
                    by REFERENCE UID
-               WHEN 2
+               WHEN "2"
   *****            CALL 'TRXTRANSFER' USING UID
                    call '../SubFiles/bin/trxTransfer'
                    using by REFERENCE uid STATUSCODE

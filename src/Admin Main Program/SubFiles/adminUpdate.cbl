@@ -115,8 +115,18 @@
 
            EVALUATE OptCode
                WHEN 1
-                   DISPLAY "Enter new Name (20 chars): "
+                   DISPLAY "=  Enter Full Name (max 20 chars):"
                    ACCEPT NewName
+                   call '../../Utility Functions/bin/userNameVal'
+                   using by REFERENCE newName , statusCode
+                   
+                   perform until statusCode equal "00"
+                       DISPLAY esc redx "Invalid Name" esc resetx
+                       DISPLAY "=  Enter Full Name (max 20 chars):"
+                       ACCEPT newName
+                       call '../../Utility Functions/bin/userNameVal'
+                       using by REFERENCE newName , statusCode
+                   END-PERFORM
                    MOVE NewName TO AName
 
                WHEN 2
