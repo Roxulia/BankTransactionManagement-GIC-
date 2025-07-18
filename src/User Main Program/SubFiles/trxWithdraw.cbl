@@ -86,10 +86,10 @@
 
            EVALUATE statusCode
                when equal "99"
-                   Display "Error in opening File"
+                   Display esc redx "Error in opening File" esc resetx
                    exit program
                when equal "96"
-                   DISPLAY "User Not Found"
+                   DISPLAY esc redx "User Not Found" esc resetx
                    exit PROGRAM
                when equal "00"
                    *>DISPLAY c-user
@@ -102,11 +102,12 @@
            ACCEPT WS-AMOUNT
            compute TEMP-BALANCE = c-Balance - WS-AMOUNT
            if TEMP-BALANCE < minaccountbalance
-               display "Ur Minimum Account Balance Reached"
+               display esc redx"Ur Minimum Account Balance Reached "
+               esc resetx
                exit PROGRAM
            else
                if WS-AMOUNT < minwithdraw or WS-AMOUNT > maxwithdraw
-                   DISPLAY "Invalid Withdraw Amount"
+                   DISPLAY esc redx"Invalid Withdraw Amount " esc resetx
                    exit PROGRAM
                END-IF
            END-IF
@@ -137,8 +138,9 @@
                C-UID DELIMITED BY SIZE
                INTO TrxID
            END-STRING
-
-           DISPLAY "Generated TrxID: " TrxID.
+           display esc greenx
+           DISPLAY "Generated TrxID: " TrxID
+           DISPLAY esc resetx.
 
        write-transaction.
            MOVE C-UID    TO SenderID
