@@ -20,6 +20,10 @@
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
                FILE STATUS IS WS-FS.
+           Select nrcfile
+               assign to "../../../data/NRC.dat"
+               ORGANIZATION is line SEQUENTIAL
+               file status is ws-fs.
        DATA DIVISION.
        FILE SECTION.
        FD TrxFile.
@@ -44,6 +48,11 @@
            05 TrxCount    PIC 9(5).
            05 UDate       PIC 9(8).
            05 UTime       PIC 9(6).
+
+       FD  nrcfile.
+       01  nrclist.
+           05  city_code pic xx.
+           05  city_name pic x(10).
        WORKING-STORAGE SECTION.
        01  ws-fs pic xx.
        01  eof pic x value 'n'.
@@ -51,6 +60,9 @@
        01  txt-time pic x(6).
        01  curr-date pic 9(8).
        01  curr-Time pic 9(6).
+       01  cname pic x(10).
+       01  ccode pic xx.
+       01  found pic x value 'n'.
        PROCEDURE DIVISION.
        MAIN-PROCEDURE.
            open INPUT TrxFile
@@ -80,5 +92,30 @@
            DISPLAY txt-date
            DISPLAY curr-date
            DISPLAY curr-Time
+           DISPLAY "enter City Code: "
+           accept ccode
+           DISPLAY "Enter City Name : "
+           accept cname
+           open INPUT nrcfile
+           move 'n' to eof
+           move 'n' to found
+           perform until eof = 'y'
+               read nrcfile into nrclist
+               at end
+                   move 'y' to eof
+               not at end
+                   if ccode = city_code and cname = city_name
+                   move 'y' to found
+                   move 'y' to eof
+                   END-IF
+               END-READ
+           END-PERFORM
+           if found = 'y'
+               DISPLAY city_code " " city_name
+           ELSE
+               DISPLAY "Not Found"
+           END-IF
+           close nrcfile
+
             STOP RUN.
        END PROGRAM YOUR-PROGRAM-NAME.
