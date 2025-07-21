@@ -1,7 +1,7 @@
       ******************************************************************
-      * Author:
-      * Date:
-      * Purpose:
+      * Author: Nyan Ye Thu
+      * Date: 21/7/2025
+      * Purpose: Retrieve User by NRC
       * Tectonics: cobc
       ******************************************************************
        IDENTIFICATION DIVISION.
