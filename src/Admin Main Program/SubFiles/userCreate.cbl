@@ -22,7 +22,7 @@
            05  UID        PIC 9(5).
            05  UName      PIC X(20).
            05  ULoginName PIC X(25).
-           05  UAccNo     PIC X(16).
+           05  UAccNo     PIC 9(16).
            05  UNrc       PIC X(30).
            05  UEncPsw    PIC X(32).
            05  UAddress   PIC X(20).
