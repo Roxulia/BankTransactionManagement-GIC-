@@ -28,7 +28,7 @@
            05 UPhone PIC x(9).
            05 UBalance PIC 9(10)V99.
            05 UTrxCount PIC 9(5).
-           05 UDate PIC 9(6).
+           05 UDate PIC 9(8).
            05 UTime PIC 9(6).
 
        FD  TrxFile.
@@ -39,7 +39,7 @@
            05  Description PIC X(30).
            05  Amount      PIC 9(10)v99.
            05  TrxType     PIC 9.
-           05  TimeStamp   PIC 9(12).
+           05  TimeStamp   PIC 9(14).
 
        WORKING-STORAGE SECTION.
        01 WS-UID          PIC x(25).
@@ -62,23 +62,13 @@
                10  WS-CURR-MINUTES PIC 9(2).
                10  WS-CURR-SECONDS PIC 9(2).
        01  ws-user-udate.
-           05  udate-yr pic 9(2).
+           05  udate-yr pic 9(4).
            05  udate-month pic 9(2).
            05  udate-day pic 99.
        01  ws-user-utime.
            05  utime-hr pic 99.
            05  utime-mm pic 99.
            05  utime-ss pic 99.
-
-       01 WS-OUTPUT-DATA.
-           05 WS-UPDATED-DATE.
-               10 WS-UPD-YEAR    PIC 9(2).
-               10 WS-UPD-MONTH   PIC 9(2).
-               10 WS-UPD-DAY     PIC 9(2).
-           05 WS-FINAL-AMOUNT    PIC 9(10)V99.
-           05 WS-INTEREST-AMOUNT PIC 9(6)V99.
-           05 WS-TOTAL-MONTHS    PIC 9(4).
-           05 WS-OUTPUT-TIME PIC 9(6).
 
        copy 'trxConstants.cpy'.
 
@@ -87,7 +77,7 @@
            move 'n' to eof
            move 0 to record_count
            move FUNCTION CURRENT-DATE to WS-CURRENT-DATE-FIELDS
-           if WS-CURR-DAy = payday
+           if WS-CURR-DAy = payday *>and WS-CURR-TIME = paytime
                perform interest-add
            ELSE
                DISPLAY WS-CURR-DAY " " WS-CURR-TIME
@@ -110,15 +100,12 @@
                not at END
                    *>DISPLAY userdata
                    move UDate to ws-user-udate
-                   compute current-yr = FUNCTION mod(WS-CURR-YEAR,100)
-                   if currentdate > ws-user-udate
+                   if WS-CURR-DATE > ws-user-udate
                        add 1 to record_count
                        compute temp-balance = UBalance * interest
                        compute UBalance = UBalance + temp-balance
-                       move current-yr to udate-yr
-                       move WS-CURR-MONTH to udate-month
-                       move WS-CURR-DAY to udate-day
-                       move ws-user-udate to UDate
+
+                       move ws-curr-date to UDate
                        move WS-CURR-TIME to UTime
                        PERFORM TRXID-GENERATE
                        REWRITE userdata
@@ -130,13 +117,9 @@
                                move UID to ReceiverID
                                move 0 to SenderID
                                move 'Interest' to Description
-                               move 2 to TrxType
-                               ACCEPT CurrentDate FROM DATE
-                               ACCEPT CurrentTime FROM TIME
-                               STRING CurrentDate DELIMITED BY SIZE
-                                      CurrentTime DELIMITED BY SIZE
-                                      INTO TimeStamp
-                               END-STRING
+                               move 4 to TrxType
+                               move FUNCTION CURRENT-DATE(1:14)
+                               to TimeStamp
                                open i-o TrxFile
                                WRITE TransactionRecord
                                   INVALID KEY
@@ -162,7 +145,7 @@
 
            STRING
                UTrxCount DELIMITED BY SIZE
-               WS-TrxDepoPrefix DELIMITED BY SIZE
+               WS-TrxReciPrefix DELIMITED BY SIZE
                UId DELIMITED BY SIZE
                INTO TrxID
            END-STRING

@@ -36,7 +36,7 @@
            05  UPh        PIC X(9).
            05  Balance    PIC 9(10)V99.
            05  TrxCount   PIC 9(5).
-           05  UDate      PIC 9(6).
+           05  UDate      PIC 9(8).
            05  UTime      PIC 9(6).
 
        FD  TrxFile.
@@ -47,7 +47,7 @@
            05  Description PIC X(30).
            05  Amount      PIC 9(10)v99.
            05  TrxType     PIC 9.
-           05  TimeStamp   PIC 9(12).
+           05  TimeStamp   PIC 9(14).
 
        WORKING-STORAGE SECTION.
 
@@ -65,6 +65,7 @@
        01  depoDsp             PIC Z(10).
 
        01  tempInput           PIC X(10).
+
 
        COPY "../../Utility Functions/trxConstants.cpy".
 
@@ -176,12 +177,7 @@
            MOVE "Admin Deposit" TO Description
            MOVE depoAmo   TO Amount
            MOVE 3         TO TrxType
-           ACCEPT CurrentDate FROM DATE
-           ACCEPT CurrentTime FROM TIME
-           STRING CurrentDate DELIMITED BY SIZE
-                  CurrentTime DELIMITED BY SIZE
-                  INTO TimeStamp
-           END-STRING
+           move FUNCTION CURRENT-DATE(1:14) to TimeStamp
            OPEN I-O TrxFile
            WRITE TransactionRecord
               INVALID KEY

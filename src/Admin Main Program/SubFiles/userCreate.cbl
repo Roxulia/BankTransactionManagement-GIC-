@@ -9,7 +9,7 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT UserFile ASSIGN TO '../../../../data/UserAccounts.dat'
+           SELECT UserFile ASSIGN TO '../../../data/UserAccounts.dat'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
@@ -27,12 +27,12 @@
            05  UPh        PIC X(9).
            05  Balance    PIC 9(10)V99.
            05  TrxCount   PIC 9(5).
-           05  UDate      PIC 9(6).
+           05  UDate      PIC 9(8).
            05  UTime      PIC 9(6).
 
        WORKING-STORAGE SECTION.
        01  WS-FS               PIC XX.
-       01  CurrentDate         PIC 9(6).
+       01  CurrentDate         PIC 9(8).
        01  CurrentTime         PIC 9(6).
        01  Dup-Flag            PIC X VALUE 'N'.
        01  RPSW                PIC 9(6).
@@ -42,6 +42,7 @@
        01  EOF-Flag            PIC X value 'N'.
        01  PTR                 PIC 9(4)  COMP-5.
        01  I                   PIC 9(4)  COMP-5.
+       01  statusCode          pic xx.
 
        *>For display colors
        COPY "../../Utility Functions/colorCodes.cpy".
@@ -70,6 +71,7 @@
            IF WS-FS  = '35'
                DISPLAY "No file with name UserAccounts.DAT , creating"
                OPEN OUTPUT UserFile
+               DISPLAY "Created..."
                CLOSE UserFile
            END-IF
            CLOSE UserFile.
@@ -107,8 +109,18 @@
            DISPLAY "----- Create New User Account -----"
            DISPLAY "Generated UID: " UID.
 
-           DISPLAY "Enter Full Name (max 20 chars): "
+           DISPLAY "=  Enter Full Name (max 20 chars):"
            ACCEPT UName
+           call '../../Utility Functions/bin/userNameVal'
+           using by REFERENCE UName , statusCode
+           
+           perform until statusCode equal "00"
+               DISPLAY esc redx "Invalid Name" esc resetx
+               DISPLAY "=  Enter Full Name (max 20 chars):"
+               ACCEPT UName
+               call '../../Utility Functions/bin/userNameVal'
+               using by REFERENCE UName , statusCode
+           END-PERFORM
 
            DISPLAY "Enter Address (max 20 chars): "
            ACCEPT UAddress.
@@ -117,7 +129,7 @@
        *>Prompt display for PH NO and valid check
        ValidCheck-IniPsw.
 
-           CALL '../../../Utility Functions/bin/phoneValidCheck'
+           CALL '../../Utility Functions/bin/phoneValidCheck'
            USING BY REFERENCE UPh
 
            *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
@@ -160,7 +172,7 @@
        *> Call encryption submodule( to uncomment after encryption sub)
        Encryption-Call.
 
-           CALL '../../../Utility Functions/bin/encryption'
+           CALL '../../Utility Functions/bin/encryption'
            USING BY REFERENCE PlainPassword,EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."
@@ -177,8 +189,8 @@
 
            MOVE    0               TO      Balance
            MOVE    0               TO      TrxCount
-           ACCEPT  CurrentDate     FROM    DATE
-           ACCEPT  CurrentTime     FROM    TIME
+           move FUNCTION CURRENT-DATE(1:8) to CurrentDate
+           move FUNCTION CURRENT-DATE(9:6) to CurrentTime
            MOVE    CurrentDate     TO      UDate
            MOVE    CurrentTime     TO      UTime
       *     DISPLAY UserRecord

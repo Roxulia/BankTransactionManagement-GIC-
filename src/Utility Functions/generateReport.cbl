@@ -21,7 +21,7 @@
            05  Description PIC X(30).
            05  Amount      PIC 9(10)v99.
            05  TrxType     PIC 9.
-           05  TimeStamp   PIC 9(12).
+           05  TimeStamp   PIC 9(14).
 
        WORKING-STORAGE SECTION.
        01 END-FILE          PIC X VALUE "N".
@@ -45,7 +45,7 @@
            05  UPh        PIC X(9).
            05  UBalance    PIC 9(10)V99.
            05  trxCount pic 9(5).
-           05  UDate      PIC 9(6).
+           05  UDate      PIC 9(8).
            05  UTime      PIC 9(6).
 
        copy '../Utility Functions/colorCodes.cpy'.

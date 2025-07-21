@@ -24,7 +24,7 @@
            05  Description PIC X(30).
            05  Amount      PIC 9(10)v99.
            05  TrxType     PIC 9.
-           05  TimeStamp   PIC 9(12).
+           05  TimeStamp   PIC 9(14).
        WORKING-STORAGE SECTION.
        01  ws-fs pic xx.
        01  eof pic x value 'n'.

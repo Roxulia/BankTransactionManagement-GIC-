@@ -1,7 +1,7 @@
       ******************************************************************
       * Author: Sat Paing Thu
       * Date: 04.07.2025
-      * Update Date: 16.07.2025
+      * Update Date: 17.07.2025
       * Purpose: Password Encryption
       * Tectonics: cobc
       ******************************************************************
@@ -36,6 +36,7 @@
            05 WS-PREV-CODE    PIC 999.
            05 WS-TEMP         PIC 999.
            05 WS-ROUND        PIC 999.
+           05 WS-POSITION     PIC 999.
 
       * Hash buffer
        01  HASH-BUFFER.
@@ -59,6 +60,7 @@
            END-PERFORM
 
            MOVE WS-HASH-TMP TO LS-HASHED-PW
+           *>DISPLAY LS-HASHED-PW
 
            GOBACK.
 
@@ -72,21 +74,36 @@
                IF LS-INPUT-PW(WS-J:1) = SPACE
                    MOVE "0" TO WS-HASH-TMP(WS-I:1)
                ELSE
-                COMPUTE WS-CHAR-CODE = FUNCTION ORD(LS-INPUT-PW(WS-J:1))
-                 COMPUTE WS-SALT-CODE = FUNCTION ORD(SALT-VALUE(WS-I:1))
+                   COMPUTE WS-CHAR-CODE =
+                       FUNCTION ORD(LS-INPUT-PW(WS-J:1))
+                   COMPUTE WS-SALT-CODE =
+                       FUNCTION ORD(SALT-VALUE(WS-I:1))
+                   COMPUTE WS-POSITION = WS-J * 13
 
-      *>        * Introduce multiplier based on ASCII range to enhance sensitivity
-              IF WS-CHAR-CODE >= 65 AND WS-CHAR-CODE <= 90
-      *>   * Uppercase letter: apply unique multiplier
-              COMPUTE WS-CHAR-CODE = WS-CHAR-CODE * 3
-            ELSE IF WS-CHAR-CODE >= 97 AND WS-CHAR-CODE <= 122
-   * L*> owercase letter: another multiplier
-              COMPUTE WS-CHAR-CODE = WS-CHAR-CODE * 5
-            END-IF
+      * Enhanced multipliers based on character types and position
+                   EVALUATE TRUE
+      * Uppercase letters (A-Z)
+                   WHEN WS-CHAR-CODE >= 65 AND <= 90
+                       COMPUTE WS-CHAR-CODE =
+                           WS-CHAR-CODE * 3 + WS-POSITION
+      * Lowercase letters (a-z)
+                   WHEN WS-CHAR-CODE >= 97 AND <= 122
+                       COMPUTE WS-CHAR-CODE =
+                           WS-CHAR-CODE * 5 + WS-POSITION
+      * Numbers (0-9)
+                   WHEN WS-CHAR-CODE >= 48 AND <= 57
+                       COMPUTE WS-CHAR-CODE =
+                           WS-CHAR-CODE * 7 + WS-POSITION
+      * Special characters - enhanced handling
+                   WHEN OTHER
+                       COMPUTE WS-CHAR-CODE =
+                           WS-CHAR-CODE * 11 + WS-POSITION * 2
+                   END-EVALUATE
 
-             COMPUTE WS-TEMP = FUNCTION MOD(
-                (WS-CHAR-CODE * 17 + WS-I *
-               WS-ROUND * 13 + WS-SALT-CODE ** 2), 16) + 48
+                   COMPUTE WS-TEMP = FUNCTION MOD(
+                       (WS-CHAR-CODE * 17 + WS-I *
+                       WS-ROUND * 13 + WS-SALT-CODE ** 2 +
+                       WS-POSITION), 16) + 48
 
                    IF WS-TEMP > 57
                        ADD 7 TO WS-TEMP
@@ -98,16 +115,18 @@
 
       ******************************************************************
        MIX-WITH-PREVIOUS.
-      * Strengthens hash by chaining result of prior round
+      * Enhanced mixing algorithm with position sensitivity
 
            PERFORM VARYING WS-I FROM 1 BY 1 UNTIL WS-I > HASH-SIZE
                COMPUTE WS-CHAR-CODE = FUNCTION ORD(WS-HASH-TMP(WS-I:1))
                COMPUTE WS-PREV-CODE = FUNCTION ORD(WS-PREV-HASH(WS-I:1))
                COMPUTE WS-SALT-CODE = FUNCTION ORD(SALT-VALUE(WS-I:1))
 
+      * Enhanced mixing formula with better distribution
                COMPUTE WS-TEMP = FUNCTION MOD(
-                   (WS-CHAR-CODE * 3 + WS-PREV-CODE
-                   * 2 + WS-SALT-CODE + WS-ROUND), 16) + 48
+                   (WS-CHAR-CODE * 7 + WS-PREV-CODE * 5 +
+                   WS-SALT-CODE * 3 + WS-ROUND * 11 +
+                   WS-I * 13), 16) + 48
 
                IF WS-TEMP > 57
                    ADD 7 TO WS-TEMP

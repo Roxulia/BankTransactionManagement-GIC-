@@ -5,12 +5,12 @@
       * Tectonics: OpenCOBOL (GnuCOBOL)
       ******************************************************************
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. adminListPaging.
+       PROGRAM-ID. adminList.
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
            SELECT AdminAccounts
-               ASSIGN TO "../../../../data/AdminAccounts.DAT"
+               ASSIGN TO "../../../data/AdminAccounts.DAT"
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS AID
@@ -25,7 +25,7 @@
            05 ALoginName  PIC X(25).         *> Login Username
            05 AEncPsw     PIC X(32).         *> Encrypted Password
            05 ARole       PIC 9(1).
-           
+
 
        WORKING-STORAGE SECTION.
        77  WS-FS         PIC XX.
@@ -45,26 +45,44 @@
 
        PROCEDURE DIVISION.
        MAIN-LOGIC.
+           move 1 to  ws-page
+           INITIALIZE ws-last-page
+           move 'N' to ws-eof
+           INITIALIZE ws-choice
            OPEN INPUT AdminAccounts
            PERFORM DISPLAY-PAGE
-           PERFORM MENU-LOOP
            CLOSE AdminAccounts
-           STOP RUN.
+           exit program.
 
       *-------------------------------------------------------------------*
        MENU-LOOP.
            DISPLAY "---------------------------------------------"
-           DISPLAY "Options: 1=Prev page, 2=Next page, 3=Exit"
+           if ws-page = 1 and ws-eof = 'Y'
+           DISPLAY "Options:                            3=Exit"
+           DISPLAY "--------------------------------------------------"
+           else if ws-eof = 'N' and ws-page = 1
+           DISPLAY "Options:               2=Next Page, 3=Exit"
+           DISPLAY "--------------------------------------------------"
+           else if ws-eof = 'N' and ws-page not EQUAL 1
+           DISPLAY "Options:  1=Prev Page, 2=Next Page, 3=Exit"
+           DISPLAY "--------------------------------------------------"
+           else if ws-eof = 'Y' and ws-page not EQUAL 1
+           DISPLAY "Options:  1=Prev Page,            , 3=Exit"
+           DISPLAY "--------------------------------------------------"
+           end-if
+           END-IF
+           END-IF
+           END-IF
            ACCEPT WS-CHOICE
            EVALUATE WS-CHOICE
              WHEN 1
-               IF WS-PAGE > 1 
+               IF WS-PAGE > 1
                   SUBTRACT 1 FROM WS-PAGE
                   PERFORM DISPLAY-PAGE
                ELSE
                   PERFORM DISPLAY-PAGE
                END-IF
-             WHEN 2 
+             WHEN 2
                IF WS-EOF = 'N'
                    ADD 1 TO WS-PAGE
                    PERFORM DISPLAY-PAGE
@@ -74,24 +92,25 @@
                END-IF
              WHEN 3
                CLOSE AdminAccounts
-               GOBACK
+               exit program
              WHEN OTHER
                DISPLAY "Invalid choice."
-           END-EVALUATE
-           GO TO MENU-LOOP.
+               perform DISPLAY-PAGE
+           END-EVALUATE.
 
       *-------------------------------------------------------------------*
        DISPLAY-PAGE.
            *> Reposition by closing/re-opening
            CLOSE AdminAccounts
            OPEN INPUT AdminAccounts
+
            IF WS-FS NOT = "00"
                DISPLAY "ERROR: Unable to OPEN AdminAccounts," WS-FS
                STOP RUN
            END-IF
-
+           move 'N' to ws-eof
            *> Skip records from previous pages
-           COMPUTE WS-SKIP-COUNT = (WS-PAGE - 1) * 4
+           COMPUTE WS-SKIP-COUNT = (WS-PAGE - 1) * 5
            PERFORM VARYING WS-REC-COUNT FROM 1 BY 1
                    UNTIL WS-REC-COUNT > WS-SKIP-COUNT
                READ AdminAccounts
@@ -112,7 +131,7 @@
 
            *> Read and display up to 4 records
            PERFORM VARYING WS-REC-COUNT FROM 1 BY 1
-                   UNTIL WS-REC-COUNT > 4
+                   UNTIL WS-REC-COUNT > 5
                READ AdminAccounts
                    AT END
                      DISPLAY "-- End of file reached --"
@@ -123,8 +142,10 @@
                      MOVE AID TO WS-AID
                      MOVE AName TO WS-AName
                      MOVE ALoginName TO WS-ALoginName
-                     MOVE ARole TO WS-ARole                     
+                     MOVE ARole TO WS-ARole
                      DISPLAY WS-DISPLAY-LINE
                END-READ
-           END-PERFORM.
-       END PROGRAM adminListPaging.
+           END-PERFORM
+           perform MENU-LOOP
+               .
+       END PROGRAM adminList.

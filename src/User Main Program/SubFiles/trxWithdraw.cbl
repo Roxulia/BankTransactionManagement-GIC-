@@ -35,7 +35,7 @@
            05  UPh        PIC X(9).
            05  Balance    PIC 9(10)V99.
            05  TrxCount   PIC 9(5).
-           05  UDate      PIC 9(6).
+           05  UDate      PIC 9(8).
            05  UTime      PIC 9(6).
 
        FD  TrxFile.
@@ -46,15 +46,13 @@
            05  Description PIC X(30).
            05  Amount      PIC 9(10)v99.
            05  TrxType     PIC 9.
-           05  TimeStamp   PIC 9(12).
+           05  TimeStamp   PIC 9(14).
 
 
        WORKING-STORAGE SECTION.
        01 WS-UID             PIC 9(5) VALUE ZERO.
        01 WS-AMOUNT          PIC 9(10)V99 VALUE ZERO.
        01 EOF-FLAG           PIC X VALUE 'N'.
-       01 CURRENT-DATE       PIC 9(6) VALUE ZERO.
-       01 CURRENT-TIME       PIC 9(6) VALUE ZERO.
        01 USER-FOUND         PIC X VALUE 'N'.
        01 TEMP-BALANCE       PIC s9(10)V99 VALUE ZERO.
        01  password pic x(20).
@@ -70,7 +68,7 @@
            05  c-UPh        PIC X(9).
            05  c-Balance    PIC 9(10)V99.
            05  c-TrxCount   PIC 9(5).
-           05  c-UDate      PIC 9(6).
+           05  c-UDate      PIC 9(8).
            05  c-UTime      PIC 9(6).
        copy '../../Utility Functions/trxConstants.cpy'.
        copy '../../Utility Functions/colorCodes.cpy'.
@@ -88,10 +86,10 @@
 
            EVALUATE statusCode
                when equal "99"
-                   Display "Error in opening File"
+                   Display esc redx "Error in opening File" esc resetx
                    exit program
                when equal "96"
-                   DISPLAY "User Not Found"
+                   DISPLAY esc redx "User Not Found" esc resetx
                    exit PROGRAM
                when equal "00"
                    *>DISPLAY c-user
@@ -104,11 +102,12 @@
            ACCEPT WS-AMOUNT
            compute TEMP-BALANCE = c-Balance - WS-AMOUNT
            if TEMP-BALANCE < minaccountbalance
-               display "Ur Minimum Account Balance Reached"
+               display esc redx"Ur Minimum Account Balance Reached "
+               esc resetx
                exit PROGRAM
            else
                if WS-AMOUNT < minwithdraw or WS-AMOUNT > maxwithdraw
-                   DISPLAY "Invalid Withdraw Amount"
+                   DISPLAY esc redx"Invalid Withdraw Amount " esc resetx
                    exit PROGRAM
                END-IF
            END-IF
@@ -135,12 +134,13 @@
 
            STRING
                C-TrxCount DELIMITED BY SIZE
-               WS-TrxDepoPrefix DELIMITED BY SIZE
+               WS-TrxWDPrefix DELIMITED BY SIZE
                C-UID DELIMITED BY SIZE
                INTO TrxID
            END-STRING
-
-           DISPLAY "Generated TrxID: " TrxID.
+           display esc greenx
+           DISPLAY "Generated TrxID: " TrxID
+           DISPLAY esc resetx.
 
        write-transaction.
            MOVE C-UID    TO SenderID
@@ -148,12 +148,7 @@
            MOVE "WithDraw" TO Description
            MOVE WS-AMOUNT   TO Amount
            MOVE 2         TO TrxType
-           ACCEPT Current-Date FROM DATE
-           ACCEPT Current-Time FROM TIME
-           STRING Current-Date DELIMITED BY SIZE
-                  Current-Time DELIMITED BY SIZE
-                  INTO TimeStamp
-           END-STRING
+           move FUNCTION CURRENT-DATE(1:14) to TimeStamp
            OPEN I-O TrxFile
            WRITE TransactionRecord
               INVALID KEY

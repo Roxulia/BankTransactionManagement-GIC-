@@ -27,7 +27,7 @@
            05  UPh        PIC x(9).
            05  Balance    PIC 9(10)V99.
            05  TrxCount   PIC 9(5).
-           05  UDate      PIC 9(6).
+           05  UDate      PIC 9(8).
            05  UTime      PIC 9(6).
 
        WORKING-STORAGE SECTION.
@@ -123,8 +123,18 @@
 
            EVALUATE OptCode
                WHEN 1
-                   DISPLAY "Enter new Name (20 chars): "
+                   DISPLAY "=  Enter Full Name (max 20 chars):"
                    ACCEPT NewName
+                   call '../../Utility Functions/bin/userNameVal'
+                   using by REFERENCE newName , statusCode
+                   
+                   perform until statusCode equal "00"
+                       DISPLAY esc redx "Invalid Name" esc resetx
+                       DISPLAY "=  Enter Full Name (max 20 chars):"
+                       ACCEPT newName
+                       call '../../Utility Functions/bin/userNameVal'
+                       using by REFERENCE newName , statusCode
+                   END-PERFORM
                    MOVE NewName TO UName
 
                WHEN 2

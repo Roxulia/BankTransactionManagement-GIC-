@@ -9,5 +9,5 @@
        01  WS-TrxDepoPrefix    PIC X       VALUE 'D'.
        01  WS-TrxWDPrefix      PIC X       VALUE 'W'.
        01  WS-TrxReciPrefix    PIC X       VALUE 'R'.
-       01  payday              pic 99      value 16.
+       01  payday              pic 99      value 1.
        01  paytime             pic 9(6)    value 120000.
