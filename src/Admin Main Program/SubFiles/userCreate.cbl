@@ -9,7 +9,7 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT UserFile ASSIGN TO '../../../../data/UserAccounts.dat'
+           SELECT UserFile ASSIGN TO '../../../data/UserAccounts.dat'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
@@ -107,7 +107,7 @@
        *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
        *>Prompt display for user input
        Generate-CardNo.
-           CALL '../../../Utility Functions/bin/generateCardNo'
+           CALL '../../Utility Functions/bin/generateCardNo'
                USING BY REFERENCE UAccNo.
 
 
@@ -120,14 +120,14 @@
 
            DISPLAY "=  Enter Full Name (max 20 chars):"
            ACCEPT UName
-           call '../../../Utility Functions/bin/userNameVal'
+           call '../../Utility Functions/bin/userNameVal'
            using by REFERENCE UName , statusCode
 
            perform until statusCode equal "00"
                DISPLAY esc redx "Invalid Name" esc resetx
                DISPLAY "=  Enter Full Name (max 20 chars):"
                ACCEPT UName
-               call '../../../Utility Functions/bin/userNameVal'
+               call '../../Utility Functions/bin/userNameVal'
                using by REFERENCE UName , statusCode
            END-PERFORM
 
@@ -138,7 +138,7 @@
        *>Prompt display for PH NO and valid check
        ValidCheck-IniPsw.
 
-           CALL '../../../Utility Functions/bin/phoneValidCheck'
+           CALL '../../Utility Functions/bin/phoneValidCheck'
            USING BY REFERENCE UPh
 
            *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
@@ -181,7 +181,7 @@
        *> Call encryption submodule( to uncomment after encryption sub)
        Encryption-Call.
 
-           CALL '../../../Utility Functions/bin/encryption'
+           CALL '../../Utility Functions/bin/encryption'
            USING BY REFERENCE PlainPassword,EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."
