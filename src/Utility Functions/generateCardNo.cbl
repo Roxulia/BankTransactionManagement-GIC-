@@ -4,7 +4,7 @@
       * Purpose: 16 Digit Random Generated Card Number.
       * Tectonics: cobc
       ******************************************************************
-        IDENTIFICATION DIVISION.
+       IDENTIFICATION DIVISION.
        PROGRAM-ID. generateCardNo.
 
        ENVIRONMENT DIVISION.
@@ -12,35 +12,41 @@
 
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01 WS-RANDOM          PIC 9(16).
-       01 WS-TIME            PIC 9(8).
-       01 WS-SEED            PIC 9(8).
+       01 WS-CURRENT-DATE.
+          05 WS-YEAR         PIC 9(4).
+          05 WS-MONTH        PIC 9(2).
+          05 WS-DAY          PIC 9(2).
+          05 WS-HOUR         PIC 9(2).
+          05 WS-MINUTE       PIC 9(2).
+          05 WS-SECOND       PIC 9(2).
+       01 WS-PREV-DATE       PIC 9(8) VALUE ZEROS.
+       01 WS-SEQUENCE        PIC 9(4) VALUE 0.
        01 WS-FORMATTED-NUM.
-          05 PART1           PIC 9(4).
-          05 FILLER          PIC X VALUE '-'.
-          05 PART2           PIC 9(4).
-          05 FILLER          PIC X VALUE '-'.
-          05 PART3           PIC 9(4).
-          05 FILLER          PIC X VALUE '-'.
-          05 PART4           PIC 9(4).
+          05 WS-DATE-TIME    PIC 9(12).
+          05 WS-SEQ-NUM      PIC 9(4).
 
        LINKAGE SECTION.
-       01 LS-RETURN-NUM      PIC X(19).
+       01 LS-RETURN-NUM      PIC X(16).
 
        PROCEDURE DIVISION USING LS-RETURN-NUM.
        MAIN-PARA.
-           ACCEPT WS-TIME FROM TIME
-           MOVE FUNCTION CURRENT-DATE(9:8) TO WS-SEED
+           MOVE FUNCTION CURRENT-DATE(1:14) TO WS-CURRENT-DATE
 
-           COMPUTE WS-RANDOM = FUNCTION
-           RANDOM (WS-SEED) * 9000000000000000
-           ADD 1000000000000000 TO WS-RANDOM
+           COMPUTE WS-DATE-TIME =
+               (WS-YEAR * 100000000) +
+               (WS-MONTH * 1000000) +
+               (WS-DAY * 10000) +
+               (WS-HOUR * 100) +
+               WS-MINUTE
 
-           MOVE WS-RANDOM(1:4)  TO PART1
-           MOVE WS-RANDOM(5:4)  TO PART2
-           MOVE WS-RANDOM(9:4)  TO PART3
-           MOVE WS-RANDOM(13:4) TO PART4
+           IF WS-PREV-DATE NOT = FUNCTION CURRENT-DATE(1:8)
+               MOVE FUNCTION CURRENT-DATE(1:8) TO WS-PREV-DATE
+               MOVE 1 TO WS-SEQUENCE
+           ELSE
+               ADD 1 TO WS-SEQUENCE
+           END-IF
 
+           MOVE WS-SEQUENCE TO WS-SEQ-NUM
            MOVE WS-FORMATTED-NUM TO LS-RETURN-NUM
 
            DISPLAY 'Generated Number: ' WS-FORMATTED-NUM
