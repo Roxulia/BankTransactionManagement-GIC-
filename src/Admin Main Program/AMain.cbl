@@ -19,12 +19,10 @@
        01  userid pic X(5).
        01  edit-id pic 9(5).
        01  statusCode pic x(2) value "00".
+
        *>For display colors
-       77  RED-CODE            PIC X(6) VALUE "[1;31m".*> set red
-      *77  ESC                 PIC X    VALUE X"1B".   *> ASCII ESC
-       77  RESET-CODE          PIC X(4) VALUE "[0m".   *> reset
-       77  GREEN-CODE          PIC X(6) VALUE "[1;32m".*>set green
        copy '../Utility Functions/colorCodes.cpy'.
+
        PROCEDURE DIVISION.
        MAIN-PROCEDURE.
       *     call 'adminLogin'

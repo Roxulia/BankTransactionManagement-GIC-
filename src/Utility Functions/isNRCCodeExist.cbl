@@ -5,7 +5,8 @@
       * Tectonics: cobc
       ******************************************************************
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. isNRCCodeExist.ENVIRONMENT DIVISION.
+       PROGRAM-ID. isNRCCodeExist.
+       ENVIRONMENT DIVISION.
        INPUT-OUTPUT section.
        file-control.
        Select nrcfile
@@ -31,6 +32,7 @@
            open INPUT nrcfile
            if ws-fs not EQUAL '00'
                move '99' to statusCode
+               DISPLAY statusCode
                exit PROGRAM
            end-if
            perform until eof = 'y'
