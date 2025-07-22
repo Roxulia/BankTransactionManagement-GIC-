@@ -187,7 +187,7 @@
            subtract WS-Amount from u-Balance
            add WS-Amount to R-BALANCE
            open I-O USERACCOUNTS
-           move USER-RECORD to USERDATA
+           move SENDER-RECORD to USERDATA
 
            DISPLAY "================================================="
            REWRITE USERDATA
