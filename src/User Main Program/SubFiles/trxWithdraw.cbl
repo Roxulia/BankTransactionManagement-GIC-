@@ -27,17 +27,13 @@
        FILE SECTION.
        FD  UserFile.
        01  UserRecord.
+
        COPY "../../Utility Functions/userFile.cpy".
 
        FD  TrxFile.
        01  TransactionRecord.
-           05 TrxID        PIC x(11).
-           05 SenderAcc    PIC 9(16).
-           05 ReceiverAcc  PIC 9(16).
-           05 Description  PIC X(30).
-           05 Amount       PIC 9(10)V99.
-           05 T-Type       PIC 9.
-           05 TimeStamp    PIC 9(14).
+
+       COPY "../../Utility Functions/transactionFile.cpy".
 
 
        WORKING-STORAGE SECTION.
@@ -63,8 +59,11 @@
            05  c-TrxCount   PIC 9(5).
            05  c-UDate      PIC 9(8).
            05  c-UTime      PIC 9(6).
+
        copy '../../Utility Functions/trxConstants.cpy'.
+
        copy '../../Utility Functions/colorCodes.cpy'.
+
        LINKAGE SECTION.
        01 LS-UID PIC 9(5).
 
@@ -140,7 +139,7 @@
            MOVE 0           TO ReceiverAcc
            MOVE "WithDraw"  TO Description
            MOVE WS-AMOUNT   TO Amount
-           MOVE 2           TO T-Type
+           MOVE 2           TO TrxType
            move FUNCTION CURRENT-DATE(1:14) to TimeStamp
            OPEN I-O TrxFile
            WRITE TransactionRecord

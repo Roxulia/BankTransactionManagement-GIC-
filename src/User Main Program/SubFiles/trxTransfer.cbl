@@ -31,13 +31,8 @@
 
        FD Transactions.
        01 TRXRECORD.
-           05 TrxID        PIC x(11).
-           05 SenderAcc    PIC 9(16).
-           05 ReceiverAcc  PIC 9(16).
-           05 Description  PIC X(30).
-           05 Amount       PIC 9(10)V99.
-           05 T-Type       PIC 9.
-           05 TimeStamp    PIC 9(14).
+
+       COPY "../../Utility Functions/transactionFile.cpy".
 
        WORKING-STORAGE SECTION.
        01  WS-SenderID     PIC 9(5) VALUE ZERO.
@@ -221,7 +216,7 @@
            MOVE R-UAccNo    TO ReceiverAcc
            MOVE "Transfer" TO Description
            MOVE WS-AMOUNT   TO Amount
-           MOVE 4         TO T-Type
+           MOVE 4         TO TrxType
            move FUNCTION CURRENT-DATE(1:14) to TimeStamp
            OPEN i-o Transactions
            WRITE TrxRecord
