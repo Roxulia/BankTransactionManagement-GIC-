@@ -9,7 +9,7 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT UserFile ASSIGN TO '../../../data/UserAccounts.dat'
+           SELECT UserFile ASSIGN TO '../../../../data/UserAccounts.dat'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
@@ -23,6 +23,8 @@
            05  UName      PIC X(20).
            05  ULoginName PIC X(25).
            05  UAccNo     PIC 9(16).
+
+
            05  UEncPsw    PIC X(32).
            05  UNrc       PIC X(30).
            05  UAddress   PIC X(20).
@@ -58,6 +60,7 @@
            PERFORM File-Check
            PERFORM Generate-UID
            PERFORM Generate-CardNo
+           PERFORM Prompt-NRC
            PERFORM Prompt-Box
            PERFORM ValidCheck-IniPsw
            PERFORM Generate-Login
@@ -106,8 +109,9 @@
            CLOSE UserFile.
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
-       *>Prompt display for user input
+       *>Generating user bank account Number
        Generate-CardNo.
+
            CALL '../../Utility Functions/bin/generateCardNo'
                USING BY REFERENCE UID,UAccNo.
 
@@ -127,14 +131,14 @@
 
            DISPLAY "=  Enter Full Name (max 20 chars):"
            ACCEPT UName
-           call '../../Utility Functions/bin/userNameVal'
+           call '../../../Utility Functions/bin/userNameVal'
            using by REFERENCE UName , statusCode
 
            perform until statusCode equal "00"
                DISPLAY esc redx "Invalid Name" esc resetx
                DISPLAY "=  Enter Full Name (max 20 chars):"
                ACCEPT UName
-               call '../../Utility Functions/bin/userNameVal'
+               call '../../../Utility Functions/bin/userNameVal'
                using by REFERENCE UName , statusCode
            END-PERFORM
 
@@ -145,7 +149,7 @@
        *>Prompt display for PH NO and valid check
        ValidCheck-IniPsw.
 
-           CALL '../../Utility Functions/bin/phoneValidCheck'
+           CALL '../../../Utility Functions/bin/phoneValidCheck'
            USING BY REFERENCE UPh
 
            *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
@@ -188,7 +192,7 @@
        *> Call encryption submodule( to uncomment after encryption sub)
        Encryption-Call.
 
-           CALL '../../Utility Functions/bin/encryption'
+           CALL '../../../Utility Functions/bin/encryption'
            USING BY REFERENCE PlainPassword,EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."

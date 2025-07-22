@@ -67,8 +67,8 @@
                 DISPLAY nrc-string
             END-IF
             exit PROGRAM.
-       input-process.
 
+       input-process.
 
             DISPLAY "Enter NRC : "
             ACCEPT ws-nrc-string
@@ -80,7 +80,7 @@
 
             ELSE
                 move 'y' to has_slash
-                DISPLAY "Check 1 passed"
+                *>DISPLAY "Check 1 passed"
             END-IF
             if paren1 not equal 1
                 move 'n' to has_paren1
@@ -88,17 +88,17 @@
 
             ELSE
                 move 'y' to has_paren1
-                DISPLAY "Check 2 passed"
+                *>DISPLAY "Check 2 passed"
             END-IF
 
             inspect ws-nrc-string TALLYING paren2 for all ")"
             if paren2 not equal 1
                 move 'n' to has_paren2
-                DISPLAY "Must contain ')'"
+                *>DISPLAY "Must contain ')'"
 
             ELSE
                 move 'y' to has_paren2
-                DISPLAY "Check 3 passed"
+                *>DISPLAY "Check 3 passed"
             END-IF
             if has_slash = 'y' and has_paren1 = 'y' and has_paren2 = 'y'
                 UNSTRING ws-nrc-string DELIMITED by "/"
@@ -109,6 +109,7 @@
                 into nrc_status nrc_number
 
                 MOVE FUNCTION UPPER-CASE(nrc_city) TO nrc_city
+
 
                 CALL '../../Utility Functions/bin/isNRCCodeExist'
                    USING by REFERENCE
