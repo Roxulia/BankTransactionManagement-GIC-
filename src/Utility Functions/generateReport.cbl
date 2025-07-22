@@ -15,17 +15,11 @@
        FILE SECTION.
        FD TrxFile.
        01 TrxRecord.
-           05  TrxID       PIC X(11).
-           05  SenderID    PIC 9(5).
-           05  ReceiverID  PIC 9(5).
-           05  Description PIC X(30).
-           05  Amount      PIC 9(10)v99.
-           05  TrxType     PIC 9.
-           05  TimeStamp   PIC 9(14).
+           copy '../Utility Functions/transactionFile.cpy'.
 
        WORKING-STORAGE SECTION.
        01 END-FILE          PIC X VALUE "N".
-       01 BALANCE           PIC s9(12)V99 VALUE 0.
+       01 T-BALANCE           PIC s9(12)V99 VALUE 0.
        01 withdraw         pic s9(10)v99.
        01 deposit           pic s9(10)v99.
        01 format-balance pic zzzzzzzzzzz9.99.
@@ -37,16 +31,7 @@
        01  ws-fs pic xx.
        01  statusCode pic xx.
        01  UserData.
-           05  UID        PIC 9(5).
-           05  UName      PIC X(20).
-           05  ULoginName PIC X(25).
-           05  UEncPsw    PIC X(32).
-           05  UAddress   PIC X(20).
-           05  UPh        PIC X(9).
-           05  UBalance    PIC 9(10)V99.
-           05  trxCount pic 9(5).
-           05  UDate      PIC 9(8).
-           05  UTime      PIC 9(6).
+           copy '../Utility Functions/userFile.cpy'.
 
        copy '../Utility Functions/colorCodes.cpy'.
 
@@ -94,7 +79,7 @@
                        MOVE SPACES TO TYPE-NAME
                        MOVE zeroS TO WITHDRAW-AMT
                        MOVE zeroS TO DEPOSIT-AMT
-                       IF SenderID = INPUT-UID
+                       IF SenderAcc = UAccNo
 
                            *>display TrxRecord
                            MOVE TimeStamp TO DISPLAY-TIME
@@ -103,7 +88,7 @@
                            DISPLAY DISPLAY-TIME
                                    "  " WITHDRAW-AMT "  " DEPOSIT-AMT
                                    "  " Description
-                       else if ReceiverID = Input-uid
+                       else if ReceiverAcc = UAccNo
 
                            MOVE TimeStamp TO DISPLAY-TIME
                            MOVE Amount to deposit-AMT

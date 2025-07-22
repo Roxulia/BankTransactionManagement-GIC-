@@ -20,26 +20,11 @@
         FILE SECTION.
        FD userfile.
        01 userdata.
-           05 UID      PIC 9(5).
-           05 UName    PIC X(20).
-           05 ULoginName PIC X(25).
-           05 UEncodedPassword PIC X(32).
-           05 UAddress PIC X(20).
-           05 UPhone PIC x(9).
-           05 UBalance PIC 9(10)V99.
-           05 UTrxCount PIC 9(5).
-           05 UDate PIC 9(8).
-           05 UTime PIC 9(6).
+           copy '../Utility Functions/userFile.cpy'.
 
        FD  TrxFile.
        01  TransactionRecord.
-           05  TrxID       PIC X(11).
-           05  SenderID    PIC 9(5).
-           05  ReceiverID  PIC 9(5).
-           05  Description PIC X(30).
-           05  Amount      PIC 9(10)v99.
-           05  TrxType     PIC 9.
-           05  TimeStamp   PIC 9(14).
+           copy '../Utility Functions/transactionFile.cpy'.
 
        WORKING-STORAGE SECTION.
        01 WS-UID          PIC x(25).
@@ -102,8 +87,8 @@
                    move UDate to ws-user-udate
                    if WS-CURR-DATE > ws-user-udate
                        add 1 to record_count
-                       compute temp-balance = UBalance * interest
-                       compute UBalance = UBalance + temp-balance
+                       compute temp-balance = Balance * interest
+                       compute Balance = Balance + temp-balance
 
                        move ws-curr-date to UDate
                        move WS-CURR-TIME to UTime
@@ -114,8 +99,8 @@
                            not INVALID KEY
                                DISPLAY "Successfully updated"
                                move temp-balance to Amount
-                               move UID to ReceiverID
-                               move 0 to SenderID
+                               move UAccNo to ReceiverAcc
+                               move 0 to SenderAcc
                                move 'Interest' to Description
                                move 4 to TrxType
                                move FUNCTION CURRENT-DATE(1:14)
@@ -141,10 +126,10 @@
 
        TRXID-GENERATE.
 
-           ADD 1 TO UTrxCount
+           ADD 1 TO TrxCount
 
            STRING
-               UTrxCount DELIMITED BY SIZE
+               TrxCount DELIMITED BY SIZE
                WS-TrxReciPrefix DELIMITED BY SIZE
                UId DELIMITED BY SIZE
                INTO TrxID
