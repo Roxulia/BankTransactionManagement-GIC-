@@ -1,5 +1,5 @@
       ******************************************************************
-      * Author: Nyan Ye Thu
+      * Author: Nyan Ye Thu, Myo Thein Chit
       * Date: 7/7/2025
       * Purpose: Bank Transaction System
       * Tectonics: cobc
@@ -26,49 +26,43 @@
        FILE SECTION.
        FD USERACCOUNTS.
        01 USERDATA.
-           05 UID          PIC 9(5).
-           05 UName        PIC X(20).
-           05 ULoginName   PIC X(25).
-           05 UEncPsw      PIC X(32).
-           05 UAddress     PIC X(20).
-           05 UPh          PIC x(9).
-           05 Balance      PIC 9(10)V99.
-           05 TrxCount     PIC 9(5).
-           05 UDate        PIC 9(8).
-           05 UTime        PIC 9(6).
+
+       COPY "../../Utility Functions/userFile.cpy".
 
        FD Transactions.
        01 TRXRECORD.
            05 TrxID        PIC x(11).
-           05 SenderID     PIC 9(5).
-           05 ReceiverID   PIC 9(5).
+           05 SenderAcc    PIC 9(16).
+           05 ReceiverAcc  PIC 9(16).
            05 Description  PIC X(30).
            05 Amount       PIC 9(10)V99.
            05 T-Type       PIC 9.
            05 TimeStamp    PIC 9(14).
 
        WORKING-STORAGE SECTION.
-       01 WS-SenderUID    PIC 9(5) VALUE ZERO.
-       01 WS-ReceiverUID  PIC 9(5) VALUE ZERO.
-       01 WS-Amount       PIC 9(10)V99 VALUE ZERO.
-       01  TEMP-BALANCE   pic s9(10)v99.
-       01 EOF-FLAG          PIC X VALUE 'N'.
-       01 SENDER-FOUND      PIC X VALUE 'N'.
-       01 RECEIVER-FOUND    PIC X VALUE 'N'.
-       01 WS-FS1            PIC XX.
-       01 WS-FS2            PIC XX.
-       01 WS-TRXID          PIC 9(10) VALUE 1.
-       01 WS-TrxBaseID     PIC 9(10).
+       01  WS-SenderAcc    PIC 9(16) VALUE ZERO.
+       01  WS-ReceiverAcc  PIC 9(16) VALUE ZERO.
+       01  WS-Amount       PIC 9(10)V99 VALUE ZERO.
+       01  TEMP-BALANCE    pic s9(10)v99.
+       01  EOF-FLAG          PIC X VALUE 'N'.
+       01  SENDER-FOUND      PIC X VALUE 'N'.
+       01  RECEIVER-FOUND    PIC X VALUE 'N'.
+       01  WS-FS1            PIC XX.
+       01  WS-FS2            PIC XX.
+       01  WS-TRXID          PIC 9(10) VALUE 1.
+       01  WS-TrxBaseID     PIC 9(10).
       * 01 WS-TrxDepoPrefix1 PIC 9(10).
-       01 WS-TrxFullID     PIC 9(10).
-       01 WS-TrxCount      Pic 9(5).
+       01  WS-TrxFullID     PIC 9(10).
+       01  WS-TrxCount      Pic 9(5).
        01  statusCode pic xx.
        01  password pic x(20).
        01  enc_psw pic x(32).
-       01 USER-RECORD.
+
+       01  SENDER-RECORD.
            05 U-UID       PIC 9(5).
            05 U-NAME      PIC X(20).
            05 U-LoginName PIC X(25).
+           05 U-UAccNo    PIC 9(16).
            05 U-EncPsw    PIC X(32).
            05 U-ADDRESS   PIC X(20).
            05 U-PHONE     PIC x(9).
@@ -77,10 +71,10 @@
            05 U-DATE      PIC 9(8).
            05 U-TIME      PIC 9(6).
 
-       01 RECEIVER-RECORD.
+       01  RECEIVER-RECORD.
            05 R-UID        PIC 9(5).
            05 R-NAME       PIC X(20).
-           05 R-ULoginName PIC X(25).
+           05 R-UAccNo     PIC 9(16).
            05 R-EncPsw     PIC X(32).
            05 R-ADDRESS    PIC X(20).
            05 R-PHONE      PIC x(9).
@@ -88,18 +82,23 @@
            05 R-TrxCount   PIC 9(5).
            05 R-DATE       PIC 9(8).
            05 R-TIME       PIC 9(6).
+
        COPY "../../Utility Functions/trxConstants.cpy".
+
        COPY "../../Utility Functions/colorCodes.cpy".
+
        LINKAGE SECTION.
-       01 LS-SenderID    PIC 9(5).
-       01 LS-StatusCode     PIC X(2) VALUE SPACES.
-       PROCEDURE DIVISION USING LS-SenderID LS-StatusCode.
+
+       01  LS-SenderAcc    PIC 9(16).
+       01  LS-StatusCode   PIC X(2) VALUE SPACES.
+
+       PROCEDURE DIVISION USING LS-SenderAcc LS-StatusCode.
 
        MAIN-PROCEDURE.
             initialize WS-Amount
-            initialize WS-ReceiverUID
-            INITIALIZE WS-SenderUID
-            MOVE LS-SENDERID TO WS-SenderUID
+            initialize WS-ReceiverAcc
+            INITIALIZE WS-SenderAcc
+            MOVE LS-SENDERAcc TO WS-SenderAcc
             PERFORM FIND-SENDER
             *>DISPLAY "Enter SenderID : "
             *>ACCEPT WS-SenderUID
@@ -119,8 +118,8 @@
            exit program.
 
        FIND-SENDER.
-           call '../../Utility Functions/bin/getUserByID'
-           using by REFERENCE WS-SenderUID,USER-RECORD,statusCode
+           call '../../Utility Functions/bin/getUserByAccNumber'
+           using by REFERENCE WS-SenderAcc,SENDER-RECORD,statusCode
 
            if statusCode  EQUAL "99"
                display esc redx"FILE ERROR" esc resetx
@@ -132,15 +131,17 @@
 
 
        FIND-RECEIVER.
-           DISPLAY "Enter Receiver's UID:".
-           ACCEPT WS-RECEIVERUID
-           if WS-SenderUID = WS-ReceiverUID
+           DISPLAY "Enter Receiver's Account Number :".
+           ACCEPT WS-ReceiverAcc
+           if WS-SenderAcc = WS-ReceiverAcc
                DISPLAY esc redx "CAN'T TRANSFER TO URSELF" esc resetx
                exit PROGRAM
            end-if
            initialize statusCode
-           call '../../Utility Functions/bin/getUserByID'
-           using by REFERENCE WS-ReceiverUID,RECEIVER-RECORD,statusCode
+
+           call '../../Utility Functions/bin/getUserByAccNumber'
+           using by REFERENCE WS-ReceiverAcc,RECEIVER-RECORD,statusCode
+
            if statusCode not EQUAL "00"
                display esc redx "FILE ERROR" esc resetx
                exit PROGRAM
@@ -173,9 +174,9 @@
            ADD 1 TO u-TrxCount
 
            STRING
-               u-TrxCount DELIMITED BY SIZE
+               U-TrxCount DELIMITED BY SIZE
                WS-TrxSentPrefix DELIMITED BY SIZE
-               u-UID DELIMITED BY SIZE
+               U-UID DELIMITED BY SIZE
                INTO TrxID
            END-STRING
 
@@ -216,8 +217,8 @@
            CLOSE USERACCOUNTS.
 
        write-transaction.
-           MOVE u-UID    TO SenderID
-           MOVE R-UID    TO ReceiverID
+           MOVE U-UAccNo    TO SenderAcc
+           MOVE R-UAccNo    TO ReceiverAcc
            MOVE "Transfer" TO Description
            MOVE WS-AMOUNT   TO Amount
            MOVE 4         TO T-Type
@@ -232,9 +233,9 @@
            END-WRITE
            DISPLAY "================================================="
            DISPLAY ESC GREENX FUNCTION TRIM(WS-AMOUNT) WITH NO ADVANCING
-           DISPLAY " successfully transfer to account ID :"
+           DISPLAY " successfully transfer to account No :"
                WITH NO ADVANCING
-           DISPLAY ESC GREENX R-UID
+           DISPLAY ESC GREENX R-UAccNo
            DISPLAY ESC RESETX
            CLOSE Transactions.
        END PROGRAM trxTransfer.
