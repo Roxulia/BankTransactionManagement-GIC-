@@ -17,7 +17,11 @@
        01  adminRole pic 9(1) value 1.
        01  adminId pic 9(5).
        01  userid pic X(5).
+       01  userAccNum pic x(16).
+       01  text-input pic x(16).
+       01  unrc pic x(30).
        01  edit-id pic 9(5).
+       01  dpAccNum pic 9(16).
        01  statusCode pic x(2) value "00".
 
        *>For display colors
@@ -81,7 +85,7 @@
                DISPLAY "=============================="
                display "=============================="
                DISPLAY "=           NOTE:            ="
-               display "=    U can enter user ID     ="
+               display "=    U can enter user NRC    ="
                DISPLAY "=            OR              ="
                DISPLAY "=    'EXIT' to go back       ="
                DISPLAY "=============================="
@@ -151,19 +155,23 @@
                PERFORM generate-report-page
            end-if
            END-PERFORM
-           DISPLAY "Going Back To Main Screen"
+           DISPLAY esc redx
+           DISPLAY "Going Back To Main Screen..."
+           DISPLAY esc resetx
            perform home-page.
 
        choice-opt-deposit.
-           DISPLAY "Enter ID to be deposited : "
-           ACCEPT userid.
-           perform until userid = "EXIT" or userid = "exit"
+           DISPLAY "Enter Acc Number to be deposited : "
+           ACCEPT userAccNum
+           INITIALIZE text-input
+           move userAccNum to text-input
+           perform until text-input = "EXIT" or text-input = "exit"
            call '../../Utility Functions/bin/numberCheck' USING
-           by REFERENCE userid,statusCode
+           by REFERENCE text-input,statusCode
            if statusCode equal "00"
-               move userid to edit-ID
+               move userAccNum to dpAccNum
                CALL '../SubFiles/bin/trxDeposit'
-               USING REFERENCE edit-id statusCode
+               USING REFERENCE dpAccNum statusCode
                perform deposit-page
            Else
                DISPLAY esc REDx
@@ -172,29 +180,28 @@
                PERFORM deposit-page
            end-if
            END-PERFORM
-           DISPLAY "Going Back To Main Screen"
+           DISPLAY esc redx
+           DISPLAY "Going Back To Main Screen..."
+           DISPLAY esc resetx
            perform home-page.
 
        choice-opt-update-info.
-           DISPLAY "Enter ID to be updated : "
-           ACCEPT userid.
-           perform until userid = "EXIT" or userid = "exit"
-           call '../../Utility Functions/bin/numberCheck' USING
-           by REFERENCE userid,statusCode
-           if statusCode equal "00"
-               move userid to edit-ID
-               if homepageOpt equal 3
+           if homepageOpt EQUAL 3
+
+               DISPLAY "Enter NRC to be updated : "
+               ACCEPT unrc
+               perform until unrc = "EXIT" or unrc = "exit"
                   call '../SubFiles/bin/userUpdate'
-                  using by REFERENCE edit-id, statusCode
+                  using by REFERENCE unrc, statusCode
                   EVALUATE statusCode
                    when equal "00"
                        DISPLAY esc GREENx
-                       DISPLAY "Updated Info for ID ("userid")"
+                       DISPLAY "Updated Info for User"
                        DISPLAY esc RESETx
                        perform update-info-page
                    when equal "96"
                        DISPLAY esc GREENx
-                       DISPLAY "NOT FOUND USER WITH ID ("userid")"
+                       DISPLAY "NOT FOUND USER WITH NRC"
                        DISPLAY esc RESETx
                        perform update-info-page
                    when OTHER
@@ -202,10 +209,23 @@
                        DISPLAY "CANNOT PERFORM UPDATE PROCESS"
                        DISPLAY esc RESETx
                        perform update-info-page
-               END-EVALUATE
-               else if homepageOpt equal 7
-                  call '../SubFiles/bin/adminUpdate'
-                  using by REFERENCE edit-id,statusCode
+                   END-EVALUATE
+               END-PERFORM
+               DISPLAY "Going Back To Main Screen"
+               perform home-page
+           else
+               if homepageOpt equal 7
+               DISPLAY "Enter ID to be updated : "
+               ACCEPT userid
+               INITIALIZE text-input
+               move userid to text-input
+               perform until text-input = "EXIT" or text-input = "exit"
+               call '../../Utility Functions/bin/numberCheck' USING
+               by REFERENCE text-input,statusCode
+               if statusCode equal "00"
+                   move userid to edit-ID
+                   call '../SubFiles/bin/adminUpdate'
+                   using by REFERENCE edit-id,statusCode
                   EVALUATE statusCode
                    when equal "00"
                        DISPLAY esc GREENx
@@ -223,16 +243,17 @@
                        DISPLAY esc RESETx
                        perform update-info-page
                END-EVALUATE
-               end-if
-           Else
-           DISPLAY esc REDx
-           DISPLAY "Invalid Input Type"
-           DISPLAY esc RESETx
-           PERFORM update-info-page
+               Else
+                   DISPLAY esc REDx
+                   DISPLAY "Invalid Input Type"
+                   DISPLAY esc RESETx
+                   PERFORM update-info-page
+               END-IF
+               END-PERFORM
+               DISPLAY "Going Back To Main Screen"
+               perform home-page
            end-if
-           END-PERFORM
-           DISPLAY "Going Back To Main Screen"
-           perform home-page.
+           end-if.
 
 
        choice-opt-login.

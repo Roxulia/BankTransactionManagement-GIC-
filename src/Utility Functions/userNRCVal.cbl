@@ -26,6 +26,7 @@
        01  nrc_code pic xx.
        01  nrc_city pic x(10).
        01  nrc_number pic x(6).
+       01  text-input  pic x(16).
        01  nrc_status pic x.
        01  ws-status1 pic xx.
        01  ws-status2 pic xx.
@@ -119,9 +120,10 @@
                 ELSE
                     DISPLAY ws-status1
                 end-if
-
+                INITIALIZE text-input
+                move nrc_number to text-input
                 call '../../Utility Functions/bin/numberCheck' using
-                by REFERENCE nrc_number ws-status2
+                by REFERENCE text-input ws-status2
 
                 if ws-status2 EQUAL "10"
                     DISPLAY "INVALID NRC NUMBER"
