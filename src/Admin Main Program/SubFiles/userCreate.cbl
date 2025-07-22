@@ -9,7 +9,7 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT UserFile ASSIGN TO '../../../../data/UserAccounts.dat'
+           SELECT UserFile ASSIGN TO '../../../data/UserAccounts.dat'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
@@ -23,8 +23,6 @@
            05  UName      PIC X(20).
            05  ULoginName PIC X(25).
            05  UAccNo     PIC 9(16).
-
-
            05  UEncPsw    PIC X(32).
            05  UNrc       PIC X(30).
            05  UAddress   PIC X(20).
@@ -47,6 +45,20 @@
        01  PTR                 PIC 9(4)  COMP-5.
        01  I                   PIC 9(4)  COMP-5.
        01  statusCode          pic xx.
+       01  temp-nrc pic x(30).
+       01  UserData.
+           05  ws-UID        PIC 9(5).
+           05  ws-UName      PIC X(20).
+           05  ws-ULoginName PIC X(25).
+           05  ws-UAccNo     PIC 9(16).
+           05  ws-UEncPsw    PIC X(32).
+           05  ws-UNrc       PIC X(30).
+           05  ws-UAddress   PIC X(20).
+           05  ws-UPh        PIC X(9).
+           05  ws-Balance    PIC 9(10)V99.
+           05  ws-TrxCount   PIC 9(5).
+           05  ws-UDate      PIC 9(8).
+           05  ws-UTime      PIC 9(6).
 
        *>For display colors
        COPY "../../Utility Functions/colorCodes.cpy".
@@ -61,6 +73,18 @@
            PERFORM Generate-UID
            PERFORM Generate-CardNo
            PERFORM Prompt-NRC
+           call '../../Utility Functions/bin/getUserByNRC'
+           using by REFERENCE temp-nrc UserData statusCode
+           if statusCode equal "00"
+               DISPLAY esc redx
+               DISPLAY "User Already Existed"
+               DISPLAY esc greenx
+               DISPLAY "Name : " ws-UName
+               DISPLAY "Account Number : " ws-UAccNo
+               DISPLAY esc resetx
+               exit PROGRAM
+           end-if
+           move temp-nrc to UNrc
            PERFORM Prompt-Box
            PERFORM ValidCheck-IniPsw
            PERFORM Generate-Login
@@ -120,7 +144,7 @@
        Prompt-NRC.
 
            CALL '../../Utility Functions/bin/userNRCVal'
-               USING BY REFERENCE UNrc.
+               USING BY REFERENCE temp-nrc.
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
        *>Prompt display for user input
@@ -131,14 +155,14 @@
 
            DISPLAY "=  Enter Full Name (max 20 chars):"
            ACCEPT UName
-           call '../../../Utility Functions/bin/userNameVal'
+           call '../../Utility Functions/bin/userNameVal'
            using by REFERENCE UName , statusCode
 
            perform until statusCode equal "00"
                DISPLAY esc redx "Invalid Name" esc resetx
                DISPLAY "=  Enter Full Name (max 20 chars):"
                ACCEPT UName
-               call '../../../Utility Functions/bin/userNameVal'
+               call '../../Utility Functions/bin/userNameVal'
                using by REFERENCE UName , statusCode
            END-PERFORM
 
@@ -149,7 +173,7 @@
        *>Prompt display for PH NO and valid check
        ValidCheck-IniPsw.
 
-           CALL '../../../Utility Functions/bin/phoneValidCheck'
+           CALL '../../Utility Functions/bin/phoneValidCheck'
            USING BY REFERENCE UPh
 
            *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
@@ -192,7 +216,7 @@
        *> Call encryption submodule( to uncomment after encryption sub)
        Encryption-Call.
 
-           CALL '../../../Utility Functions/bin/encryption'
+           CALL '../../Utility Functions/bin/encryption'
            USING BY REFERENCE PlainPassword,EncryptedPassword
            IF RETURN-CODE NOT = 0
                DISPLAY "Error encrypting password. Aborting."

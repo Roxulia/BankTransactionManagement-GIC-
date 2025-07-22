@@ -22,7 +22,9 @@
            05  UID        PIC 9(5).
            05  UName      PIC X(20).
            05  ULoginName PIC X(25).
+           05  UAccNum    PIC 9(16).
            05  UEncPsw    PIC X(32).
+           05  UNRC       pic x(30).
            05  UAddress   PIC X(20).
            05  UPh        PIC x(9).
            05  Balance    PIC 9(10)V99.
@@ -41,20 +43,20 @@
        77  NewPsw            PIC X(20).
        77  EncryptedPassword PIC X(32).
        77  statusCode pic xx.
-       77  ws-uid pic 9(5).
+       77  ws-nrc pic x(30).
 
        LINKAGE SECTION.
-       01  LNK-UID           PIC 9(5).
+       01  LNK-NRC           PIC x(30).
        01  LNK-Status        PIC XX.
 
-       PROCEDURE DIVISION USING LNK-UID LNK-Status.
+       PROCEDURE DIVISION USING LNK-NRC LNK-Status.
 
        Main-Section.
            INITIALIZE optcode
-           INITIALIZE ws-uid
-           move LNK-UID to ws-uid
-           call '../../Utility Functions/bin/getUserByID'
-           using by REFERENCE ws-UID,UserRecord,statusCode
+           INITIALIZE ws-nrc
+           move LNK-nrc to ws-nrc
+           call '../../Utility Functions/bin/getUserByNRC'
+           using by REFERENCE ws-nrc,UserRecord,statusCode
 
            if statusCode not EQUAL "00"
                move statuscode to LNK-Status
@@ -79,22 +81,7 @@
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
        *> opening UserAccounts data file and retrieving the RECORD
-       Record-pointer.
 
-           MOVE LNK-UID TO UID
-           OPEN I-O UserFile
-           IF WS-FileStatus NOT = '00'
-               MOVE '99' TO LNK-Status
-               GOBACK
-           END-IF
-
-           READ UserFile KEY IS UID
-               INVALID KEY
-                   DISPLAY "User ID not found"
-                   MOVE '99' TO LNK-Status
-                   CLOSE UserFile
-                   GOBACK
-           END-READ.
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
        *> Display current values prompting edit options
@@ -127,7 +114,7 @@
                    ACCEPT NewName
                    call '../../Utility Functions/bin/userNameVal'
                    using by REFERENCE newName , statusCode
-                   
+
                    perform until statusCode equal "00"
                        DISPLAY esc redx "Invalid Name" esc resetx
                        DISPLAY "=  Enter Full Name (max 20 chars):"
