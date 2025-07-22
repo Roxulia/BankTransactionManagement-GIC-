@@ -101,7 +101,7 @@
                DISPLAY "=            OR              ="
                DISPLAY "=    'EXIT' to go back       ="
                DISPLAY "=============================="
-               DISPLAY esc RESET-CODE
+               DISPLAY esc resetx
                move 7 to homepageOpt
                perform choice-opt-update-info
 
@@ -147,9 +147,9 @@
                USING REFERENCE edit-id
                perform generate-report-page
            Else
-               DISPLAY esc RED-CODE
+               DISPLAY esc REdx
                DISPLAY "Invalid Input Type"
-               DISPLAY esc RESET-CODE
+               DISPLAY esc RESETx
                PERFORM generate-report-page
            end-if
            END-PERFORM
@@ -168,9 +168,9 @@
                USING REFERENCE edit-id statusCode
                perform deposit-page
            Else
-               DISPLAY esc RED-CODE
+               DISPLAY esc REDx
                DISPLAY "Invalid Input Type"
-               DISPLAY esc RESET-CODE
+               DISPLAY esc RESETx
                PERFORM deposit-page
            end-if
            END-PERFORM
@@ -190,19 +190,19 @@
                   using by REFERENCE edit-id, statusCode
                   EVALUATE statusCode
                    when equal "00"
-                       DISPLAY esc GREEN-CODE
+                       DISPLAY esc GREENx
                        DISPLAY "Updated Info for ID ("userid")"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc RESETx
                        perform update-info-page
                    when equal "96"
-                       DISPLAY esc GREEN-CODE
+                       DISPLAY esc GREENx
                        DISPLAY "NOT FOUND USER WITH ID ("userid")"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc RESETx
                        perform update-info-page
                    when OTHER
-                       DISPLAY ESC RED-CODE
+                       DISPLAY ESC REDx
                        DISPLAY "CANNOT PERFORM UPDATE PROCESS"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc RESETx
                        perform update-info-page
                END-EVALUATE
                else if homepageOpt equal 7
@@ -210,26 +210,26 @@
                   using by REFERENCE edit-id,statusCode
                   EVALUATE statusCode
                    when equal "00"
-                       DISPLAY esc GREEN-CODE
+                       DISPLAY esc GREENx
                        DISPLAY "Updated Info for ID ("userid")"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc RESETx
                        perform update-info-page
                    when equal "96"
-                       DISPLAY esc GREEN-CODE
+                       DISPLAY esc GREENx
                        DISPLAY "NOT FOUND ADMIN WITH ID ("userid")"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc RESETx
                        perform update-info-page
                    when OTHER
-                       DISPLAY esc RED-CODE
+                       DISPLAY esc REDx
                        DISPLAY "CANNOT PERFORM UPDATE PROCESS"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc RESETx
                        perform update-info-page
                END-EVALUATE
                end-if
            Else
-           DISPLAY esc RED-CODE
+           DISPLAY esc REDx
            DISPLAY "Invalid Input Type"
-           DISPLAY esc RESET-CODE
+           DISPLAY esc RESETx
            PERFORM update-info-page
            end-if
            END-PERFORM
@@ -248,27 +248,27 @@
                            adminName , adminRole , statusCode
                        EVALUATE statusCode
                            when equal "00"
-                               display ESC GREEN-CODE"LOG IN SUCCESSFUL"
-                               DISPLAY ESC RESET-CODE
+                               display ESC GREENx"LOG IN SUCCESSFUL"
+                               DISPLAY ESC RESETx
                                perform home-page
                            when equal "96"
-                               DISPLAY ESC RED-CODE "ADMIN NOT FOUND!!"
-                               DISPLAY esc RESET-CODE
+                               DISPLAY ESC REDx "ADMIN NOT FOUND!!"
+                               DISPLAY esc RESETx
                                perform login-page
                            when equal "95"
-                               DISPLAY esc RED-CODE"INVALID CREDENTIAL!"
-                               DISPLAY esc RESET-CODE
+                               DISPLAY esc REDx"INVALID CREDENTIAL!"
+                               DISPLAY esc RESETx
                                perform login-page
                        END-EVALUATE
                    when OTHER
-                       DISPLAY esc RED-CODE "INVALID OPTION CODE"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc REDx "INVALID OPTION CODE"
+                       DISPLAY esc RESETx
                        perform login-page
                END-EVALUATE
            END-PERFORM
-           DISPLAY esc RED-CODE
+           DISPLAY esc REDx
            DISPLAY "Exitting the Program ...."
-           DISPLAY esc RESET-CODE
+           DISPLAY esc RESETx
            stop run.
 
        choice-opt-home.
@@ -313,14 +313,14 @@
                    when equal 8
                        perform generate-report-page
                    when OTHER
-                       display esc RED-CODE
+                       display esc REDx
                        display "INVALID OPTION CODE"
-                       display esc RESET-CODE
+                       display esc RESETx
                        perform home-page
                END-EVALUATE
            END-PERFORM
-           DISPLAY esc RED-CODE
+           DISPLAY esc REDx
            display "Logging Out..."
-           DISPLAY esc RESET-CODE
+           DISPLAY esc RESETx
            perform login-page.
        END PROGRAM AMain.
