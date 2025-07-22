@@ -19,8 +19,8 @@
        FILE SECTION.
        FD  UserFile.
        01  UserRecord.
-
        COPY "../../Utility Functions/userFile.cpy".
+
 
        WORKING-STORAGE SECTION.
 
@@ -33,20 +33,20 @@
        77  NewPsw            PIC X(20).
        77  EncryptedPassword PIC X(32).
        77  statusCode pic xx.
-       77  ws-uid pic 9(5).
+       77  ws-nrc pic x(30).
 
        LINKAGE SECTION.
-       01  LNK-UID           PIC 9(5).
+       01  LNK-NRC           PIC x(30).
        01  LNK-Status        PIC XX.
 
-       PROCEDURE DIVISION USING LNK-UID LNK-Status.
+       PROCEDURE DIVISION USING LNK-NRC LNK-Status.
 
        Main-Section.
            INITIALIZE optcode
-           INITIALIZE ws-uid
-           move LNK-UID to ws-uid
-           call '../../Utility Functions/bin/getUserByID'
-           using by REFERENCE ws-UID,UserRecord,statusCode
+           INITIALIZE ws-nrc
+           move LNK-nrc to ws-nrc
+           call '../../Utility Functions/bin/getUserByNRC'
+           using by REFERENCE ws-nrc,UserRecord,statusCode
 
            if statusCode not EQUAL "00"
                move statuscode to LNK-Status
@@ -71,22 +71,7 @@
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
        *> opening UserAccounts data file and retrieving the RECORD
-       Record-pointer.
 
-           MOVE LNK-UID TO UID
-           OPEN I-O UserFile
-           IF WS-FileStatus NOT = '00'
-               MOVE '99' TO LNK-Status
-               GOBACK
-           END-IF
-
-           READ UserFile KEY IS UID
-               INVALID KEY
-                   DISPLAY "User ID not found"
-                   MOVE '99' TO LNK-Status
-                   CLOSE UserFile
-                   GOBACK
-           END-READ.
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
        *> Display current values prompting edit options
