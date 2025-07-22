@@ -31,16 +31,11 @@
 
        FD Transactions.
        01 TRXRECORD.
-           05 TrxID        PIC x(11).
-           05 SenderAcc    PIC 9(16).
-           05 ReceiverAcc  PIC 9(16).
-           05 Description  PIC X(30).
-           05 Amount       PIC 9(10)V99.
-           05 T-Type       PIC 9.
-           05 TimeStamp    PIC 9(14).
+
+       COPY "../../Utility Functions/transactionFile.cpy".
 
        WORKING-STORAGE SECTION.
-       01  WS-SenderAcc    PIC 9(16) VALUE ZERO.
+       01  WS-SenderID     PIC 9(5) VALUE ZERO.
        01  WS-ReceiverAcc  PIC 9(16) VALUE ZERO.
        01  WS-Amount       PIC 9(10)V99 VALUE ZERO.
        01  TEMP-BALANCE    pic s9(10)v99.
@@ -89,16 +84,16 @@
 
        LINKAGE SECTION.
 
-       01  LS-SenderAcc    PIC 9(16).
+       01  LS-SenderID    PIC 9(5).
        01  LS-StatusCode   PIC X(2) VALUE SPACES.
 
-       PROCEDURE DIVISION USING LS-SenderAcc LS-StatusCode.
+       PROCEDURE DIVISION USING LS-SenderID LS-StatusCode.
 
        MAIN-PROCEDURE.
             initialize WS-Amount
             initialize WS-ReceiverAcc
-            INITIALIZE WS-SenderAcc
-            MOVE LS-SENDERAcc TO WS-SenderAcc
+            INITIALIZE WS-SenderID
+            MOVE LS-SenderID TO WS-SenderID
             PERFORM FIND-SENDER
             *>DISPLAY "Enter SenderID : "
             *>ACCEPT WS-SenderUID
@@ -118,8 +113,8 @@
            exit program.
 
        FIND-SENDER.
-           call '../../Utility Functions/bin/getUserByAccNumber'
-           using by REFERENCE WS-SenderAcc,SENDER-RECORD,statusCode
+           call '../../Utility Functions/bin/getUserByID'
+           using by REFERENCE WS-SenderID,SENDER-RECORD,statusCode
 
            if statusCode  EQUAL "99"
                display esc redx"FILE ERROR" esc resetx
@@ -133,7 +128,7 @@
        FIND-RECEIVER.
            DISPLAY "Enter Receiver's Account Number :".
            ACCEPT WS-ReceiverAcc
-           if WS-SenderAcc = WS-ReceiverAcc
+           if U-UAccNo = WS-ReceiverAcc
                DISPLAY esc redx "CAN'T TRANSFER TO URSELF" esc resetx
                exit PROGRAM
            end-if
@@ -187,7 +182,7 @@
            subtract WS-Amount from u-Balance
            add WS-Amount to R-BALANCE
            open I-O USERACCOUNTS
-           move USER-RECORD to USERDATA
+           move SENDER-RECORD to USERDATA
 
            DISPLAY "================================================="
            REWRITE USERDATA
@@ -221,7 +216,7 @@
            MOVE R-UAccNo    TO ReceiverAcc
            MOVE "Transfer" TO Description
            MOVE WS-AMOUNT   TO Amount
-           MOVE 4         TO T-Type
+           MOVE 4         TO TrxType
            move FUNCTION CURRENT-DATE(1:14) to TimeStamp
            OPEN i-o Transactions
            WRITE TrxRecord

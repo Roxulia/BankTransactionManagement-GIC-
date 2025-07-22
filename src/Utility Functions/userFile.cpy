@@ -5,6 +5,7 @@
                05  UEncPsw    PIC X(32).
                05  UNrc       PIC X(30).
                05  UAddress   PIC X(20).
+               05  UNrc       PIC x(30).
                05  UPh        PIC X(9).
                05  Balance    PIC 9(10)V99.
                05  TrxCount   PIC 9(5).
