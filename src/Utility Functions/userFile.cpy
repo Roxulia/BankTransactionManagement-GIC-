@@ -1,0 +1,10 @@
+               05 UID         PIC 9(5).
+               05 UName       PIC X(20).
+               05 ULoginName  PIC X(25).
+               05 UEncPsw     PIC X(32).
+               05 UAddress    PIC X(20).
+               05 Phone       PIC X(9).
+               05 Balance     PIC 9(10)V99.
+               05 trxCount    pic 9(5).
+               05 UDate       PIC 9(8).
+               05 UTime       PIC 9(6).
