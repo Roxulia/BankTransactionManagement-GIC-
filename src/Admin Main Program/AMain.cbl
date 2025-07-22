@@ -200,7 +200,7 @@
                        DISPLAY esc RESETx
                        perform update-info-page
                    when equal "96"
-                       DISPLAY esc GREENx
+                       DISPLAY esc redx
                        DISPLAY "NOT FOUND USER WITH NRC"
                        DISPLAY esc RESETx
                        perform update-info-page

@@ -13,7 +13,7 @@
            ASSIGN TO "../../../data/UserAccounts.dat"
            ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
-               RECORD KEY IS UNRC
+               RECORD KEY IS UID
                FILE STATUS IS WS-FS.
        DATA DIVISION.
        FILE SECTION.
@@ -36,6 +36,7 @@
        01 EOF-Flag          PIC X VALUE 'N'.
        01 InputNRC          PIC X(30).
        01 FoundFlag         PIC X VALUE 'N'.
+       01 space_count       pic 99.
        LINKAGE SECTION.
        01 NRCInput.
            05 NRC           PIC X(30).
@@ -56,21 +57,23 @@
        PROCEDURE DIVISION USING NRCInput, ReturnUserData, statusCode.
        MAIN-PROCEDURE.
 
-           MOVE NRC TO InputNRC
            MOVE 'N' TO FoundFlag
            MOVE 'N' TO EOF-Flag
-
            OPEN INPUT testfile
            IF WS-FS NOT = '00'
                MOVE '99' TO statusCode
+               DISPLAY WS-FS
                GO TO EXIT-PROGRAM
            END-IF
-             PERFORM UNTIL EOF-Flag = 'Y'
+           PERFORM UNTIL EOF-Flag = 'Y'
+               *>DISPLAY "reading"
                READ testfile INTO userdata
                    AT END
+                       DISPLAY "EOF"
                        MOVE 'Y' TO EOF-Flag
                    NOT AT END
-                       IF UNRC = InputNRC
+                       *>DISPLAY unrc InputNRC "a"
+                       IF UNRC EQUAL NRC
                            MOVE UID TO RET-UID
                            MOVE UName TO RET-UName
                            MOVE ULoginName TO RET-ULoginName
@@ -95,9 +98,8 @@
            ELSE
                MOVE '96' TO statusCode
            END-IF.
-             EXIT-PROGRAM.
+       EXIT-PROGRAM.
            CLOSE testfile
            EXIT PROGRAM.
 
-            STOP RUN.
        END PROGRAM getUserByNRC.

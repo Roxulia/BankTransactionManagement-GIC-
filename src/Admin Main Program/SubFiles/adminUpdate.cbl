@@ -19,11 +19,8 @@
        FILE SECTION.
        FD  AdminFile.
        01  AdminRecord.
-           05  AID        PIC 9(5).
-           05  AName      PIC X(20).
-           05  ALoginName PIC X(25).
-           05  AEncPsw    PIC X(32).
-           05  role       PIC 9.
+
+       COPY "../../Utility Functions/adminFile.cpy".
 
        WORKING-STORAGE SECTION.
 
@@ -119,7 +116,7 @@
                    ACCEPT NewName
                    call '../../Utility Functions/bin/userNameVal'
                    using by REFERENCE newName , statusCode
-                   
+
                    perform until statusCode equal "00"
                        DISPLAY esc redx "Invalid Name" esc resetx
                        DISPLAY "=  Enter Full Name (max 20 chars):"

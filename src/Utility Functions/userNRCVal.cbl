@@ -23,6 +23,7 @@
        01  ws-fs pic xx.
 
        01  ws-nrc-string pic x(30).
+       01  ws-temp pic x(30).
        01  nrc_code pic xx.
        01  nrc_city pic x(10).
        01  nrc_number pic x(6).
@@ -61,11 +62,8 @@
                 DISPLAY "Error in NRC Data file"
                 exit PROGRAM
             else
-                String nrc_code DELIMITED by space "/"
-                DELIMITED by space nrc_city DELIMITED by SpacE
-                "(" DELIMITED by Space nrc_status DELIMITED by space
-                ")" DELIMITED by space nrc_number into nrc-string
-                DISPLAY nrc-string
+                move ws-temp
+                to nrc-string
             END-IF
             exit PROGRAM.
 
@@ -102,6 +100,8 @@
                 *>DISPLAY "Check 3 passed"
             END-IF
             if has_slash = 'y' and has_paren1 = 'y' and has_paren2 = 'y'
+                INITIALIZE ws-temp
+                move ws-nrc-string to ws-temp
                 UNSTRING ws-nrc-string DELIMITED by "/"
                 into nrc_code ws-nrc-string
                 UNSTRING ws-nrc-string DELIMITED by "("
@@ -117,8 +117,7 @@
                 nrc_code nrc_city ws-status1
                 if ws-status1 EQUAL "90"
                     DISPLAY "INVALID CITY CODE"
-                ELSE
-                    DISPLAY ws-status1
+
                 end-if
                 INITIALIZE text-input
                 move nrc_number to text-input
