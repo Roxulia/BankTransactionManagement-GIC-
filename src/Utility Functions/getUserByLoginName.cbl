@@ -22,11 +22,13 @@
            05 UID      PIC 9(5).
            05 UName    PIC X(20).
            05 ULoginName PIC X(25).
+           05 UAccNumber PIC 9(16).
            05 UEncodedPassword PIC X(32).
+           05 UNRC     PIC x(30).
            05 UAddress PIC X(20).
            05 UPhone PIC x(9).
            05 UBalance PIC 9(10)V99.
-           05 trxCount pic 9(5).
+           05 UtrxCount pic 9(5).
            05 UDate PIC 9(8).
            05 UTime PIC 9(6).
 
@@ -54,11 +56,13 @@
            05 RET-UID      PIC 9(5).
            05 RET-UName    PIC X(20).
            05 RET-ULoginName PIC X(25).
+           05 RET-UAccNumber pic 9(16).
            05 RET-UEncodedPassword PIC X(32).
+           05 RET-UNRC     PIC x(30).
            05 RET-UAddress PIC X(20).
            05 RET-UPhone PIC x(9).
            05 RET-UBalance PIC 9(10)V99.
-           05 RET-trxCount pic 9(5).
+           05 RET-TrxCount PIC 9(5).
            05 RET-UDate PIC 9(8).
            05 RET-UTime PIC 9(6).
 
@@ -100,6 +104,8 @@
                             MOVE UID         TO RET-UID
                             MOVE UName       TO RET-UName
                             MOVE ULoginName  TO RET-ULoginName
+                            MOVE UNRC        TO RET-UNRC
+                            move UAccNumber  to RET-UAccNumber
                             MOVE UEncodedPassword
                             TO RET-UEncodedPassword
                             MOVE UAddress  TO RET-UAddress
@@ -107,7 +113,7 @@
                                 MOVE UPhone TO RET-UPhone
                             END-IF
                             MOVE UBalance TO RET-UBalance
-                            move trxCount to RET-trxCount
+                            move utrxCount to RET-trxCount
                             MOVE UDate TO RET-UDate
                             MOVE UTime TO RET-UTime
                             MOVE 'Y' TO RET-Found

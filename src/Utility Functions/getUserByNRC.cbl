@@ -19,45 +19,47 @@
        FILE SECTION.
        FD testfile.
        01 userdata.
-           05 UID           PIC 9(5).
-           05 UName         PIC X(20).
-           05 ULoginName    PIC X(25).
-           05 UEncPsw       PIC X(32).
-           05 UAddress      PIC X(20).
-           05 UPhone        PIC 9(9).
-           05 UBalance      PIC 9(10)V99.
-           05 UTrxCount     PIC 9(5).
-           05 UDate         PIC 9(6).
-           05 UTime         PIC 9(6).
-           05 UNRC          PIC X(30).  *> New field: NRC number
-       WORKING-STORAGE SECTION.  
+           05 UID      PIC 9(5).
+           05 UName    PIC X(20).
+           05 ULoginName PIC X(25).
+           05 UAccNumber PIC 9(16).
+           05 UEncodedPassword PIC X(32).
+           05 UNRC     PIC x(30).
+           05 UAddress PIC X(20).
+           05 UPhone PIC x(9).
+           05 UBalance PIC 9(10)V99.
+           05 UtrxCount pic 9(5).
+           05 UDate PIC 9(8).
+           05 UTime PIC 9(6).  *> New field: NRC number
+       WORKING-STORAGE SECTION.
        01 WS-FS             PIC XX.
        01 EOF-Flag          PIC X VALUE 'N'.
-       01 InputNRC          PIC X(14).
+       01 InputNRC          PIC X(30).
        01 FoundFlag         PIC X VALUE 'N'.
        LINKAGE SECTION.
        01 NRCInput.
            05 NRC           PIC X(30).
        01 ReturnUserData.
-           05 RET-UID       PIC 9(5).
-           05 RET-UName     PIC X(20).
+           05 RET-UID      PIC 9(5).
+           05 RET-UName    PIC X(20).
            05 RET-ULoginName PIC X(25).
-           05 RET-UEncPsw   PIC X(32).
-           05 RET-UAddress  PIC X(20).
-           05 RET-UPhone    PIC 9(9).
-           05 RET-UBalance  PIC 9(10)V99.
-           05 RET-TrxCount  PIC 9(5).
-           05 RET-UDate     PIC 9(6).
-           05 RET-UTime     PIC 9(6).
-           05 RET-UNRC      PIC X(14).
+           05 RET-UAccNumber pic 9(16).
+           05 RET-UEncodedPassword PIC X(32).
+           05 RET-UNRC     PIC x(30).
+           05 RET-UAddress PIC X(20).
+           05 RET-UPhone PIC x(9).
+           05 RET-UBalance PIC 9(10)V99.
+           05 RET-TrxCount PIC 9(5).
+           05 RET-UDate PIC 9(8).
+           05 RET-UTime PIC 9(6).
        01 statusCode        PIC XX.
        PROCEDURE DIVISION USING NRCInput, ReturnUserData, statusCode.
        MAIN-PROCEDURE.
-           
+
            MOVE NRC TO InputNRC
            MOVE 'N' TO FoundFlag
            MOVE 'N' TO EOF-Flag
-           
+
            OPEN INPUT testfile
            IF WS-FS NOT = '00'
                MOVE '99' TO statusCode
@@ -72,7 +74,9 @@
                            MOVE UID TO RET-UID
                            MOVE UName TO RET-UName
                            MOVE ULoginName TO RET-ULoginName
-                           MOVE UEncPsw TO RET-UEncPsw
+                            MOVE UNRC        TO RET-UNRC
+                            move UAccNumber  to RET-UAccNumber
+                           MOVE UEncodedPassword TO RET-UEncodedPassword
                            MOVE UAddress TO RET-UAddress
                            MOVE UPhone TO RET-UPhone
                            MOVE UBalance TO RET-UBalance
@@ -85,7 +89,7 @@
                        END-IF
                END-READ
            END-PERFORM
-           
+
             IF FoundFlag = 'Y'
                MOVE '00' TO statusCode
            ELSE
@@ -97,4 +101,3 @@
 
             STOP RUN.
        END PROGRAM getUserByNRC.
-

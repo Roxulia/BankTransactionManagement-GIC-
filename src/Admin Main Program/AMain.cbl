@@ -17,14 +17,16 @@
        01  adminRole pic 9(1) value 1.
        01  adminId pic 9(5).
        01  userid pic X(5).
+       01  userAccNum pic x(16).
+       01  text-input pic x(16).
+       01  unrc pic x(30).
        01  edit-id pic 9(5).
+       01  dpAccNum pic 9(16).
        01  statusCode pic x(2) value "00".
+
        *>For display colors
-       77  RED-CODE            PIC X(6) VALUE "[1;31m".*> set red
-      *77  ESC                 PIC X    VALUE X"1B".   *> ASCII ESC
-       77  RESET-CODE          PIC X(4) VALUE "[0m".   *> reset
-       77  GREEN-CODE          PIC X(6) VALUE "[1;32m".*>set green
        copy '../Utility Functions/colorCodes.cpy'.
+
        PROCEDURE DIVISION.
        MAIN-PROCEDURE.
       *     call 'adminLogin'
@@ -83,7 +85,7 @@
                DISPLAY "=============================="
                display "=============================="
                DISPLAY "=           NOTE:            ="
-               display "=    U can enter user ID     ="
+               display "=    U can enter user NRC    ="
                DISPLAY "=            OR              ="
                DISPLAY "=    'EXIT' to go back       ="
                DISPLAY "=============================="
@@ -101,7 +103,7 @@
                DISPLAY "=            OR              ="
                DISPLAY "=    'EXIT' to go back       ="
                DISPLAY "=============================="
-               DISPLAY esc RESET-CODE
+               DISPLAY esc resetx
                move 7 to homepageOpt
                perform choice-opt-update-info
 
@@ -147,94 +149,111 @@
                USING REFERENCE edit-id
                perform generate-report-page
            Else
-               DISPLAY esc RED-CODE
+               DISPLAY esc REdx
                DISPLAY "Invalid Input Type"
-               DISPLAY esc RESET-CODE
+               DISPLAY esc RESETx
                PERFORM generate-report-page
            end-if
            END-PERFORM
-           DISPLAY "Going Back To Main Screen"
+           DISPLAY esc redx
+           DISPLAY "Going Back To Main Screen..."
+           DISPLAY esc resetx
            perform home-page.
 
        choice-opt-deposit.
-           DISPLAY "Enter ID to be deposited : "
-           ACCEPT userid.
-           perform until userid = "EXIT" or userid = "exit"
+           DISPLAY "Enter Acc Number to be deposited : "
+           ACCEPT userAccNum
+           INITIALIZE text-input
+           move userAccNum to text-input
+           perform until text-input = "EXIT" or text-input = "exit"
            call '../../Utility Functions/bin/numberCheck' USING
-           by REFERENCE userid,statusCode
+           by REFERENCE text-input,statusCode
            if statusCode equal "00"
-               move userid to edit-ID
+               move userAccNum to dpAccNum
                CALL '../SubFiles/bin/trxDeposit'
-               USING REFERENCE edit-id statusCode
+               USING REFERENCE dpAccNum statusCode
                perform deposit-page
            Else
-               DISPLAY esc RED-CODE
+               DISPLAY esc REDx
                DISPLAY "Invalid Input Type"
-               DISPLAY esc RESET-CODE
+               DISPLAY esc RESETx
                PERFORM deposit-page
            end-if
            END-PERFORM
-           DISPLAY "Going Back To Main Screen"
+           DISPLAY esc redx
+           DISPLAY "Going Back To Main Screen..."
+           DISPLAY esc resetx
            perform home-page.
 
        choice-opt-update-info.
-           DISPLAY "Enter ID to be updated : "
-           ACCEPT userid.
-           perform until userid = "EXIT" or userid = "exit"
-           call '../../Utility Functions/bin/numberCheck' USING
-           by REFERENCE userid,statusCode
-           if statusCode equal "00"
-               move userid to edit-ID
-               if homepageOpt equal 3
+           if homepageOpt EQUAL 3
+
+               DISPLAY "Enter NRC to be updated : "
+               ACCEPT unrc
+               perform until unrc = "EXIT" or unrc = "exit"
                   call '../SubFiles/bin/userUpdate'
-                  using by REFERENCE edit-id, statusCode
+                  using by REFERENCE unrc, statusCode
                   EVALUATE statusCode
                    when equal "00"
-                       DISPLAY esc GREEN-CODE
-                       DISPLAY "Updated Info for ID ("userid")"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc GREENx
+                       DISPLAY "Updated Info for User"
+                       DISPLAY esc RESETx
                        perform update-info-page
                    when equal "96"
-                       DISPLAY esc GREEN-CODE
-                       DISPLAY "NOT FOUND USER WITH ID ("userid")"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc GREENx
+                       DISPLAY "NOT FOUND USER WITH NRC"
+                       DISPLAY esc RESETx
                        perform update-info-page
                    when OTHER
-                       DISPLAY ESC RED-CODE
+                       DISPLAY ESC REDx
                        DISPLAY "CANNOT PERFORM UPDATE PROCESS"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc RESETx
                        perform update-info-page
-               END-EVALUATE
-               else if homepageOpt equal 7
-                  call '../SubFiles/bin/adminUpdate'
-                  using by REFERENCE edit-id,statusCode
+                   END-EVALUATE
+               END-PERFORM
+               DISPLAY "Going Back To Main Screen"
+               perform home-page
+           else
+               if homepageOpt equal 7
+               DISPLAY "Enter ID to be updated : "
+               ACCEPT userid
+               INITIALIZE text-input
+               move userid to text-input
+               perform until text-input = "EXIT" or text-input = "exit"
+               call '../../Utility Functions/bin/numberCheck' USING
+               by REFERENCE text-input,statusCode
+               if statusCode equal "00"
+                   move userid to edit-ID
+                   call '../SubFiles/bin/adminUpdate'
+                   using by REFERENCE edit-id,statusCode
                   EVALUATE statusCode
                    when equal "00"
-                       DISPLAY esc GREEN-CODE
+                       DISPLAY esc GREENx
                        DISPLAY "Updated Info for ID ("userid")"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc RESETx
                        perform update-info-page
                    when equal "96"
-                       DISPLAY esc GREEN-CODE
+                       DISPLAY esc GREENx
                        DISPLAY "NOT FOUND ADMIN WITH ID ("userid")"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc RESETx
                        perform update-info-page
                    when OTHER
-                       DISPLAY esc RED-CODE
+                       DISPLAY esc REDx
                        DISPLAY "CANNOT PERFORM UPDATE PROCESS"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc RESETx
                        perform update-info-page
                END-EVALUATE
-               end-if
-           Else
-           DISPLAY esc RED-CODE
-           DISPLAY "Invalid Input Type"
-           DISPLAY esc RESET-CODE
-           PERFORM update-info-page
+               Else
+                   DISPLAY esc REDx
+                   DISPLAY "Invalid Input Type"
+                   DISPLAY esc RESETx
+                   PERFORM update-info-page
+               END-IF
+               END-PERFORM
+               DISPLAY "Going Back To Main Screen"
+               perform home-page
            end-if
-           END-PERFORM
-           DISPLAY "Going Back To Main Screen"
-           perform home-page.
+           end-if.
 
 
        choice-opt-login.
@@ -248,27 +267,27 @@
                            adminName , adminRole , statusCode
                        EVALUATE statusCode
                            when equal "00"
-                               display ESC GREEN-CODE"LOG IN SUCCESSFUL"
-                               DISPLAY ESC RESET-CODE
+                               display ESC GREENx"LOG IN SUCCESSFUL"
+                               DISPLAY ESC RESETx
                                perform home-page
                            when equal "96"
-                               DISPLAY ESC RED-CODE "ADMIN NOT FOUND!!"
-                               DISPLAY esc RESET-CODE
+                               DISPLAY ESC REDx "ADMIN NOT FOUND!!"
+                               DISPLAY esc RESETx
                                perform login-page
                            when equal "95"
-                               DISPLAY esc RED-CODE"INVALID CREDENTIAL!"
-                               DISPLAY esc RESET-CODE
+                               DISPLAY esc REDx"INVALID CREDENTIAL!"
+                               DISPLAY esc RESETx
                                perform login-page
                        END-EVALUATE
                    when OTHER
-                       DISPLAY esc RED-CODE "INVALID OPTION CODE"
-                       DISPLAY esc RESET-CODE
+                       DISPLAY esc REDx "INVALID OPTION CODE"
+                       DISPLAY esc RESETx
                        perform login-page
                END-EVALUATE
            END-PERFORM
-           DISPLAY esc RED-CODE
+           DISPLAY esc REDx
            DISPLAY "Exitting the Program ...."
-           DISPLAY esc RESET-CODE
+           DISPLAY esc RESETx
            stop run.
 
        choice-opt-home.
@@ -313,14 +332,14 @@
                    when equal 8
                        perform generate-report-page
                    when OTHER
-                       display esc RED-CODE
+                       display esc REDx
                        display "INVALID OPTION CODE"
-                       display esc RESET-CODE
+                       display esc RESETx
                        perform home-page
                END-EVALUATE
            END-PERFORM
-           DISPLAY esc RED-CODE
+           DISPLAY esc REDx
            display "Logging Out..."
-           DISPLAY esc RESET-CODE
+           DISPLAY esc RESETx
            perform login-page.
        END PROGRAM AMain.
