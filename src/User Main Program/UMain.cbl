@@ -9,6 +9,7 @@
        DATA DIVISION.
        WORKING-STORAGE SECTION.
        01 UID     PIC 9(5).
+
        01  username pic x(20).
        01 STATUSCODE PIC X(2) VALUE ZEROS.
        01 OPTION     PIC x(1) VALUE ZEROS.
@@ -19,7 +20,7 @@
        PROCEDURE DIVISION.
        MAIN-LOGIC.
            INITIALIZE uid
-           
+
       *      CALL 'USERLOGIN' USING UID STATUSCODE.
            PERFORM login-page
            Stop run.
@@ -67,7 +68,7 @@
        choice-opt-login.
            DISPLAY "Choosen Option Code : "
            accept loginOpt
-           
+
            PERFORM UNTIL loginOpt EQUAL "99"
                EVALUATE loginOpt
                    when EQUAL "1"
