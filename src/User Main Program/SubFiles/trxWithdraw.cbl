@@ -2,7 +2,7 @@
    ****    * Author: YOUR-NAME
    ****    * Date: April 5, 2025
    ** **   * Purpose: Handle withdrawal transaction for logged-in user
-    ***   * Tectonics: GnuCOBOL / OpenCOBOL
+    ***    * Tectonics: GnuCOBOL / OpenCOBOL
      **  *****************************************************************
        IDENTIFICATION DIVISION.
        PROGRAM-ID. trxWithdraw.
@@ -27,26 +27,17 @@
        FILE SECTION.
        FD  UserFile.
        01  UserRecord.
-           05  UID        PIC 9(5).
-           05  UName      PIC X(20).
-           05  ULoginName PIC X(25).
-           05  UEncPsw    PIC X(32).
-           05  UAddress   PIC X(20).
-           05  UPh        PIC X(9).
-           05  Balance    PIC 9(10)V99.
-           05  TrxCount   PIC 9(5).
-           05  UDate      PIC 9(8).
-           05  UTime      PIC 9(6).
+       COPY "../../Utility Functions/userFile.cpy".
 
        FD  TrxFile.
        01  TransactionRecord.
-           05  TrxID       PIC X(11).
-           05  SenderID    PIC 9(5).
-           05  ReceiverID  PIC 9(5).
-           05  Description PIC X(30).
-           05  Amount      PIC 9(10)v99.
-           05  TrxType     PIC 9.
-           05  TimeStamp   PIC 9(14).
+           05 TrxID        PIC x(11).
+           05 SenderAcc    PIC 9(16).
+           05 ReceiverAcc  PIC 9(16).
+           05 Description  PIC X(30).
+           05 Amount       PIC 9(10)V99.
+           05 T-Type       PIC 9.
+           05 TimeStamp    PIC 9(14).
 
 
        WORKING-STORAGE SECTION.
@@ -63,8 +54,10 @@
            05  C-UID        PIC 9(5).
            05  c-UName      PIC X(20).
            05  c-ULoginName PIC X(25).
+           05  c-UAccNo     PIC 9(16).
            05  c-UEncPsw    PIC X(32).
            05  c-UAddress   PIC X(20).
+           05  c-UNrc       PIC X(30).
            05  c-UPh        PIC X(9).
            05  c-Balance    PIC 9(10)V99.
            05  c-TrxCount   PIC 9(5).
@@ -143,11 +136,11 @@
            DISPLAY esc resetx.
 
        write-transaction.
-           MOVE C-UID    TO SenderID
-           MOVE 0    TO ReceiverID
-           MOVE "WithDraw" TO Description
+           MOVE C-UAccNo    TO SenderAcc
+           MOVE 0           TO ReceiverAcc
+           MOVE "WithDraw"  TO Description
            MOVE WS-AMOUNT   TO Amount
-           MOVE 2         TO TrxType
+           MOVE 2           TO T-Type
            move FUNCTION CURRENT-DATE(1:14) to TimeStamp
            OPEN I-O TrxFile
            WRITE TransactionRecord
