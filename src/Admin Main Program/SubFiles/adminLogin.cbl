@@ -19,11 +19,9 @@
        FILE SECTION.
        fd  AdminFile.
        01  admin.
-           05  AID        PIC 9(5).
-           05  AName      PIC X(20).
-           05  ALoginName PIC X(25).
-           05  AEncPsw    PIC X(32).
-           05  role       pic 9.
+
+       COPY "../../Utility Functions/adminFile.cpy".
+
        WORKING-STORAGE SECTION.
        01  loginname pic x(25).
        01  password pic x(20).

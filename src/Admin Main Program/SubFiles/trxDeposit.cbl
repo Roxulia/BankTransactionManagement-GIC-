@@ -14,7 +14,7 @@
            SELECT UserFile ASSIGN TO '../../../data/UserAccounts.dat'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
-               RECORD KEY IS UID
+               RECORD KEY IS UAccNo
                FILE STATUS IS WS-FS.
 
            SELECT TrxFile ASSIGN TO '../../../data/Transactions.dat'
@@ -28,16 +28,8 @@
 
        FD  UserFile.
        01  UserRecord.
-           05  UID        PIC 9(5).
-           05  UName      PIC X(20).
-           05  ULoginName PIC X(25).
-           05  UEncPsw    PIC X(32).
-           05  UAddress   PIC X(20).
-           05  UPh        PIC X(9).
-           05  Balance    PIC 9(10)V99.
-           05  TrxCount   PIC 9(5).
-           05  UDate      PIC 9(8).
-           05  UTime      PIC 9(6).
+
+       COPY "../../Utility Functions/userFile.cpy".
 
        FD  TrxFile.
        01  TransactionRecord.
@@ -70,10 +62,10 @@
        COPY "../../Utility Functions/trxConstants.cpy".
 
        LINKAGE section.
-       01  userId              PIC 9(5).
+       01  AccNo              PIC 9(16).
        01  optStatus           PIC 9(2).
 
-       PROCEDURE DIVISION using REFERENCE userId,optStatus.
+       PROCEDURE DIVISION using REFERENCE AccNo,optStatus.
        Main-Section.
            INITIALIZE depoAmo
            INITIALIZE depoStr
@@ -91,21 +83,21 @@
        TEST-HELPER.
 
            DISPLAY "================================================="
-           DISPLAY "ENTER UID TO MAKE DEPOSIT :"
+           DISPLAY "ENTER Account Number TO MAKE DEPOSIT :"
            ACCEPT tempInput
            IF FUNCTION UPPER-CASE(tempInput) = "EXIT"
                MOVE 99 TO optStatus
                GOBACK
            END-IF
-           MOVE FUNCTION NUMVAL(tempInput) TO userId.
+           MOVE FUNCTION NUMVAL(tempInput) TO AccNo.
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
        *>>>>> Finding the desired user record in the UserFile <<<<<<<<<*
        RECORD-POINTER.
 
            OPEN I-O UserFile
-           MOVE userId TO UID
-           READ UserFile KEY IS UID
+           MOVE AccNo TO UAccNo
+           READ UserFile KEY IS UAccNo
                INVALID KEY
                    DISPLAY ESC REDX "[ERROR] User not found." ESC RESETX
                    MOVE 44 TO optStatus
@@ -122,7 +114,7 @@
            STRING
                TrxCount DELIMITED BY SIZE
                WS-TrxDepoPrefix DELIMITED BY SIZE
-               userId DELIMITED BY SIZE
+               AccNo DELIMITED BY SIZE
                INTO TrxID
            END-STRING
 
@@ -173,7 +165,7 @@
        WRITE-TRX.
 
            MOVE 0    TO SenderID
-           MOVE userId    TO ReceiverID
+           MOVE AccNo    TO ReceiverID
            MOVE "Admin Deposit" TO Description
            MOVE depoAmo   TO Amount
            MOVE 3         TO TrxType
@@ -191,7 +183,7 @@
            DISPLAY ESC GREENX FUNCTION TRIM(depoDsp) WITH NO ADVANCING
            DISPLAY " successfully deposited into account ID :"
                WITH NO ADVANCING
-           DISPLAY ESC GREENX userId
+           DISPLAY ESC GREENX AccNo
            DISPLAY ESC RESETX
            CLOSE TrxFile.
 
@@ -210,7 +202,7 @@
                    GOBACK
            END-REWRITE
 
-           DISPLAY ESC GREENX "Balance updated for ID : "userId
+           DISPLAY ESC GREENX "Balance updated for Account : "AccNo
            DISPLAY ESC RESETX
            MOVE 00 TO optStatus
            CLOSE UserFile.

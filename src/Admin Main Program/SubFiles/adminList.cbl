@@ -20,11 +20,8 @@
        FILE SECTION.
        FD  AdminAccounts.
        01  AdminRecord.
-           05 AID         PIC 9(5).          *> Admin ID
-           05 AName       PIC X(20).         *> Admin Name
-           05 ALoginName  PIC X(25).         *> Login Username
-           05 AEncPsw     PIC X(32).         *> Encrypted Password
-           05 ARole       PIC 9(1).
+
+       COPY "../../Utility Functions/adminFile.cpy".
 
 
        WORKING-STORAGE SECTION.
