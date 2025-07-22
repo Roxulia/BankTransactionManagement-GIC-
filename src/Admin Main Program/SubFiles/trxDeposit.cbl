@@ -33,13 +33,7 @@
 
        FD  TrxFile.
        01  TransactionRecord.
-           05  TrxID       PIC X(11).
-           05  SenderID    PIC 9(5).
-           05  ReceiverID  PIC 9(5).
-           05  Description PIC X(30).
-           05  Amount      PIC 9(10)v99.
-           05  TrxType     PIC 9.
-           05  TimeStamp   PIC 9(14).
+           copy "../../Utility Functions/transactionFile.cpy".
 
        WORKING-STORAGE SECTION.
 
@@ -164,8 +158,8 @@
        *>>>>>>>>>>>> writing a new transaction record in the TrxFile <<<*
        WRITE-TRX.
 
-           MOVE 0    TO SenderID
-           MOVE AccNo    TO ReceiverID
+           MOVE 0    TO SenderAcc
+           MOVE AccNo    TO ReceiverAcc
            MOVE "Admin Deposit" TO Description
            MOVE depoAmo   TO Amount
            MOVE 3         TO TrxType
