@@ -10,7 +10,7 @@
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
            SELECT UserAccounts
-               ASSIGN TO "../../../data/UserAccounts.DAT"
+               ASSIGN TO "../../../../data/UserAccounts.DAT"
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
@@ -36,7 +36,9 @@
            05 WS-UID     PIC X(6).
            05 WS-UNAME   PIC X(20).
            05 WS-ADDRESS PIC X(20).
-           05 WS-PHONE   PIC X(9).
+           05 WS-PHONE   PIC X(12).
+           05 ws-Uaccno  Pic 9(16).
+           05 ws-trxcount pic 9(5).
        PROCEDURE DIVISION.
        MAIN-LOGIC.
            move 1 to  ws-page
@@ -128,9 +130,11 @@
            END-STRING
            DISPLAY WS-TEXT
            DISPLAY "***************************************************"
+                   "***************************************************"
            DISPLAY "UID   UName              Address              Phone"
+                   "       Account Number             Transaction Count"
            DISPLAY "---------------------------------------------------"
-
+                   "---------------------------------------------------"
            *> Read and display up to 10 records
            PERFORM VARYING WS-REC-COUNT FROM 1 BY 1
                    UNTIL WS-REC-COUNT > 5
@@ -144,7 +148,9 @@
                      MOVE UID TO WS-UID
                      MOVE UName TO WS-UNAME
                      MOVE UAddress TO WS-ADDRESS
-                     MOVE Phone TO WS-PHONE
+                     MOVE uph TO WS-PHONE
+                     move uaccno to ws-Uaccno
+                     move trxcount to ws-trxcount
                      DISPLAY WS-DISPLAY-LINE
                END-READ
            END-PERFORM
