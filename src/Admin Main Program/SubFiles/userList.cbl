@@ -10,7 +10,7 @@
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
            SELECT UserAccounts
-               ASSIGN TO "../../../../data/UserAccounts.DAT"
+               ASSIGN TO "../../../data/UserAccounts.DAT"
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS UID
