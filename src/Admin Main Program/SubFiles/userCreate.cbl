@@ -23,8 +23,10 @@
            05  UName      PIC X(20).
            05  ULoginName PIC X(25).
            05  UAccNo     PIC 9(16).
-           05  UNrc       PIC X(30).
+
+
            05  UEncPsw    PIC X(32).
+           05  UNrc       PIC X(30).
            05  UAddress   PIC X(20).
            05  UPh        PIC X(9).
            05  Balance    PIC 9(10)V99.
@@ -109,14 +111,15 @@
        *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
        *>Generating user bank account Number
        Generate-CardNo.
-           CALL '../../../Utility Functions/bin/generateCardNo'
+
+           CALL '../../Utility Functions/bin/generateCardNo'
                USING BY REFERENCE UID,UAccNo.
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
        *>NRC prompt box
        Prompt-NRC.
 
-           CALL '../../../Utility Functions/bin/userNRCVal'
+           CALL '../../Utility Functions/bin/userNRCVal'
                USING BY REFERENCE UNrc.
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*

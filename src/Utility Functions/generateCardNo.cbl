@@ -28,7 +28,8 @@
        LINKAGE SECTION.
 
        01  UID               PIC 9(5).
-       01  LS-RETURN-NUM     PIC X(16).
+
+       01  LS-RETURN-NUM     PIC 9(16).
 
        PROCEDURE DIVISION USING UID,LS-RETURN-NUM.
        MAIN-PARA.

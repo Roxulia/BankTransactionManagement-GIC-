@@ -40,7 +40,15 @@
        01  nrc-string pic x(30).
        PROCEDURE DIVISION using nrc-string.
        MAIN-PROCEDURE.
-
+            INITIALIZE ws-nrc-string
+            INITIALIZE slash
+            INITIALIZE paren1
+            INITIALIZE paren2
+            INITIALIZE has_slash
+            INITIALIZE has_paren2
+            INITIALIZE has_paren1
+            INITIALIZE ws-status1
+            INITIALIZE ws-status2
 
             perform
             UNTIL ws-status1 = "00"
@@ -61,10 +69,6 @@
             exit PROGRAM.
 
        input-process.
-            INITIALIZE ws-nrc-string
-            INITIALIZE slash
-            INITIALIZE paren1
-            INITIALIZE paren2
 
             DISPLAY "Enter NRC : "
             ACCEPT ws-nrc-string
@@ -106,20 +110,21 @@
 
                 MOVE FUNCTION UPPER-CASE(nrc_city) TO nrc_city
 
-                CALL '../../../Utility Functions/bin/isNRCCodeExist'
+
+                CALL '../../Utility Functions/bin/isNRCCodeExist'
                    USING by REFERENCE
                 nrc_code nrc_city ws-status1
-                if ws-status1 EQUAL "00"
-                    *>DISPLAY "check 4 passed"
+                if ws-status1 EQUAL "90"
+                    DISPLAY "INVALID CITY CODE"
                 ELSE
                     DISPLAY ws-status1
                 end-if
 
-                call '../../../Utility Functions/bin/numberCheck' using
+                call '../../Utility Functions/bin/numberCheck' using
                 by REFERENCE nrc_number ws-status2
 
-                if ws-status2 EQUAL "00"
-                    DISPLAY "Check 5 passed"
+                if ws-status2 EQUAL "10"
+                    DISPLAY "INVALID NRC NUMBER"
                 END-IF
             end-if.
        END PROGRAM userNRCVal.
