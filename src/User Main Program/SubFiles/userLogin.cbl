@@ -40,10 +40,10 @@
        process_login.
            call '../../Utility Functions/bin/encryption'
            using REFERENCE password , enc_password
-           DISPLAY enc_password
+           *>DISPLAY enc_password
            call '../../Utility Functions/bin/getUserByLoginName'
            using REFERENCE loginname,userdata,statusCode
-           DISPLAY uencpsw
+           *>DISPLAY uencpsw
            if statusCode EQUAL "00"
                if uEncPsw = enc_password THEN
                    move "00" to statusCode

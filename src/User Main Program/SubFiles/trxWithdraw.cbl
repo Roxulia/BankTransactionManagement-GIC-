@@ -52,8 +52,8 @@
            05  c-ULoginName PIC X(25).
            05  c-UAccNo     PIC 9(16).
            05  c-UEncPsw    PIC X(32).
-           05  c-UAddress   PIC X(20).
            05  c-UNrc       PIC X(30).
+           05  c-UAddress   PIC X(20).
            05  c-UPh        PIC X(9).
            05  c-Balance    PIC 9(10)V99.
            05  c-TrxCount   PIC 9(5).
