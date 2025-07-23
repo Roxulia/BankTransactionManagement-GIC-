@@ -19,18 +19,7 @@
        FILE SECTION.
        FD testfile.
        01 userdata.
-           05 UID      PIC 9(5).
-           05 UName    PIC X(20).
-           05 ULoginName PIC X(25).
-           05 UAccNumber PIC 9(16).
-           05 UEncodedPassword PIC X(32).
-           05 UNRC     PIC x(30).
-           05 UAddress PIC X(20).
-           05 UPhone PIC x(9).
-           05 UBalance PIC 9(10)V99.
-           05 UtrxCount pic 9(5).
-           05 UDate PIC 9(8).
-           05 UTime PIC 9(6).
+           copy '../Utility Functions/userFile.cpy'.
 
        WORKING-STORAGE SECTION.
        01 EOF-Flag PIC X(1) VALUE 'N'.
@@ -49,7 +38,7 @@
            05 RET-UEncodedPassword PIC X(32).
            05 RET-UNRC     PIC x(30).
            05 RET-UAddress PIC X(20).
-           05 RET-UPhone PIC x(9).
+           05 RET-UPhone PIC x(11).
            05 RET-UBalance PIC 9(10)V99.
            05 RET-TrxCount PIC 9(5).
            05 RET-UDate PIC 9(8).
@@ -74,21 +63,21 @@
                         move "96" to statusCode
                     NOT AT END
                         *>DISPLAY userdata
-                        IF UAccNumber = ws-uid
+                        IF UAccNo = ws-uid
                             *>DISPLAY userdata
                             MOVE UID         TO RET-UID
                             MOVE UName       TO RET-UName
                             MOVE ULoginName  TO RET-ULoginName
                             MOVE UNRC        TO RET-UNRC
-                            move UAccNumber  to RET-UAccNumber
-                            MOVE UEncodedPassword
+                            move UAccNo  to RET-UAccNumber
+                            MOVE UEncpsw
                             TO RET-UEncodedPassword
                             MOVE UAddress  TO RET-UAddress
-                            IF UPhone NOT = 0
-                                MOVE UPhone TO RET-UPhone
+                            IF UPh NOT = 0
+                                MOVE UPh TO RET-UPhone
                             END-IF
-                            MOVE UBalance TO RET-UBalance
-                            move UtrxCount to RET-TrxCount
+                            MOVE Balance TO RET-UBalance
+                            move trxCount to RET-TrxCount
                             MOVE UDate TO RET-UDate
                             MOVE UTime TO RET-UTime
                             MOVE 'Y' TO RET-Found

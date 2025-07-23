@@ -18,7 +18,7 @@
        01  adminId pic 9(5).
        01  userid pic X(5).
        01  userAccNum pic x(16).
-       01  text-input pic x(16).
+       01  text-input pic x(20).
        01  unrc pic x(30).
        01  edit-id pic 9(5).
        01  dpAccNum pic 9(16).
@@ -141,8 +141,11 @@
            DISPLAY "Enter User ID : "
            ACCEPT userid.
            perform until userid = "EXIT" or userid = "exit"
+
+           INITIALIZE text-input
+           move userid to text-input
            call '../../Utility Functions/bin/numberCheck' USING
-           by REFERENCE userid,statusCode
+           by REFERENCE text-input,statusCode
            if statusCode equal "00"
                move userid to edit-ID
                CALL '../../Utility Functions/bin/generateReport'
@@ -170,6 +173,7 @@
            by REFERENCE text-input,statusCode
            if statusCode equal "00"
                move userAccNum to dpAccNum
+               *>DISPLAY dpAccNum
                CALL '../SubFiles/bin/trxDeposit'
                USING REFERENCE dpAccNum statusCode
                perform deposit-page

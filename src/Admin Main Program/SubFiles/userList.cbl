@@ -138,7 +138,7 @@
            *> Read and display up to 10 records
            PERFORM VARYING WS-REC-COUNT FROM 1 BY 1
                    UNTIL WS-REC-COUNT > 5
-               READ UserAccounts
+               READ UserAccounts into UserRecord
                    AT END
                      DISPLAY "-- End of file reached --"
                      MOVE WS-PAGE TO WS-LAST-PAGE

@@ -38,7 +38,7 @@
 
        WORKING-STORAGE SECTION.
        01 WS-UID             PIC 9(5) VALUE ZERO.
-       01 WS-AMOUNT          PIC 9(10)V99 VALUE ZERO.
+       01 WS-AMOUNT          PIC s9(10)V99 VALUE ZERO.
        01 EOF-FLAG           PIC X VALUE 'N'.
        01 USER-FOUND         PIC X VALUE 'N'.
        01 TEMP-BALANCE       PIC s9(10)V99 VALUE ZERO.
@@ -151,9 +151,9 @@
            END-WRITE
            DISPLAY "================================================="
            DISPLAY ESC GREENX FUNCTION TRIM(WS-AMOUNT) WITH NO ADVANCING
-           DISPLAY " successfully withdrawn from account ID :"
+           DISPLAY " successfully withdrawn from account  :"
                WITH NO ADVANCING
-           DISPLAY ESC GREENX C-UID
+           DISPLAY ESC GREENX C-UAccNo
            DISPLAY ESC RESETX
            CLOSE TrxFile.
 
@@ -171,7 +171,7 @@
                    exit PROGRAM
            END-REWRITE
 
-           DISPLAY ESC GREENX "Balance updated for ID : " uId
+           DISPLAY ESC GREENX "Balance updated for Acc : " uaccno
            DISPLAY ESC RESETX
            CLOSE UserFile.
        END PROGRAM trxWithdraw.

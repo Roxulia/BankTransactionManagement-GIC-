@@ -23,8 +23,8 @@
 
        WORKING-STORAGE SECTION.
        01  WS-FS               PIC XX.
-       01  CurrentDate         PIC 9(8).
-       01  CurrentTime         PIC 9(6).
+       01  CurrentDate         PIC x(8).
+       01  CurrentTime         PIC x(6).
        01  Dup-Flag            PIC X VALUE 'N'.
        01  RPSW                PIC 9(6).
        01  PlainPassword       PIC X(20).
@@ -43,7 +43,7 @@
            05  ws-UEncPsw    PIC X(32).
            05  ws-UNrc       PIC X(30).
            05  ws-UAddress   PIC X(20).
-           05  ws-UPh        PIC X(9).
+           05  ws-UPh        PIC X(11).
            05  ws-Balance    PIC 9(10)V99.
            05  ws-TrxCount   PIC 9(5).
            05  ws-UDate      PIC 9(8).
@@ -73,7 +73,7 @@
                DISPLAY esc resetx
                exit PROGRAM
            end-if
-           move temp-nrc to UNrc
+           move temp-nrc to unrc
            PERFORM Prompt-Box
            PERFORM ValidCheck-IniPsw
            PERFORM Generate-Login
@@ -226,6 +226,8 @@
            move FUNCTION CURRENT-DATE(9:6) to CurrentTime
            MOVE    CurrentDate     TO      UDate
            MOVE    CurrentTime     TO      UTime
+           DISPLAY CurrentDate " " UDate
+           DISPLAY CurrentTime " " UTime
       *     DISPLAY UserRecord
            OPEN I-O UserFile
            WRITE UserRecord

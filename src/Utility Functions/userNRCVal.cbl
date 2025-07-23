@@ -27,7 +27,7 @@
        01  nrc_code pic xx.
        01  nrc_city pic x(10).
        01  nrc_number pic x(6).
-       01  text-input  pic x(16).
+       01  text-input  pic x(20).
        01  nrc_status pic x.
        01  ws-status1 pic xx.
        01  ws-status2 pic xx.
