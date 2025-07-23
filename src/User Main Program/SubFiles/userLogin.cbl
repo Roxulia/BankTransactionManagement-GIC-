@@ -1,7 +1,7 @@
       ******************************************************************
-      * Author:
-      * Date:
-      * Purpose:
+      * Author: Nyan Ye Thu
+      * Date:   7/7/2025
+      * Purpose: User can login to Bank system.
       * Tectonics: cobc
       ******************************************************************
        IDENTIFICATION DIVISION.

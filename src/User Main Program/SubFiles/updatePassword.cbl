@@ -20,16 +20,7 @@
        FILE SECTION.
        FD UserFile.
        01 UserRecord.
-           05 UID         PIC 9(5).
-           05 UName       PIC X(20).
-           05 ULoginName  PIC X(25).
-           05 UEncPsw     PIC X(32).
-           05 UAddress    PIC X(20).
-           05 Phone       PIC X(9).
-           05 Balance     PIC 9(10)V99.
-           05 TrxCount    pic 9(5).
-           05 UDate       PIC 9(8).
-           05 UTime       PIC 9(6).
+           COPY "../../Utility Functions/userFile.cpy".
 
        WORKING-STORAGE SECTION.
        01  WS-FS         PIC XX.
@@ -44,7 +35,7 @@
        01 EOF-FLAG       PIC X VALUE 'N'.
        01 StatusCode     PIC XX VALUE "00".
        LINKAGE SECTION.
-       01 LS-UserID      PIC 9(5).
+       01  LS-UserID      PIC 9(5).
        01  LNK-Status        PIC XX.
 
        PROCEDURE DIVISION USING LS-UserID,LNK-Status.
