@@ -37,7 +37,7 @@
        WORKING-STORAGE SECTION.
        01  WS-SenderID     PIC 9(5) VALUE ZERO.
        01  WS-ReceiverAcc  PIC 9(16) VALUE ZERO.
-       01  WS-Amount       PIC 9(10)V99 VALUE ZERO.
+       01  WS-Amount       PIC s9(10)V99 VALUE ZERO.
        01  TEMP-BALANCE    pic s9(10)v99.
        01  EOF-FLAG          PIC X VALUE 'N'.
        01  SENDER-FOUND      PIC X VALUE 'N'.
@@ -138,7 +138,7 @@
            using by REFERENCE WS-ReceiverAcc,RECEIVER-RECORD,statusCode
 
            if statusCode not EQUAL "00"
-               display esc redx "FILE ERROR" esc resetx
+               display esc redx "USER CAN'T BE FOUND" esc resetx
                exit PROGRAM
            end-if
            .
@@ -154,7 +154,12 @@
            end-if.
 
        validate_amount.
+           if WS-Amount < 0
+               DISPLAY esc redx "Invalid Amount" esc resetx
+               exit PROGRAM
+           END-IF
            compute TEMP-BALANCE = u-Balance - WS-AMOUNT
+
            if TEMP-BALANCE < minaccountbalance
                display esc redx"Ur Minimum Account Balance Reached"
                DISPLAY esc resetx
@@ -192,7 +197,7 @@
                    CLOSE USERACCOUNTS
                    exit PROGRAM
            END-REWRITE
-           DISPLAY ESC GREENX "Balance updated for ID : " uId
+           DISPLAY ESC GREENX "Balance updated for Acc : " uaccno
            DISPLAY ESC RESETX
            move RECEIVER-RECORD to USERDATA
            close USERACCOUNTS
@@ -207,7 +212,7 @@
                    CLOSE USERACCOUNTS
                    exit PROGRAM
            END-REWRITE
-           DISPLAY ESC GREENX "Balance updated for ID : " uId
+           DISPLAY ESC GREENX "Balance updated for Acc : " uaccno
            DISPLAY ESC RESETX
            CLOSE USERACCOUNTS.
 

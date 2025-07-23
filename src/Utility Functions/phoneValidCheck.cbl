@@ -21,7 +21,7 @@
        77  VALID-PHONE      PIC X VALUE 'N'.
 
        LINKAGE SECTION.
-       01  UPh              PIC X(20).
+       01  UPh              PIC X(11).
 
        PROCEDURE DIVISION USING UPh.
            MOVE 'N' TO VALID-PHONE
@@ -39,7 +39,7 @@
                    UNTIL I > LENGTH OF RAW-PHONE-IN
                    IF RAW-PHONE-IN(I:1) IS NUMERIC
                        ADD 1 TO DIGIT-COUNT
-                       MOVE RAW-PHONE-IN(I:1) TO 
+                       MOVE RAW-PHONE-IN(I:1) TO
                            DIGITS-ONLY(DIGIT-COUNT:1)
                    END-IF
                END-PERFORM
@@ -54,8 +54,8 @@
                            MOVE DIGITS-ONLY TO UPh
                            MOVE 'Y' TO VALID-PHONE
                        ELSE
-                           DISPLAY ESC REDX 
-                           DISPLAY">> ERROR: phone number invalid" 
+                           DISPLAY ESC REDX
+                           DISPLAY">> ERROR: phone number invalid"
                            DISPLAY ESC RESETX
                        END-IF
                    ELSE
@@ -63,8 +63,8 @@
                            MOVE DIGITS-ONLY TO UPh
                            MOVE 'Y' TO VALID-PHONE
                        ELSE
-                           DISPLAY ESC REDX 
-                           DISPLAY">> ERROR: phone number invalid" 
+                           DISPLAY ESC REDX
+                           DISPLAY">> ERROR: phone number invalid"
                            DISPLAY ESC RESETX
                        END-IF
                    END-IF
