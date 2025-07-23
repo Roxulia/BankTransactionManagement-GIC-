@@ -15,16 +15,7 @@
        FILE SECTION.
        FD UserFile.
        01 userdata.
-           05 UID           PIC 9(5).
-           05 UName         PIC X(20).
-           05 ULoginName    PIC X(25).
-           05 UEncPsw       PIC X(32).
-           05 UAddress      PIC X(20).
-           05 Phone         PIC x(9).
-           05 Balance       PIC 9(10)V99.
-           05 trxCount      pic 9(5).
-           05 UDate         PIC 9(8).
-           05 UTime         PIC 9(6).
+          COPY "../../Utility Functions/userFile.cpy".
 
        WORKING-STORAGE SECTION.
        01 WS-UID            PIC 9(5).
@@ -54,7 +45,7 @@
                            MOVE "Y" TO WS-FOUND
                            DISPLAY "-----------------------------------"
                            DISPLAY "User Name : " UName
-                           DISPLAY "Phone     : " Phone
+                           DISPLAY "Phone     : " UPH
                            DISPLAY "Balance   : " Balance
                            DISPLAY "-----------------------------------"
                            MOVE "Y" TO END-FILE
