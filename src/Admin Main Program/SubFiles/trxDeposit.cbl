@@ -14,7 +14,7 @@
            SELECT UserFile ASSIGN TO '../../../data/UserAccounts.dat'
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
-               RECORD KEY IS UAccNo
+               RECORD KEY IS Uid
                FILE STATUS IS WS-FS.
 
            SELECT TrxFile ASSIGN TO '../../../data/Transactions.dat'
@@ -42,6 +42,7 @@
        01  WS-FS               PIC XX.
        01  depoAmo             PIC 9(10).
        01  depoStr             PIC X(10).
+       01  text-input          pic x(20).
 
        01  CurrentDate         PIC 9(6).
        01  CurrentTime         PIC 9(6).
@@ -51,6 +52,7 @@
        01  depoDsp             PIC Z(10).
 
        01  tempInput           PIC X(10).
+       01  statusCode          pic xx.
 
 
        COPY "../../Utility Functions/trxConstants.cpy".
@@ -89,15 +91,16 @@
        *>>>>> Finding the desired user record in the UserFile <<<<<<<<<*
        RECORD-POINTER.
 
-           OPEN I-O UserFile
-           MOVE AccNo TO UAccNo
-           READ UserFile KEY IS UAccNo
-               INVALID KEY
-                   DISPLAY ESC REDX "[ERROR] User not found." ESC RESETX
-                   MOVE 44 TO optStatus
-                   CLOSE UserFile
+           call '../../Utility Functions/bin/getUserByAccNumber'
+           using by REFERENCE AccNo UserRecord statusCode
+           EVALUATE statusCode
+               when EQUAL "99"
+                   DISPLAY "FILE ERROR"
                    GOBACK
-           END-READ.
+               when EQUAL "96"
+                   DISPLAY "USER NOT FOUND"
+                   GOBACK
+           END-EVALUATE.
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
        *>>>>> TrxID generator to get a unique ID every transaction <<<<*
@@ -108,7 +111,7 @@
            STRING
                TrxCount DELIMITED BY SIZE
                WS-TrxDepoPrefix DELIMITED BY SIZE
-               AccNo DELIMITED BY SIZE
+               UId DELIMITED BY SIZE
                INTO TrxID
            END-STRING
 
@@ -134,11 +137,21 @@
                    CLOSE UserFile
                    GOBACK
                END-IF
+               INITIALIZE text-input
+               move depoStr to text-input
+               call '../../Utility Functions/bin/numberCheck'
+               using by REFERENCE text-input statusCode
+               if statusCode not EQUAL "00"
+                   DISPLAY "Invalid Amount"
+                   CLOSE UserFile
+                   GOBACK
+               END-IF
                MOVE FUNCTION NUMVAL(depoStr) TO depoAmo
                IF depoAmo < minAmoDepo OR depoAmo > maxAmoDepo
                    DISPLAY ESC REDX "Amount out of allowed range."
                    DISPLAY ESC RESETX
                END-IF
+
            END-PERFORM
            MOVE depoAmo TO depoDsp.
 

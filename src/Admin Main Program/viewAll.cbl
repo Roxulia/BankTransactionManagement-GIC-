@@ -84,7 +84,7 @@
                at end
                    move 'y' to eof
                not at end
-                   DISPLAY UNRc
+                   DISPLAY UserRecord
                END-READ
            END-PERFORM
            close UserAccounts

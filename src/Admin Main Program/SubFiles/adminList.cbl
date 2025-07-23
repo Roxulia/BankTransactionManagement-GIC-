@@ -139,7 +139,7 @@
                      MOVE AID TO WS-AID
                      MOVE AName TO WS-AName
                      MOVE ALoginName TO WS-ALoginName
-                     MOVE ARole TO WS-ARole
+                     MOVE Role TO WS-ARole
                      DISPLAY WS-DISPLAY-LINE
                END-READ
            END-PERFORM

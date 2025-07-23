@@ -31,6 +31,7 @@
        COPY "../../Utility Functions/colorCodes.cpy".
 
        01  WS-FS               PIC XX.
+       01  statusCode          PIC xx.
        01  Dup-Flag            PIC X VALUE 'N'.
        01  RPSW                PIC 9(6).
        01  PlainPassword       PIC X(20).
