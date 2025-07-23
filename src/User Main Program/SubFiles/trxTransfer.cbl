@@ -59,6 +59,7 @@
            05 U-LoginName PIC X(25).
            05 U-UAccNo    PIC 9(16).
            05 U-EncPsw    PIC X(32).
+           05 U-Unrc      PIC X(30).
            05 U-ADDRESS   PIC X(20).
            05 U-PHONE     PIC x(9).
            05 U-BALANCE   PIC 9(10)V99.
@@ -69,8 +70,10 @@
        01  RECEIVER-RECORD.
            05 R-UID        PIC 9(5).
            05 R-NAME       PIC X(20).
+           05 R-LoginName PIC X(25).
            05 R-UAccNo     PIC 9(16).
            05 R-EncPsw     PIC X(32).
+           05 R-UNRC       PIC X(30).
            05 R-ADDRESS    PIC X(20).
            05 R-PHONE      PIC x(9).
            05 R-BALANCE    PIC 9(10)V99.
