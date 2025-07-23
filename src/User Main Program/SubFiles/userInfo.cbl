@@ -19,16 +19,7 @@
        01  ws-fs pic x(2).
        01  statuscode pic xx.
        01  UserRecord.
-           05  UID        PIC 9(5).
-           05  UName      PIC X(20).
-           05  ULoginName PIC X(25).
-           05  UEncPsw    PIC X(32).
-           05  UAddress   PIC X(20).
-           05  UPh        PIC x(9).
-           05  Balance    PIC 9(10)V99.
-           05  TrxCount   PIC 9(5).
-           05  UDate      PIC 9(8).
-           05  UTime      PIC 9(6).
+          COPY "../../Utility Functions/userFile.cpy".
 
        copy '../../Utility Functions/colorCodes.cpy'.
        linkage SECTION.
