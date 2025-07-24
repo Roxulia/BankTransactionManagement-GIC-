@@ -65,7 +65,7 @@
            if WS-CURR-DAy = payday *>and WS-CURR-TIME = paytime
                perform interest-add
            ELSE
-               DISPLAY WS-CURR-DAY " " WS-CURR-TIME
+               DISPLAY WS-CURR-DAY " " payday
            end-if
            stop run
            .
