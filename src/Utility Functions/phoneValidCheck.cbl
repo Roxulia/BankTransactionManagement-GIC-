@@ -29,7 +29,10 @@
                DISPLAY "==========================================="
                DISPLAY "=  Enter new Phone Number: "
                ACCEPT RAW-PHONE-IN
-
+               if Raw-phone-in EQUAL "exit" or raw-phone-in = "EXIT"
+                   move "EXIT" to UPh
+                   exit PROGRAM
+               END-IF
                *> Strip non-digits
                MOVE SPACES TO DIGITS-ONLY
                MOVE FUNCTION TRIM(RAW-PHONE-IN) TO RAW-PHONE-IN

@@ -133,7 +133,11 @@
        Prompt-NRC.
 
            CALL '../../Utility Functions/bin/userNRCVal'
-               USING BY REFERENCE temp-nrc.
+               USING BY REFERENCE temp-nrc
+           if temp-nrc EQUAL "EXIT"
+               DISPLAY esc redx"Going Back to Mainmenu" esc resetx
+               exit PROGRAM
+           END-IF.
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
        *>Prompt display for user input
@@ -164,6 +168,10 @@
 
            CALL '../../Utility Functions/bin/phoneValidCheck'
            USING BY REFERENCE UPh
+           if Uph EQUAL "EXIT"
+               DISPLAY esc redx "Going back to Mainmenu" esc resetx
+               exit PROGRAM
+           END-IF
 
            *>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*
            *>Generate random initial password
