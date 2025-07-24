@@ -71,6 +71,10 @@
 
             DISPLAY "Enter NRC : "
             ACCEPT ws-nrc-string
+            if ws-nrc-string EQUAL "EXIT" or ws-nrc-string = "exit"
+                move "EXIT" to nrc-string
+                exit PROGRAM
+           END-IF
             inspect ws-nrc-string tallying slash for all "/"
             inspect ws-nrc-string TALLYING paren1 for all "("
             if slash not equal 1
