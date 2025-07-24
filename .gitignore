@@ -1,1 +1,6 @@
 *.exe
+*.dll
+UserAccounts.dat
+Transactions.dat
+src/Admin Main Program/bin/AMain.exe
+src/Admin Main Program/SubFiles/bin/userList.dll
