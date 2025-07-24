@@ -40,7 +40,7 @@
        COPY "../../Utility Functions/colorCodes.cpy".
 
        01  WS-FS               PIC XX.
-       01  depoAmo             PIC 9(10).
+       01  depoAmo             PIC s9(10)v99.
        01  depoStr             PIC X(10).
        01  text-input          pic x(20).
 
@@ -199,6 +199,7 @@
        BALANCE-UPDATE.
 
            ADD depoAmo TO Balance
+           DISPLAY balance
            open i-o UserFile
            DISPLAY "================================================="
            REWRITE UserRecord

@@ -61,8 +61,8 @@
            05 U-EncPsw    PIC X(32).
            05 U-Unrc      PIC X(30).
            05 U-ADDRESS   PIC X(20).
-           05 U-PHONE     PIC x(9).
-           05 U-BALANCE   PIC 9(10)V99.
+           05 U-PHONE     PIC x(11).
+           05 U-BALANCE   PIC s9(10)V99.
            05 U-TrxCount  PIC 9(5).
            05 U-DATE      PIC 9(8).
            05 U-TIME      PIC 9(6).
@@ -75,8 +75,8 @@
            05 R-EncPsw     PIC X(32).
            05 R-UNRC       PIC X(30).
            05 R-ADDRESS    PIC X(20).
-           05 R-PHONE      PIC x(9).
-           05 R-BALANCE    PIC 9(10)V99.
+           05 R-PHONE      PIC x(11).
+           05 R-BALANCE    PIC s9(10)V99.
            05 R-TrxCount   PIC 9(5).
            05 R-DATE       PIC 9(8).
            05 R-TIME       PIC 9(6).
@@ -94,6 +94,7 @@
 
        MAIN-PROCEDURE.
             initialize WS-Amount
+            INITIALIZE TEMP-BALANCE
             initialize WS-ReceiverAcc
             INITIALIZE WS-SenderID
             MOVE LS-SenderID TO WS-SenderID

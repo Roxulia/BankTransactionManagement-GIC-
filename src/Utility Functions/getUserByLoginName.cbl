@@ -50,7 +50,7 @@
            05 RET-UNRC     PIC x(30).
            05 RET-UAddress PIC X(20).
            05 RET-UPhone PIC x(11).
-           05 RET-UBalance PIC 9(10)V99.
+           05 RET-UBalance PIC s9(10)V99.
            05 RET-TrxCount PIC 9(5).
            05 RET-UDate PIC 9(8).
            05 RET-UTime PIC 9(6).
