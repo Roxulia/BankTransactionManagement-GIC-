@@ -199,6 +199,7 @@
        BALANCE-UPDATE.
 
            ADD depoAmo TO Balance
+           open i-o UserFile
            DISPLAY "================================================="
            REWRITE UserRecord
                INVALID KEY
