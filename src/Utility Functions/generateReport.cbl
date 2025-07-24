@@ -8,6 +8,7 @@
                ORGANIZATION IS INDEXED
                ACCESS MODE IS DYNAMIC
                RECORD KEY IS TrxID
+               ALTERNATE RECORD KEY IS TimeStamp WITH DUPLICATES
                FILE STATUS IS WS-FS.
      **     SELECT TRANSACTIONS ASSIGN TO "C:\Users\W24016\Desktop
       *     \BankTransactionManagement-GIC-hsy\src\Utility Functions\Transactions.dat"
@@ -70,35 +71,63 @@
            DISPLAY "-----------------------------------------------"
                    "-----------------------------------------------"
 
+                  *>––– prime the file pointer at the lowest timestamp
+           MOVE ZEROS     TO TimeStamp
+           READ TrxFile
+             AT END
+               MOVE "Y" TO END-FILE
+             NOT AT END
+               *> handle the very first record
+               MOVE SPACES         TO TYPE-NAME
+               MOVE ZEROS          TO WITHDRAW-AMT
+               MOVE ZEROS          TO DEPOSIT-AMT
+
+               IF SenderAcc = UAccNo
+                   MOVE TimeStamp TO DISPLAY-TIME
+                   MOVE Amount    TO WITHDRAW-AMT
+                   ADD Amount     TO withdraw
+                   DISPLAY DISPLAY-TIME
+                           "  " WITHDRAW-AMT "  " DEPOSIT-AMT
+                           "  " Description
+               ELSE IF ReceiverAcc = UAccNo
+                   MOVE TimeStamp TO DISPLAY-TIME
+                   MOVE Amount    TO DEPOSIT-AMT
+                   ADD Amount     TO deposit
+                   DISPLAY DISPLAY-TIME
+                           "  " WITHDRAW-AMT "  " DEPOSIT-AMT
+                           "  " Description
+               END-IF
+           END-READ
+
+       *>––– now read each successive record in timestamp order
            PERFORM UNTIL END-FILE = "Y"
-               READ TrxFile into TrxRecord
-                   AT END
-                       MOVE "Y" TO END-FILE
-                   NOT AT END
-                       *>display TrxRecord
-                       MOVE SPACES TO TYPE-NAME
-                       MOVE zeroS TO WITHDRAW-AMT
-                       MOVE zeroS TO DEPOSIT-AMT
-                       IF SenderAcc = UAccNo
+             READ TrxFile
+               NEXT RECORD KEY TimeStamp
+               AT END
+                 MOVE "Y" TO END-FILE
+               NOT AT END
+                 MOVE SPACES         TO TYPE-NAME
+                 MOVE ZEROS          TO WITHDRAW-AMT
+                 MOVE ZEROS          TO DEPOSIT-AMT
 
-                           *>display TrxRecord
-                           MOVE TimeStamp TO DISPLAY-TIME
-                           MOVE Amount to WITHDRAW-AMT
-                           Add Amount to withdraw
-                           DISPLAY DISPLAY-TIME
-                                   "  " WITHDRAW-AMT "  " DEPOSIT-AMT
-                                   "  " Description
-                       else if ReceiverAcc = UAccNo
+                 IF SenderAcc = UAccNo
+                     MOVE TimeStamp TO DISPLAY-TIME
+                     MOVE Amount    TO WITHDRAW-AMT
+                     ADD Amount     TO withdraw
+                     DISPLAY DISPLAY-TIME
+                             "  " WITHDRAW-AMT "  " DEPOSIT-AMT
+                             "  " Description
+                 ELSE IF ReceiverAcc = UAccNo
+                     MOVE TimeStamp TO DISPLAY-TIME
+                     MOVE Amount    TO DEPOSIT-AMT
+                     ADD Amount     TO deposit
+                     DISPLAY DISPLAY-TIME
+                             "  " WITHDRAW-AMT "  " DEPOSIT-AMT
+                             "  " Description
+                 END-IF
+             END-READ
+           END-PERFORM
 
-                           MOVE TimeStamp TO DISPLAY-TIME
-                           MOVE Amount to deposit-AMT
-                           Add Amount to deposit
-                           DISPLAY DISPLAY-TIME
-                                   "  " WITHDRAW-AMT "  " DEPOSIT-AMT
-                                   "  " Description
-                       END-IF
-               END-READ
-           END-PERFORM.
            compute BALANCE = DEPOSIT - WITHDRAW
            move BALANCE to format-balance
            DISPLAY "-----------------------------------------------"
