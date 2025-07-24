@@ -35,10 +35,12 @@
        77  WS-LAST-PAGE  PIC 9(3) VALUE 0.
 
        01  WS-DISPLAY-LINE.
-           05 WS-AID     PIC X(5).
-           05 WS-AName   PIC X(20).
+           05 WS-AID        PIC 9(5).
+           05 WS-AName      PIC X(20).
            05 WS-ALoginName PIC X(25).
-           05 WS-ARole   PIC 9(1).
+           05 WS-ARole      PIC X(8).
+
+       copy '../../Utility Functions/colorCodes.cpy'.
 
        PROCEDURE DIVISION.
        MAIN-LOGIC.
@@ -53,19 +55,34 @@
 
       *-------------------------------------------------------------------*
        MENU-LOOP.
-           DISPLAY "---------------------------------------------"
+           DISPLAY COLOR-BLUE
+                   "---------------------------------------------------"
+                   "---------------------------------------------------"
+                   ESC RESETX
            if ws-page = 1 and ws-eof = 'Y'
            DISPLAY "Options:                            3=Exit"
-           DISPLAY "--------------------------------------------------"
+           DISPLAY COLOR-BLUE
+                   "---------------------------------------------------"
+                   "---------------------------------------------------"
+                   ESC RESETX
            else if ws-eof = 'N' and ws-page = 1
            DISPLAY "Options:               2=Next Page, 3=Exit"
-           DISPLAY "--------------------------------------------------"
+           DISPLAY COLOR-BLUE
+                   "---------------------------------------------------"
+                   "---------------------------------------------------"
+                   ESC RESETX
            else if ws-eof = 'N' and ws-page not EQUAL 1
            DISPLAY "Options:  1=Prev Page, 2=Next Page, 3=Exit"
-           DISPLAY "--------------------------------------------------"
+           DISPLAY COLOR-BLUE
+                   "---------------------------------------------------"
+                   "---------------------------------------------------"
+                   ESC RESETX
            else if ws-eof = 'Y' and ws-page not EQUAL 1
            DISPLAY "Options:  1=Prev Page,            , 3=Exit"
-           DISPLAY "--------------------------------------------------"
+           DISPLAY COLOR-BLUE
+                   "---------------------------------------------------"
+                   "---------------------------------------------------"
+                   ESC RESETX
            end-if
            END-IF
            END-IF
@@ -116,31 +133,57 @@
            END-PERFORM
 
            *> Display header
-           DISPLAY "***************************************************"
-           STRING  " Page " WS-PAGE " "
+           DISPLAY COLOR-BLUE
+                   "---------------------------------------------------"
+                   "---------------------------------------------------"
+                   ESC RESETX
+           STRING  " Page " ESC GREENX WS-PAGE ESC RESETX" "
              DELIMITED BY SIZE
              INTO WS-TEXT
            END-STRING
            DISPLAY WS-TEXT
-           DISPLAY "***************************************************"
-           DISPLAY "AID   AName              AdminLoginName       Role"
-           DISPLAY "---------------------------------------------------"
+           DISPLAY COLOR-BLUE
+                   "---------------------------------------------------"
+                   "---------------------------------------------------"
+                   ESC RESETX
+           DISPLAY "AID   AName                AdminLoginName          "
+                   " Role"
+           DISPLAY COLOR-BLUE
+                   "---------------------------------------------------"
+                   "---------------------------------------------------"
+                   ESC RESETX
 
            *> Read and display up to 4 records
            PERFORM VARYING WS-REC-COUNT FROM 1 BY 1
                    UNTIL WS-REC-COUNT > 5
                READ AdminAccounts
                    AT END
-                     DISPLAY "-- End of file reached --"
+                     DISPLAY ESC REDX
+                     DISPLAY "-------------------------------"
+                             "\\-- End of file reached --//"
+                             "--------------------------------"
+                             ESC RESETX
                      MOVE WS-PAGE TO WS-LAST-PAGE
                      MOVE 'Y' TO WS-EOF
                      EXIT PERFORM
                    NOT AT END
+
+                     EVALUATE Role
+                       WHEN EQUAL 1
+                         MOVE 'Manager' TO WS-ARole
+                       WHEN EQUAL 2
+                         MOVE 'Admin' TO WS-ARole
+                       WHEN OTHER
+                         MOVE 'Unknown' TO WS-ARole
+                     END-EVALUATE
+
                      MOVE AID TO WS-AID
                      MOVE AName TO WS-AName
                      MOVE ALoginName TO WS-ALoginName
-                     MOVE Role TO WS-ARole
-                     DISPLAY WS-DISPLAY-LINE
+
+
+                     DISPLAY WS-AID" "color-pink WS-AName ESC RESETX
+                             WS-ALoginName WS-ARole
                END-READ
            END-PERFORM
            perform MENU-LOOP
