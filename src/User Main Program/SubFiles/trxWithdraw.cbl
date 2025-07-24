@@ -54,8 +54,8 @@
            05  c-UEncPsw    PIC X(32).
            05  c-UNrc       PIC X(30).
            05  c-UAddress   PIC X(20).
-           05  c-UPh        PIC X(9).
-           05  c-Balance    PIC 9(10)V99.
+           05  c-UPh        PIC X(11).
+           05  c-Balance    PIC s9(10)V99.
            05  c-TrxCount   PIC 9(5).
            05  c-UDate      PIC 9(8).
            05  c-UTime      PIC 9(6).
@@ -71,6 +71,7 @@
        MAIN-PROCEDURE.
            INITIALIZE WS-UID
            INITIALIZE WS-AMOUNT
+           INITIALIZE TEMP-BALANCE
            MOVE LS-UID TO WS-UID
 
            call '../../Utility Functions/bin/getUserByID'
@@ -92,7 +93,10 @@
        withdraw_process.
            DISPLAY "Enter Withdrawal Amount:"
            ACCEPT WS-AMOUNT
-           compute TEMP-BALANCE = c-Balance - WS-AMOUNT
+           DISPLAY c-Balance
+           move c-Balance to TEMP-BALANCE
+           DISPLAY TEMP-BALANCE
+           compute TEMP-BALANCE = TEMP-BALANCE - WS-AMOUNT
            if TEMP-BALANCE < minaccountbalance
                display esc redx"Ur Minimum Account Balance Reached "
                esc resetx

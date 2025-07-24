@@ -44,7 +44,7 @@
            05  ws-UNrc       PIC X(30).
            05  ws-UAddress   PIC X(20).
            05  ws-UPh        PIC X(11).
-           05  ws-Balance    PIC 9(10)V99.
+           05  ws-Balance    PIC s9(10)V99.
            05  ws-TrxCount   PIC 9(5).
            05  ws-UDate      PIC 9(8).
            05  ws-UTime      PIC 9(6).
@@ -220,7 +220,7 @@
        *>Writing a new record to user file
        Write-Record.
 
-           MOVE    0               TO      Balance
+           MOVE    zero               TO      Balance
            MOVE    0               TO      TrxCount
            move FUNCTION CURRENT-DATE(1:8) to CurrentDate
            move FUNCTION CURRENT-DATE(9:6) to CurrentTime
