@@ -46,7 +46,7 @@
 
        home-page.
            DISPLAY color-blue
-           DISPLAY "=======Welcome " adminName "======="
+           DISPLAY "=======Welcome " FUNCTION TRIM(adminName) "======="
            DISPLAY SPACE
            if adminRole = 1 THEN
                DISPLAY "=======Choose Options======="
@@ -116,7 +116,7 @@
            DISPLAY "=============================="
            display "=============================="
            DISPLAY "=           NOTE:            ="
-           display "=    U can enter user ID     ="
+           display "=  U can enter user Acc Num  ="
            DISPLAY "=            OR              ="
            DISPLAY "=    'EXIT' to go back       ="
            DISPLAY "=============================="

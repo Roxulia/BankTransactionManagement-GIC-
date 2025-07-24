@@ -39,6 +39,10 @@
            05 WS-PHONE   PIC X(12).
            05 ws-Uaccno  Pic 9(16).
            05 ws-trxcount pic 9(5).
+
+       *>For display colors
+       copy '../../Utility Functions/colorCodes.cpy'.
+
        PROCEDURE DIVISION.
        MAIN-LOGIC.
            move 1 to  ws-page
@@ -53,25 +57,45 @@
 
       *-------------------------------------------------------------------*
        MENU-LOOP.
-           DISPLAY "--------------------------------------------------"
+           DISPLAY COLOR-BLUE
+           DISPLAY "---------------------------------------------------"
+                   "---------------------------------------------------"
+           DISPLAY ESC RESETX
            if ws-page = 1 and ws-eof = 'Y'
            DISPLAY "Options:                            3=Exit"
-           DISPLAY "--------------------------------------------------"
+           DISPLAY COLOR-BLUE
+           DISPLAY "---------------------------------------------------"
+                   "---------------------------------------------------"
+           DISPLAY ESC RESETX
            else
                if ws-eof = 'N' and ws-page = 1
            DISPLAY "Options:               2=Next Page, 3=Exit"
-           DISPLAY "--------------------------------------------------"
+
+           DISPLAY COLOR-BLUE
+           DISPLAY "---------------------------------------------------"
+                   "---------------------------------------------------"
+           DISPLAY ESC RESETX
            else
                if ws-eof = 'N' and ws-page not EQUAL 1
            DISPLAY "Options:  1=Prev Page, 2=Next Page, 3=Exit"
-           DISPLAY "--------------------------------------------------"
+
+           DISPLAY COLOR-BLUE
+           DISPLAY "---------------------------------------------------"
+                   "---------------------------------------------------"
+           DISPLAY ESC RESETX
            else
                if ws-eof = 'Y' and ws-page not EQUAL 1
            DISPLAY "Options:  1=Prev Page,            , 3=Exit"
-           DISPLAY "--------------------------------------------------"
+           DISPLAY COLOR-BLUE
+           DISPLAY "---------------------------------------------------"
+                   "---------------------------------------------------"
+           DISPLAY ESC RESETX
            ELSE
            DISPLAY "Options:  1=Prev Page, 2=Next Page, 3=Exit"
-           DISPLAY "--------------------------------------------------"
+           DISPLAY COLOR-BLUE
+           DISPLAY "---------------------------------------------------"
+                   "---------------------------------------------------"
+           DISPLAY ESC RESETX
            end-if
            END-IF
            END-IF
@@ -123,24 +147,34 @@
            END-PERFORM
 
            *> Display header
+           DISPLAY COLOR-BLUE
            DISPLAY "***************************************************"
-           STRING  " Page " WS-PAGE " "
+                   "***************************************************"
+           DISPLAY ESC RESETX
+           STRING  " Page "ESC GREENX WS-PAGE ESC RESETX " "
              DELIMITED BY SIZE
              INTO WS-TEXT
            END-STRING
            DISPLAY WS-TEXT
+           DISPLAY COLOR-BLUE
            DISPLAY "***************************************************"
                    "***************************************************"
-           DISPLAY "UID   UName              Address              Phone"
-                   "       Account Number             Transaction Count"
+           DISPLAY ESC RESETX
+           DISPLAY "UID    UName              Address             Phone"
+                   "          Account Number         Transaction Count "
+           DISPLAY COLOR-BLUE
            DISPLAY "---------------------------------------------------"
                    "---------------------------------------------------"
+           DISPLAY ESC RESETX
            *> Read and display up to 10 records
            PERFORM VARYING WS-REC-COUNT FROM 1 BY 1
                    UNTIL WS-REC-COUNT > 5
                READ UserAccounts into UserRecord
                    AT END
-                     DISPLAY "-- End of file reached --"
+                     DISPLAY ESC REDX
+                     DISPLAY "-----------------------------"
+                     DISPLAY "\\-- End of file reached --//"
+                     DISPLAY ESC RESETX
                      MOVE WS-PAGE TO WS-LAST-PAGE
                      MOVE 'Y' TO WS-EOF
                      EXIT PERFORM
@@ -151,7 +185,8 @@
                      MOVE uph TO WS-PHONE
                      move uaccno to ws-Uaccno
                      move trxcount to ws-trxcount
-                     DISPLAY WS-DISPLAY-LINE
+                     DISPLAY WS-UID" "WS-UNAME WS-ADDRESS
+                             WS-PHONE"  "ws-Uaccno"       "ws-trxcount
                END-READ
            END-PERFORM
            perform MENU-LOOP.
