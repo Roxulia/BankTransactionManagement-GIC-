@@ -20,6 +20,7 @@
        01  statuscode pic xx.
        01  UserRecord.
           COPY "../../Utility Functions/userFile.cpy".
+       01 ws-balance pic zzzzzzzzz9.99 USAGE DISPLAY.
 
        copy '../../Utility Functions/colorCodes.cpy'.
        linkage SECTION.
@@ -46,8 +47,11 @@
                    DISPLAY "========User Profile Info========"
                    DISPLAY "UserName : " UName
                    DISPLAY "Address : " UAddress
+                   DISPLAY "Account No : " UAccno
                    DISPLAY "Phone : " UPh
-                   DISPLAY "Balance : " Balance
+                   DISPLAY "Balance : " WITH NO ADVANCING
+                   MOVE balance to ws-balance 
+                   DISPLAY  ws-balance 
                    DISPLAY "================================="
                    DISPLAY esc redx
                    DISPLAY "enter any key to exit : "

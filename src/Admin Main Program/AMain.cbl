@@ -152,7 +152,7 @@
                USING REFERENCE edit-id
                perform generate-report-page
            Else
-               DISPLAY esc REdx
+               DISPLAY esc REDx
                DISPLAY "Invalid Input Type"
                DISPLAY esc RESETx
                PERFORM generate-report-page

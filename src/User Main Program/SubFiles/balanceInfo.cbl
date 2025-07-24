@@ -22,6 +22,7 @@
        01 WS-FOUND          PIC X VALUE "N".
        01 END-FILE          PIC X VALUE "N".
        01  ws-fs pic x(2).
+       01 ws-balance pic zzzzzzzzz9.99 USAGE DISPLAY.
 
        linkage section.
        01  LS-UID pic 9(5).
@@ -45,8 +46,10 @@
                            MOVE "Y" TO WS-FOUND
                            DISPLAY "-----------------------------------"
                            DISPLAY "User Name : " UName
-                           DISPLAY "Phone     : " UPH
-                           DISPLAY "Balance   : " Balance
+                           DISPLAY "Account No     : " UAccno
+                           DISPLAY "Balance   : " WITH NO ADVANCING 
+                           MOVE balance to ws-balance 
+                           DISPLAY  ws-balance 
                            DISPLAY "-----------------------------------"
                            MOVE "Y" TO END-FILE
                        END-IF
