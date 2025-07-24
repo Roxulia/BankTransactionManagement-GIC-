@@ -6,7 +6,7 @@
                05  UNrc       PIC X(30).
                05  UAddress   PIC X(20).
                05  UPh        PIC X(11).
-               05  Balance    PIC 9(10)V99.
+               05  Balance    PIC s9(10)V99.
                05  TrxCount   PIC 9(5).
                05  UDate      PIC 9(8).
                05  UTime      PIC 9(6).

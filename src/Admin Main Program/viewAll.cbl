@@ -45,8 +45,8 @@
            05 UEncPsw     PIC X(32).
            05  UNRC       pic x(30).
            05 UAddress    PIC X(20).
-           05 Phone       PIC X(9).
-           05 Balance     PIC 9(10)V99.
+           05 Phone       PIC X(11).
+           05 Balance     PIC s9(10)V99.
            05 TrxCount    PIC 9(5).
            05 UDate       PIC 9(8).
            05 UTime       PIC 9(6).
