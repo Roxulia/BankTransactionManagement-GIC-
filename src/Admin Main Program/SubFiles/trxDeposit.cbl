@@ -95,10 +95,16 @@
            using by REFERENCE AccNo UserRecord statusCode
            EVALUATE statusCode
                when EQUAL "99"
-                   DISPLAY "FILE ERROR"
+                   display esc redx "!!!!!!!!!!!!!!"
+                   DISPLAY "! FILE ERROR !"
+                   DISPLAY "!!!!!!!!!!!!!!"
+                   DISPLAY esc resetx
                    GOBACK
                when EQUAL "96"
-                   DISPLAY "USER NOT FOUND"
+                   display esc redx "!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! User not found !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!"
+                   DISPLAY esc resetx
                    GOBACK
            END-EVALUATE.
 
@@ -142,13 +148,18 @@
                call '../../Utility Functions/bin/numberCheck'
                using by REFERENCE text-input statusCode
                if statusCode not EQUAL "00"
-                   DISPLAY "Invalid Amount"
+                   display esc redx "!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! Invalid Amount !"
+                   display "!!!!!!!!!!!!!!!!!!" esc resetx
                    CLOSE UserFile
                    GOBACK
                END-IF
                MOVE FUNCTION NUMVAL(depoStr) TO depoAmo
                IF depoAmo < minAmoDepo OR depoAmo > maxAmoDepo
-                   DISPLAY ESC REDX "Amount out of allowed range."
+                   DISPLAY ESC REDX
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   Display "! Amount out of allowed range !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                    DISPLAY ESC RESETX
                END-IF
 
@@ -180,7 +191,10 @@
            OPEN I-O TrxFile
            WRITE TransactionRecord
               INVALID KEY
-                   DISPLAY ESC REDX "Writing transaction failed."
+                   DISPLAY ESC REDX
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   Display "! Writing transaction failed !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                    DISPLAY ESC RESETX
                    MOVE 97 TO optStatus
                    CLOSE TrxFile
@@ -204,14 +218,20 @@
            DISPLAY "================================================="
            REWRITE UserRecord
                INVALID KEY
-                   DISPLAY ESC REDX "Updating user balance failed."
+                   DISPLAY ESC REDX
+                   display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   display "! Updating user balance failed !"
+                   display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                    DISPLAY ESC RESETX
                    MOVE 97 TO optStatus
                    CLOSE UserFile
                    GOBACK
            END-REWRITE
 
-           DISPLAY ESC GREENX "Balance updated for Account : "AccNo
+           DISPLAY ESC GREENX
+           display "*************************************************"
+           display "* Balance updated for Account : "AccNo" *"
+           display "*************************************************"
            DISPLAY ESC RESETX
            MOVE 00 TO optStatus
            CLOSE UserFile.

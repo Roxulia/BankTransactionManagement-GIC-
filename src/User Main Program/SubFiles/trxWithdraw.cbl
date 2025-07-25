@@ -79,10 +79,18 @@
 
            EVALUATE statusCode
                when equal "99"
-                   Display esc redx "Error in opening File" esc resetx
+                   DISPLAY esc redx
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! Error in Opening File   !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY esc resetx
                    exit program
                when equal "96"
-                   DISPLAY esc redx "User Not Found" esc resetx
+                   DISPLAY esc redx
+                   DISPLAY "!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! User Not Found !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!"
+                   DISPLAY esc resetx
                    exit PROGRAM
                when equal "00"
                    *>DISPLAY c-user
@@ -98,12 +106,19 @@
            DISPLAY TEMP-BALANCE
            compute TEMP-BALANCE = TEMP-BALANCE - WS-AMOUNT
            if TEMP-BALANCE < minaccountbalance
-               display esc redx"Ur Minimum Account Balance Reached "
-               esc resetx
+                   DISPLAY esc redx
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! Minimum balance limit reached !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY esc resetx
                exit PROGRAM
            else
                if WS-AMOUNT < minwithdraw or WS-AMOUNT > maxwithdraw
-                   DISPLAY esc redx"Invalid Withdraw Amount " esc resetx
+                   DISPLAY esc redx
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! Invalid Withdraw Amount !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY esc resetx
                    exit PROGRAM
                END-IF
            END-IF
@@ -119,7 +134,11 @@
            call '../../Utility Functions/bin/encryption'
            using by REFERENCE password enc_psw
            if enc_psw not equal c-UEncPsw
-               display esc redx "INVALID CREDENTIAL" esc resetx
+                   DISPLAY esc redx
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "!   Invalid Credentials   !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY esc resetx
                exit PROGRAM
            end-if.
 
@@ -148,7 +167,10 @@
            OPEN I-O TrxFile
            WRITE TransactionRecord
               INVALID KEY
-                   DISPLAY ESC REDX "Writing transaction failed."
+                   DISPLAY ESC REDX
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   Display "! Writing transaction failed !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                    DISPLAY ESC RESETX
                    CLOSE TrxFile
                    exit PROGRAM
@@ -169,13 +191,19 @@
            DISPLAY "================================================="
            REWRITE UserRecord
                INVALID KEY
-                   DISPLAY ESC REDX "Updating user balance failed."
+                   DISPLAY ESC REDX
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! Updating user balance failed !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                    DISPLAY ESC RESETX
                    CLOSE UserFile
                    exit PROGRAM
            END-REWRITE
 
-           DISPLAY ESC GREENX "Balance updated for Acc : " uaccno
+           DISPLAY ESC GREENX
+           DISPLAY "************************************************"
+           DISPLAY "* Balance updated for Acc : " uaccno " *"
+           DISPLAY "************************************************"
            DISPLAY ESC RESETX
            CLOSE UserFile.
        END PROGRAM trxWithdraw.

@@ -154,13 +154,17 @@
                perform generate-report-page
            Else
                DISPLAY esc REDx
-               DISPLAY "Invalid Input Type"
+               DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
+               DISPLAY "! Invalid Input Type  !"
+               DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
                DISPLAY esc RESETx
                PERFORM generate-report-page
            end-if
            END-PERFORM
-           DISPLAY esc redx
-           DISPLAY "Going Back To Main Screen..."
+           DISPLAY esc COLOR-pink
+           DISPLAY "++++++++++++++++++++++++++++++++"
+           DISPLAY "+ Going Back To Main Screen... +"
+            DISPLAY "+++++++++++++++++++++++++++++++"
            DISPLAY esc resetx
            perform home-page.
 
@@ -180,13 +184,17 @@
                perform deposit-page
            Else
                DISPLAY esc REDx
-               DISPLAY "Invalid Input Type"
+               DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
+               DISPLAY "! Invalid Input Type  !"
+               DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
                DISPLAY esc RESETx
                PERFORM deposit-page
            end-if
            END-PERFORM
-           DISPLAY esc redx
-           DISPLAY "Going Back To Main Screen..."
+           DISPLAY color-pink
+           DISPLAY "++++++++++++++++++++++++++++++++"
+           DISPLAY "+ Going Back To Main Screen... +"
+           DISPLAY "++++++++++++++++++++++++++++++++"
            DISPLAY esc resetx
            perform home-page.
 
@@ -201,17 +209,23 @@
                   EVALUATE statusCode
                    when equal "00"
                        DISPLAY esc GREENx
-                       DISPLAY "Updated Info for User"
+                       DISPLAY "*************************"
+                       DISPLAY "* Updated Info for User *"
+                       DISPLAY "*************************"
                        DISPLAY esc RESETx
                        perform update-info-page
                    when equal "96"
                        DISPLAY esc redx
-                       DISPLAY "NOT FOUND USER WITH NRC"
+                       DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                       DISPLAY "! NOT FOUND USER WITH NRC !"
+                       DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                        DISPLAY esc RESETx
                        perform update-info-page
                    when OTHER
                        DISPLAY ESC REDx
-                       DISPLAY "CANNOT PERFORM UPDATE PROCESS"
+                       DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                       DISPLAY "! CANNOT PERFORM UPDATE PROCESS !"
+                       DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                        DISPLAY esc RESETx
                        perform update-info-page
                    END-EVALUATE
@@ -234,28 +248,40 @@
                   EVALUATE statusCode
                    when equal "00"
                        DISPLAY esc GREENx
-                       DISPLAY "Updated Info for ID ("userid")"
+                       DISPLAY "**********************************"
+                       DISPLAY "* Updated Info for ID ("userid") *"
+                       DISPLAY "**********************************"
                        DISPLAY esc RESETx
                        perform update-info-page
                    when equal "96"
-                       DISPLAY esc GREENx
-                       DISPLAY "NOT FOUND ADMIN WITH ID ("userid")"
+                       DISPLAY esc REDX
+                       DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                       DISPLAY "! NOT FOUND ADMIN WITH ID ("userid") !"
+                       DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                        DISPLAY esc RESETx
                        perform update-info-page
                    when OTHER
                        DISPLAY esc REDx
-                       DISPLAY "CANNOT PERFORM UPDATE PROCESS"
+                       DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                       DISPLAY "! CANNOT PERFORM UPDATE PROCESS !"
+                       DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                        DISPLAY esc RESETx
                        perform update-info-page
                END-EVALUATE
                Else
                    DISPLAY esc REDx
-                   DISPLAY "Invalid Input Type"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! Invalid Input Type !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!"
                    DISPLAY esc RESETx
                    PERFORM update-info-page
                END-IF
                END-PERFORM
-               DISPLAY "Going Back To Main Screen"
+               DISPLAY color-pink
+               DISPLAY "+++++++++++++++++++++++++++++"
+               DISPLAY "+ Going Back To Main Screen +"
+               DISPLAY "+++++++++++++++++++++++++++++"
+               DISPLAY ESC RESETX
                perform home-page
            end-if
            end-if.
@@ -272,26 +298,40 @@
                            adminName , adminRole , statusCode
                        EVALUATE statusCode
                            when equal "00"
-                               display ESC GREENx"LOG IN SUCCESSFUL"
+                               display ESC GREENx
+                               DISPLAY "*********************"
+                               DISPLAY "* LOG IN SUCCESSFUL *"
+                               DISPLAY "*********************"
                                DISPLAY ESC RESETx
                                perform home-page
                            when equal "96"
-                               DISPLAY ESC REDx "ADMIN NOT FOUND!!"
+                               DISPLAY ESC REDx
+                               DISPLAY "!!!!!!!!!!!!!!!!!!!"
+                               DISPLAY "! ADMIN NOT FOUND !"
+                               DISPLAY "!!!!!!!!!!!!!!!!!!!"
                                DISPLAY esc RESETx
                                perform login-page
                            when equal "95"
-                               DISPLAY esc REDx"INVALID CREDENTIAL!"
+                               DISPLAY esc REDx
+                               DISPLAY "!!!!!!!!!!!!!!!!!!!!!!"
+                               DISPLAY "! INVALID CREDENTIAL !"
+                               DISPLAY "!!!!!!!!!!!!!!!!!!!!!!"
                                DISPLAY esc RESETx
                                perform login-page
                        END-EVALUATE
                    when OTHER
-                       DISPLAY esc REDx "INVALID OPTION CODE"
+                       DISPLAY esc REDx
+                       DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
+                       DISPLAY "! INVALID OPTION CODE !"
+                       DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
                        DISPLAY esc RESETx
                        perform login-page
                END-EVALUATE
            END-PERFORM
-           DISPLAY esc REDx
-           DISPLAY "Exitting the Program ...."
+           DISPLAY esc color-pink
+           DISPLAY "++++++++++++++++++++++++++++"
+           DISPLAY "+ Exitting the Program ... +"
+           DISPLAY "++++++++++++++++++++++++++++"
            DISPLAY esc RESETx
            stop run.
 
@@ -338,13 +378,17 @@
                        perform generate-report-page
                    when OTHER
                        display esc REDx
-                       display "INVALID OPTION CODE"
+                       DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
+                       display "! INVALID OPTION CODE !"
+                       DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
                        display esc RESETx
                        perform home-page
                END-EVALUATE
            END-PERFORM
-           DISPLAY esc REDx
-           display "Logging Out..."
+           DISPLAY color-pink
+           display "++++++++++++++++++"
+           display "+ Logging Out... +"
+           display "++++++++++++++++++"
            DISPLAY esc RESETx
            perform login-page.
        END PROGRAM AMain.

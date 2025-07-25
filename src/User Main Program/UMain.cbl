@@ -77,22 +77,30 @@
                        using by REFERENCE uid , username , STATUSCODE
                        EVALUATE STATUSCODE
                        when EQUAL "00"
-                           DISPLAY esc greenx "Login Successful..."
+
+                           DISPLAY esc greenx
+                           DISPLAY "***********************"
+                           DISPLAY "* Login Successful... *"
+                           DISPLAY "***********************"
                            DISPLAY esc resetx
                            PERFORM MAIN-MENU
                        when equal "95"
-                           DISPLAY esc redx"INVALID CREDENTIAL"
+                           DISPLAY esc redx
+                           DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
+                           DISPLAY "! Invalid Credentials !"
+                           DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
                            DISPLAY esc resetx
                            PERFORM login-page
                        when EQUAL "96"
 
-                           DISPLAY esc redx "USER NOT FOUND"
-                           DISPLAY esc resetx
+                           DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
+                           DISPLAY "!    User Not Found   !"
+                           DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
                            PERFORM login-page
                        when EQUAL "99"
-                           DISPLAY esc redx
-                           DISPLAY "ERROR OCCURS"
-                           DISPLAY esc resetx
+                           DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
+                           DISPLAY "!     Error Occurs    !"
+                           DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
                            PERFORM login-page
                        END-EVALUATE
                    when OTHER
@@ -103,7 +111,9 @@
                END-EVALUATE
            END-PERFORM
            DISPLAY esc redx
-           DISPLAY "Exitting the Program ...."
+           DISPLAY "==========================="
+           DISPLAY "= Exitting the Program ...."
+           DISPLAY "==========================="
            DISPLAY esc resetx
            stop run.
 
@@ -124,12 +134,16 @@
                             PERFORM MAIN-MENU
                         when EQUAL "95"
                            DISPLAY esc redx
-                           display "Invalid Credential"
+                           DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
+                           DISPLAY "! Invalid Credentials !"
+                           DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!"
                            DISPLAY esc resetx
                            perform MAIN-MENU
                         when EQUAL "99"
                            DISPLAY esc redx
-                           display "Error occurs in Updating password"
+                           DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                           display "!Error occurs in Updating password!"
+                           DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                            DISPLAY esc resetx
                            perform MAIN-MENU
                    END-EVALUATE
@@ -150,7 +164,9 @@
                    perform login-page
                WHEN OTHER
                    DISPLAY esc redx
-                   DISPLAY "Invalid Option. Try Again."
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! Invalid Option. Try Again !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                    DISPLAY esc resetx
            END-EVALUATE.
 
@@ -174,7 +190,11 @@
                    call '../SubFiles/bin/trxTransfer'
                    using by REFERENCE uid STATUSCODE
                WHEN OTHER
-                   DISPLAY "Invalid Option."
+                   DISPLAY esc redx
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! Invalid Option. Try Again !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY esc resetx
            END-EVALUATE.
        END-PARAGRAPH.
        end PROGRAM UMain.

@@ -24,6 +24,8 @@
        01  ws-fs pic x(2).
        01 ws-balance pic zzzzzzzzz9.99 USAGE DISPLAY.
 
+       COPY "../../Utility Functions/colorCodes.cpy".
+
        linkage section.
        01  LS-UID pic 9(5).
 
@@ -47,9 +49,9 @@
                            DISPLAY "-----------------------------------"
                            DISPLAY "User Name : " UName
                            DISPLAY "Account No     : " UAccno
-                           DISPLAY "Balance   : " WITH NO ADVANCING 
-                           MOVE balance to ws-balance 
-                           DISPLAY  ws-balance 
+                           DISPLAY "Balance   : " WITH NO ADVANCING
+                           MOVE balance to ws-balance
+                           DISPLAY  ws-balance
                            DISPLAY "-----------------------------------"
                            MOVE "Y" TO END-FILE
                        END-IF
@@ -57,7 +59,11 @@
            END-PERFORM
 
            IF WS-FOUND NOT = "Y"
-               DISPLAY "User ID not found."
+               display esc redx
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display "!      Account NOT Found     !"
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display esc resetx
            END-IF
 
            CLOSE UserFile
