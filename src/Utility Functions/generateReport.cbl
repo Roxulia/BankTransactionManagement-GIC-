@@ -204,7 +204,7 @@
                    "==============================================="
            display esc resetx
            CLOSE TrxFile
-
+           close TrxChrono
            DISPLAY esc redx
            display "Press any key to exit : "
            accept anykey

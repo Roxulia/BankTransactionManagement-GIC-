@@ -101,9 +101,9 @@
        withdraw_process.
            DISPLAY "Enter Withdrawal Amount:"
            ACCEPT WS-AMOUNT
-           DISPLAY c-Balance
+           *>DISPLAY c-Balance
            move c-Balance to TEMP-BALANCE
-           DISPLAY TEMP-BALANCE
+           *>DISPLAY TEMP-BALANCE
            compute TEMP-BALANCE = TEMP-BALANCE - WS-AMOUNT
            if TEMP-BALANCE < minaccountbalance
                    DISPLAY esc redx

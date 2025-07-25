@@ -176,7 +176,7 @@
                        WHEN EQUAL 1
                          MOVE 'Manager' TO WS-ARole
                        WHEN EQUAL 2
-                         MOVE 'Admin' TO WS-ARole
+                         MOVE 'Staff' TO WS-ARole
                        WHEN OTHER
                          MOVE 'Unknown' TO WS-ARole
                      END-EVALUATE
