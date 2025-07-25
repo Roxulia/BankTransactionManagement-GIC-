@@ -141,34 +141,33 @@
                    CALL '../../Utility Functions/bin/userPassVal'
                        using by REFERENCE newpsw STatuscode
                    perform until statusCode equal "00"
+                   display color-pink
+                   display "+++++++++++++++++++++++++++++++++++++++++++"
                    evaluate statusCode
                    WHEN "01"
-                       DISPLAY "Error: Username cannot be empty"
+                       DISPLAY "+ Error: Username cannot be empty +"
                    WHEN "02"
-                       DISPLAY "Error: Password cannot be empty"
+                       DISPLAY "+ Error: Password cannot be empty +"
                    WHEN "03"
-                       DISPLAY "Error: Invalid length or format"
+                       DISPLAY "+ Error: Invalid length or format +"
                    WHEN "04"
-                       DISPLAY "Error: Password must contain at least "
-                        WITH NO ADVANCING
-                       DISPLAY "one uppercase letter"
+                       DISPLAY "+ Error: Password must contain at least"
+                               " one uppercase letter +"
                    WHEN "05"
-                       DISPLAY "Error: Password must contain at least "
-                        WITH NO ADVANCING
-                       DISPLAY "one lowercase letter"
+                       DISPLAY "+ Error: Password must contain at least"
+                               " one lowercase letter +"
                    WHEN "06"
-                       DISPLAY "Error: Password must contain at least "
-                        WITH NO ADVANCING
-                       DISPLAY "one number"
+                       DISPLAY "+ Error: Password must contain at least"
+                               " one number +"
                    WHEN "07"
-                       DISPLAY "Error: Password must contain at least "
-                        WITH NO ADVANCING
-                       DISPLAY "one special character"
+                       DISPLAY "+ Error: Password must contain at least"
+                               " one special character +"
                    WHEN "08"
-                       DISPLAY "Error: Password must be at least 9"
-                       WITH NO ADVANCING
-                       DISPLAY "characters long"
+                       DISPLAY "+ Error: Password must be at least 9"
+                               " characters long +"
                    END-EVALUATE
+                   display "+++++++++++++++++++++++++++++++++++++++++++"
+                   display esc resetx
                    DISPLAY "Enter new Password: "
                    ACCEPT NewPsw
                    if newpsw = "EXIT" or newpsw = "exit"

@@ -119,7 +119,11 @@
            OPEN INPUT AdminAccounts
 
            IF WS-FS NOT = "00"
-               DISPLAY "ERROR: Unable to OPEN AdminAccounts," WS-FS
+               display esc redx
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               DISPLAY "! ERROR: Unable to OPEN AdminAccounts," WS-FS"!"
+               DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               DISPLAY esc resetx
                STOP RUN
            END-IF
            move 'N' to ws-eof

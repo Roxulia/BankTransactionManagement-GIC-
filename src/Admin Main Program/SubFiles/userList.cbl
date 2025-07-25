@@ -133,7 +133,11 @@
            OPEN INPUT UserAccounts
            move 'N' to ws-eof
            IF WS-FS NOT = "00"
-               DISPLAY "ERROR: Unable to OPEN UserAccounts," WS-FS
+               display esc redx
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               DISPLAY "! ERROR: Unable to OPEN UserAccounts," WS-FS" !"
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display esc resetx
                STOP RUN
            END-IF
 

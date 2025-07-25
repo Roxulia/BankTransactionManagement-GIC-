@@ -109,7 +109,11 @@
            using by REFERENCE AName , statusCode
 
            perform until statusCode equal "00"
-               DISPLAY esc redx "Invalid Name" esc resetx
+               DISPLAY esc redx
+               display "!!!!!!!!!!!!!!!!"
+               DISPLAY "! Invalid Name !"
+               display "!!!!!!!!!!!!!!!!"
+               DISPLAY esc resetx
                DISPLAY "=  Enter Full Name (max 20 chars):"
                ACCEPT AName
                call '../../Utility Functions/bin/userNameVal'
@@ -157,7 +161,11 @@
            USING BY REFERENCE PlainPassword
                                               EncryptedPassword
            IF RETURN-CODE NOT = 0
-               DISPLAY "Error encrypting password. Aborting."
+               display esc redx
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               DISPLAY "! Error encrypting password. Aborting !"
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display esc resetx
                MOVE 4 TO WS-ReturnCode
                GO TO End-Program
            END-IF
@@ -173,16 +181,15 @@
            OPEN I-O AdminFile
            WRITE AdminRecord
                INVALID KEY
-                   DISPLAY "======================================="
-                   DISPLAY "Error writing to file (Status=" WS-FS ")"
-                   DISPLAY "======================================="
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! Error writing to file (Status=" WS-FS ")!"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                    MOVE 2 TO WS-ReturnCode
                NOT INVALID KEY
-                   DISPLAY "======================================="
-                   DISPLAY ESC GREENX "Admin account created"
-                       WITH NO ADVANCING
-                   DISPLAY "successfully."
-                   DISPLAY "======================================="
+                   DISPLAY ESC GREENX
+                   DISPLAY "**************************************"
+                   DISPLAY "* Admin account created successfully *"
+                   DISPLAY "**************************************"
                    MOVE 0 TO WS-ReturnCode
                    display esc RESETX
            END-WRITE

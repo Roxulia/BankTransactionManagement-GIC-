@@ -118,7 +118,11 @@
                    using by REFERENCE newName , statusCode
 
                    perform until statusCode equal "00"
-                       DISPLAY esc redx "Invalid Name" esc resetx
+                       DISPLAY esc redx
+                       display "!!!!!!!!!!!!!!!!"
+                       DISPLAY "! Invalid Name !"
+                       display "!!!!!!!!!!!!!!!!"
+                       DISPLAY esc resetx
                        DISPLAY "=  Enter Full Name (max 20 chars):"
                        ACCEPT newName
                        call '../../Utility Functions/bin/userNameVal'
@@ -134,34 +138,34 @@
                    CALL '../../Utility Functions/bin/userPassVal'
                        using by REFERENCE newpsw STatuscode
                    perform until statusCode equal "00"
+
+                   display color-pink
+                   DISPLAY "+++++++++++++++++++++++++++++++++++++++++++"
                    evaluate statusCode
                    WHEN "01"
-                       DISPLAY "Error: Username cannot be empty"
+                       DISPLAY "+ Error: Username cannot be empty +"
                    WHEN "02"
-                       DISPLAY "Error: Password cannot be empty"
+                       DISPLAY "+ Error: Password cannot be empty +"
                    WHEN "03"
-                       DISPLAY "Error: Invalid length or format"
+                       DISPLAY "+ Error: Invalid length or format +"
                    WHEN "04"
-                       DISPLAY "Error: Password must contain at least "
-                        WITH NO ADVANCING
-                       DISPLAY "one uppercase letter"
+                       DISPLAY "+ Error: Password must contain at least"
+                               "one uppercase letter +"
                    WHEN "05"
-                       DISPLAY "Error: Password must contain at least "
-                        WITH NO ADVANCING
-                       DISPLAY "one lowercase letter"
+                       DISPLAY "+ Error: Password must contain at least"
+                               " one lowercase letter +"
                    WHEN "06"
-                       DISPLAY "Error: Password must contain at least "
-                        WITH NO ADVANCING
-                       DISPLAY "one number"
+                       DISPLAY "+ Error: Password must contain at least"
+                               " one number +"
                    WHEN "07"
-                       DISPLAY "Error: Password must contain at least "
-                        WITH NO ADVANCING
-                       DISPLAY "one special character"
+                       DISPLAY "+ Error: Password must contain at least"
+                               " one special character +"
                    WHEN "08"
-                       DISPLAY "Error: Password must be at least 9"
-                       WITH NO ADVANCING
-                       DISPLAY "characters long"
+                       DISPLAY "+ Error: Password must be at least 9 "
+                               "characters long +"
                    END-EVALUATE
+                   DISPLAY "+++++++++++++++++++++++++++++++++++++++++++"
+                   display esc resetx
                    DISPLAY "Enter new Password: "
                    ACCEPT NewPsw
 
@@ -192,7 +196,11 @@
                    CONTINUE
 
                WHEN OTHER
-                   DISPLAY "Invalid option, please choose 1 to 4 :"
+                   display esc redx
+                   display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! Invalid option, please choose 1 to 4 !"
+                   display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   display esc resetx
                    MOVE '99' TO LNK-Status
                    CONTINUE
            END-EVALUATE.
@@ -205,9 +213,11 @@
                    DISPLAY "Error updating record " WS-FileStatus
                    MOVE "99" TO LNK-Status
                NOT INVALID KEY
-                   DISPLAY "========================================"
-                   DISPLAY "=      Record updated successfully     ="
-                   DISPLAY "========================================"
+                   display esc greenx
+                   DISPLAY "****************************************"
+                   DISPLAY "*      Record updated successfully     *"
+                   DISPLAY "****************************************"
+                   display esc resetx
                    MOVE "00" TO LNK-Status
            END-REWRITE.
 

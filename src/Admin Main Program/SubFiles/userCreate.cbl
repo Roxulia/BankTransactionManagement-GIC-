@@ -66,10 +66,14 @@
            using by REFERENCE temp-nrc UserData statusCode
            if statusCode equal "00"
                DISPLAY esc redx
-               DISPLAY "User Already Existed"
+               display "!!!!!!!!!!!!!!!!!!!!!!!!"
+               DISPLAY "! User Already Existed !"
+               display "!!!!!!!!!!!!!!!!!!!!!!!!"
                DISPLAY esc greenx
-               DISPLAY "Name : " ws-UName
-               DISPLAY "Account Number : " ws-UAccNo
+               display "************************"
+               DISPLAY "* Name : " ws-UName
+               DISPLAY "* Account Number : " ws-UAccNo
+               DISPLAY "************************"
                DISPLAY esc resetx
                exit PROGRAM
            end-if
@@ -101,7 +105,11 @@
 
            OPEN INPUT UserFile
            IF WS-FS NOT = '00'
-              DISPLAY "Error opening UserAccounts.dat (Status="WS-FS")"
+              display esc redx
+              display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              DISPLAY "! Error opening UserAccounts.dat ("WS-FS") !"
+              display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              display esc redx
               MOVE 1 TO WS-ReturnCode
               GO TO End-Program
            END-IF
@@ -135,7 +143,11 @@
            CALL '../../Utility Functions/bin/userNRCVal'
                USING BY REFERENCE temp-nrc
            if temp-nrc EQUAL "EXIT"
-               DISPLAY esc redx"Going Back to Mainmenu" esc resetx
+               DISPLAY color-pink
+               display "++++++++++++++++++++++++++"
+               DISPLAY "+ Going Back to Mainmenu +"
+               display "++++++++++++++++++++++++++"
+               display esc resetx
                exit PROGRAM
            END-IF.
 
@@ -169,7 +181,11 @@
            CALL '../../Utility Functions/bin/phoneValidCheck'
            USING BY REFERENCE UPh
            if Uph EQUAL "EXIT"
-               DISPLAY esc redx "Going back to Mainmenu" esc resetx
+               DISPLAY color-pink
+               display "++++++++++++++++++++++++++"
+               display "+ Going back to Mainmenu +"
+               display "++++++++++++++++++++++++++"
+               display esc resetx
                exit PROGRAM
            END-IF
 
@@ -216,7 +232,11 @@
            CALL '../../Utility Functions/bin/encryption'
            USING BY REFERENCE PlainPassword,EncryptedPassword
            IF RETURN-CODE NOT = 0
-               DISPLAY "Error encrypting password. Aborting."
+               display esc redx
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               DISPLAY "! Error encrypting password. Aborting !"
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display esc resetx
                MOVE 4 TO WS-ReturnCode
                GO TO End-Program
            END-IF
@@ -243,11 +263,12 @@
                    DISPLAY "Error writing to file (Status=" WS-FS ")"
                    MOVE 2 TO WS-ReturnCode
                NOT INVALID KEY
-                   DISPLAY ESC GREENX "User account created"
-                       WITH NO ADVANCING
-                   DISPLAY "successfully."
-                   DISPLAY ESC RESETX
+                   DISPLAY ESC GREENX
+                   DISPLAY "**************************************"
+                   DISPLAY "* User account created successfully  *"
+                   DISPLAY "**************************************"
                    MOVE 0 TO WS-ReturnCode
+                   display esc RESETX
            END-WRITE
 
            CLOSE UserFile.

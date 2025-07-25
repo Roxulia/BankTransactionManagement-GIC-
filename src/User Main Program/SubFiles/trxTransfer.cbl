@@ -121,10 +121,18 @@
            using by REFERENCE WS-SenderID,SENDER-RECORD,statusCode
 
            if statusCode  EQUAL "99"
-               display esc redx"FILE ERROR" esc resetx
+               display esc redx
+               display "!!!!!!!!!!!!!!"
+               display "! FILE ERROR !"
+               display "!!!!!!!!!!!!!!"
+               display esc resetx
                exit PROGRAM
            else if statusCode EQUAL "96"
-               DISPLAY esc redx "SENDER NOT FOUND" esc resetx
+               display esc redx
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display "! Sender account not found !"
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display esc resetx
                exit PROGRAM
            end-if.
 
@@ -133,7 +141,11 @@
            DISPLAY "Enter Receiver's Account Number :".
            ACCEPT WS-ReceiverAcc
            if U-UAccNo = WS-ReceiverAcc
-               DISPLAY esc redx "CAN'T TRANSFER TO URSELF" esc resetx
+               display esc redx
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display "! Can't transfer to yourself !"
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display esc resetx
                exit PROGRAM
            end-if
            initialize statusCode
@@ -142,7 +154,11 @@
            using by REFERENCE WS-ReceiverAcc,RECEIVER-RECORD,statusCode
 
            if statusCode not EQUAL "00"
-               display esc redx "USER CAN'T BE FOUND" esc resetx
+               display esc redx
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display "!      Account NOT Found     !"
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display esc resetx
                exit PROGRAM
            end-if
            .
@@ -159,14 +175,21 @@
 
        validate_amount.
            if WS-Amount < 0
-               DISPLAY esc redx "Invalid Amount" esc resetx
+               display esc redx
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display "!        Invalid Amount      !"
+               display "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+               display esc resetx
                exit PROGRAM
            END-IF
            compute TEMP-BALANCE = u-Balance - WS-AMOUNT
 
            if TEMP-BALANCE < minaccountbalance
-               display esc redx"Ur Minimum Account Balance Reached"
-               DISPLAY esc resetx
+                   DISPLAY esc redx
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "! Minimum balance limit reached !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY esc resetx
                exit PROGRAM
            END-IF.
 
@@ -196,12 +219,18 @@
            DISPLAY "================================================="
            REWRITE USERDATA
                INVALID KEY
-                   DISPLAY ESC REDX "Updating user balance failed."
-                   DISPLAY ESC RESETX
+                   DISPLAY esc redx
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "!  Updating user balace failed  !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY esc resetx
                    CLOSE USERACCOUNTS
                    exit PROGRAM
            END-REWRITE
-           DISPLAY ESC GREENX "Balance updated for Acc : " uaccno
+           DISPLAY ESC GREENX
+           DISPLAY "************************************************"
+           DISPLAY "* Balance updated for Acc : " uaccno " *"
+           DISPLAY "************************************************"
            DISPLAY ESC RESETX
            move RECEIVER-RECORD to USERDATA
            close USERACCOUNTS
@@ -211,12 +240,18 @@
            DISPLAY "================================================="
            REWRITE USERDATA
                INVALID KEY
-                   DISPLAY ESC REDX "Updating user balance failed."
-                   DISPLAY ESC RESETX
+                   DISPLAY esc redx
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "!  Updating user balace failed  !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY esc resetx
                    CLOSE USERACCOUNTS
                    exit PROGRAM
            END-REWRITE
-           DISPLAY ESC GREENX "Balance updated for Acc : " uaccno
+           DISPLAY ESC GREENX
+           DISPLAY "************************************************"
+           DISPLAY "* Balance updated for Acc : " uaccno " *"
+           DISPLAY "************************************************"
            DISPLAY ESC RESETX
            CLOSE USERACCOUNTS.
 
@@ -230,8 +265,11 @@
            OPEN i-o Transactions
            WRITE TrxRecord
               INVALID KEY
-                   DISPLAY ESC REDX "Writing transaction failed."
-                   DISPLAY ESC RESETX
+                   DISPLAY esc redx
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY "!  Writing transactions failed  !"
+                   DISPLAY "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                   DISPLAY esc resetx
                    CLOSE Transactions
                    exit PROGRAM
            END-WRITE

@@ -9,11 +9,17 @@
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-           SELECT TrxFile ASSIGN TO '../../../data/Transactions.dat'
-               ORGANIZATION IS INDEXED
-               ACCESS MODE IS DYNAMIC
-               RECORD KEY IS TrxID
+           SELECT TrxFile ASSIGN TO 'TmpSeqTrx.dat'
+               ORGANIZATION IS SEQUENTIAL
+               ACCESS MODE    IS SEQUENTIAL
+               FILE STATUS    IS WS-FS.
+
+           SELECT ChronoFile ASSIGN TO '../../../data/TrxChrono.dat'
+               ORGANIZATION IS LINE SEQUENTIAL
                FILE STATUS IS WS-FS.
+
+           SELECT WORK ASSIGN TO 'WRK.DAT'.
+
            SELECT UserAccounts
                ASSIGN TO "../../../data/UserAccounts.DAT"
                ORGANIZATION IS INDEXED
@@ -24,17 +30,38 @@
                assign to "../../../data/NRC.dat"
                ORGANIZATION is line SEQUENTIAL
                file status is ws-fs.
+
        DATA DIVISION.
        FILE SECTION.
        FD TrxFile.
        01 TrxRecord.
            05  TrxID       PIC X(11).
-           05  SenderID    PIC 9(5).
-           05  ReceiverID  PIC 9(5).
+           05  SenderAcc    PIC 9(16).
+           05  ReceiverAcc  PIC 9(16).
            05  Description PIC X(30).
-           05  Amount      PIC 9(10)v99.
+           05  Amount      PIC s9(10)v99.
            05  TrxType     PIC 9.
            05  TimeStamp   PIC 9(14).
+
+       FD ChronoFile.
+       01 ChrRecord.
+           05  C-TrxID       PIC X(11).
+           05  C-SenderAcc    PIC 9(16).
+           05  C-ReceiverAcc  PIC 9(16).
+           05  C-Description PIC X(30).
+           05  C-Amount      PIC s9(10)v99.
+           05  C-TrxType     PIC 9.
+           05  C-TimeStamp   PIC 9(14).
+
+       SD  WORK.
+       01  WorkRecord.
+           05  W-TrxID        PIC X(11).
+           05  W-SenderAcc    PIC 9(16).
+           05  W-ReceiverAcc  PIC 9(16).
+           05  W-Description  PIC X(30).
+           05  W-Amount       PIC s9(10)v99.
+           05  W-TrxType      PIC 9.
+           05  W-TimeStamp    PIC 9(14).
 
        FD  UserAccounts.
        01  UserRecord.
@@ -67,57 +94,36 @@
        01  found pic x value 'n'.
        PROCEDURE DIVISION.
        MAIN-PROCEDURE.
-           *>open INPUT TrxFile
-           *>perform until eof = 'y'
-             *>  read TrxFile into TrxRecord
-             *>  at end
-             *>      move 'y' to eof
-             *>  not at end
-             *>      DISPLAY TrxRecord
-             *>  END-READ
-           *>END-PERFORM
-           *>close TrxFile
-           open INPUT UserAccounts
-           move 'n' to eof
+
+           SORT WORK
+               ON ASCENDING KEY TimeStamp
+               USING TrxFile GIVING ChronoFile
+
+           open INPUT TrxFile
+           DISPLAY ws-fs
            perform until eof = 'y'
-               read UserAccounts into UserRecord
+               read TrxFile into TrxRecord
                at end
                    move 'y' to eof
                not at end
-                   DISPLAY UserRecord
+                   DISPLAY TimeStamp
                END-READ
            END-PERFORM
-           close UserAccounts
-           move FUNCTION CURRENT-DATE(1:8) to curr-date
-           move FUNCTION CURRENT-DATE(9:6) to curr-time
-           DISPLAY txt-time
-           DISPLAY txt-date
-           DISPLAY curr-date
-           DISPLAY curr-Time
-           DISPLAY "enter City Code: "
-           accept ccode
-           DISPLAY "Enter City Name : "
-           accept cname
-           open INPUT nrcfile
+           close TrxFile
+
+           open INPUT ChronoFile
+           DISPLAY ws-fs
            move 'n' to eof
-           move 'n' to found
            perform until eof = 'y'
-               read nrcfile into nrclist
+               read ChronoFile into ChrRecord
                at end
                    move 'y' to eof
                not at end
-                   if ccode = city_code and cname = city_name
-                   move 'y' to found
-                   move 'y' to eof
-                   END-IF
+                   DISPLAY ChrRecord
                END-READ
            END-PERFORM
-           if found = 'y'
-               DISPLAY city_code " " city_name
-           ELSE
-               DISPLAY "Not Found"
-           END-IF
-           close nrcfile
+           close ChronoFile
+
 
             STOP RUN.
        END PROGRAM YOUR-PROGRAM-NAME.

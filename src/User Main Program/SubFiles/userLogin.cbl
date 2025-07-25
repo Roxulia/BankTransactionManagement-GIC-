@@ -35,7 +35,7 @@
            DISPLAY "=              Login Form             ="
            DISPLAY "======================================="
            display "Enter Login Name : " ACCEPT loginname
-           display "Enter Ur Password : " ACCEPT password.
+           display "Enter Ur Password : " ACCEPT password. *>WITH NO-ECHO.
 
        process_login.
            call '../../Utility Functions/bin/encryption'
