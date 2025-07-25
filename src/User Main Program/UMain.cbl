@@ -1,6 +1,5 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. UMain.
-       AUTHOR. YOUR-NAME.
 
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
@@ -41,7 +40,9 @@
        MAIN-MENU.
            DISPLAY SPACE
            display esc greenx
-           DISPLAY "****************  Welcome **********************"
+           DISPLAY "****************  Welcome " color-blue
+                   FUNCTION TRIM(username) esc greenx
+                   "**********************"
            DISPLAY SPACE
 
            call '../SubFiles/bin/balanceInfo' using UID
@@ -170,7 +171,6 @@
                    CALL '../SubFiles/bin/trxWithdraw' USING
                    by REFERENCE UID
                WHEN "2"
-  *****            CALL 'TRXTRANSFER' USING UID
                    call '../SubFiles/bin/trxTransfer'
                    using by REFERENCE uid STATUSCODE
                WHEN OTHER

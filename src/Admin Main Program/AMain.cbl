@@ -46,7 +46,8 @@
 
        home-page.
            DISPLAY color-blue
-           DISPLAY "=======Welcome " FUNCTION TRIM(adminName) "======="
+           DISPLAY "=======Welcome " ESC GREENX
+                   FUNCTION TRIM(adminName) COLOR-BLUE"======="
            DISPLAY SPACE
            if adminRole = 1 THEN
                DISPLAY "=======Choose Options======="
