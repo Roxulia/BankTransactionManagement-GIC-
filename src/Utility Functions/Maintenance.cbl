@@ -34,7 +34,7 @@
        01  currentdate pic 9(6).
        01  currenttime pic 9(6).
        01  current-yr pic 9(2).
-       01  interest pic v999 value 0.002.
+       01  interest pic v999 value 0.005.
        01  temp-balance pic 9(10)v99.
        01  record_count pic 9(11).
        01  WS-CURRENT-DATE-FIELDS.

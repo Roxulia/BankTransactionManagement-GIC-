@@ -58,7 +58,7 @@
                *>DISPLAY "reading"
                READ testfile INTO userdata
                    AT END
-                       DISPLAY "EOF"
+                       *>DISPLAY "EOF"
                        MOVE 'Y' TO EOF-Flag
                    NOT AT END
                        *>DISPLAY unrc InputNRC "a"

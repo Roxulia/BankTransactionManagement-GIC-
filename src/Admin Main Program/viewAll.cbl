@@ -99,6 +99,18 @@
                ON ASCENDING KEY TimeStamp
                USING TrxFile GIVING ChronoFile
 
+           open INPUT UserAccounts
+           DISPLAY ws-fs
+           perform until eof = 'y'
+               read UserAccounts into userRecord
+               at end
+                   move 'y' to eof
+               not at end
+                   DISPLAY UserRecord
+               END-READ
+           END-PERFORM
+           close TrxFile
+
            open INPUT TrxFile
            DISPLAY ws-fs
            perform until eof = 'y'
