@@ -99,7 +99,9 @@
            DISPLAY "=  Which field to update?"
            DISPLAY "=  1. Name"
            DISPLAY "=  2. Password"
+
            DISPLAY "=  3. Role"
+
            DISPLAY "=  4. Exit"
            DISPLAY "========================================"
            DISPLAY "=  Enter option code: "
@@ -187,10 +189,11 @@
                    MOVE EncryptedPassword TO AEncPsw
 
                WHEN 3
-                   DISPLAY "Enter new Role(1 for Manager, 2 for staff):"
+
+                   DISPLAY "Enter new Role(1 for Manager,"
+                   " 2 for staff):"
                    ACCEPT NewRole
                    MOVE NewRole TO role
-
                WHEN 4
                    CLOSE AdminFile
                    CONTINUE
@@ -219,6 +222,7 @@
                    DISPLAY "****************************************"
                    display esc resetx
                    MOVE "00" TO LNK-Status
-           END-REWRITE.
+           END-REWRITE
+           CLOSE AdminFile.
 
        *>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

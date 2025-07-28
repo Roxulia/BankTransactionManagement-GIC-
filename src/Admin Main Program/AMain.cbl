@@ -360,7 +360,8 @@
                            perform home-page
                        else
                            call '../SubFiles/bin/adminUpdate'
-                               using adminId
+                               using adminId statusCode
+                           INITIALIZE statusCode
                            perform home-page
                        END-IF
                    when equal 6
